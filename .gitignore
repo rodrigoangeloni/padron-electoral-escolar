@@ -20,6 +20,7 @@ wheels/
 .installed.cfg
 *.egg
 .venv
+venv/
 
 # Archivos de SQLite
 *.db
@@ -27,6 +28,11 @@ wheels/
 
 # Archivos de configuración personales
 assets/config/.admin_password
+
+# Imágenes de candidatos (ignorar todo en la carpeta, excepto el default)
+assets/images/*
+!assets/images/default_candidate.jpg
+assets/images/personajes/
 
 # Archivos temporales del sistema
 .DS_Store

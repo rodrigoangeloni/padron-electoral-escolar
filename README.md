@@ -2,6 +2,15 @@
 
 Aplicación de escritorio para gestionar elecciones estudiantiles, permitiendo a los estudiantes votar por sus representantes para los cargos de Directora, Vice Directora y Coordinadora.
 
+## Tecnologías Utilizadas
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Tkinter](https://img.shields.io/badge/Tkinter-2C5E8B?style=for-the-badge&logo=python&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
+![Matplotlib](https://img.shields.io/badge/Matplotlib-11557c?style=for-the-badge&logo=matplotlib&logoColor=white)
+
+---
+
 ## Tabla de Contenidos
 1. [Descripción General](#descripción-general)
 2. [Arquitectura del Proyecto](#arquitectura-del-proyecto)
