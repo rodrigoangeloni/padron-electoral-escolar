@@ -2,72 +2,90 @@ import tkinter as tk
 from tkinter import messagebox, ttk, filedialog
 import sys
 import os
+import shutil
 from PIL import Image, ImageTk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-# Añadir el directorio raíz al path para importar módulos
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from database import DatabaseManager
 from utils.auth import AuthManager
+import config
 
-class AdminApp:
-    def __init__(self):
-        self.root = tk.Tk()
-        self.db_manager = DatabaseManager()
+class AdminApp(tk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+        self.db_manager = controller.db_manager
         self.auth_manager = AuthManager()
-        self.check_admin_password()
-        self.setup_login_ui()
-    
-    def check_admin_password(self):
-        if not os.path.exists('assets/config/.admin_password'):
-            self.auth_manager.set_admin_password("admin123")
-    
-    def setup_login_ui(self):
-        self.root.title("Administración - Sistema de Votación Escolar")
-        self.root.geometry("400x300")
-        self.root.resizable(False, False)
-        
-        title_label = tk.Label(self.root, text="Acceso Administrativo", font=("Arial", 16, "bold"))
+
+        if not os.path.exists(config.ADMIN_PASSWORD_FILE):
+            self.auth_manager.set_admin_password(config.DEFAULT_ADMIN_PASSWORD)
+
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+        self.frames = {}
+        self._create_frames()
+        self.show_login_frame()
+
+    def _create_frames(self):
+        login_frame = tk.Frame(self)
+        admin_panel_frame = tk.Frame(self)
+
+        self.frames["LoginFrame"] = login_frame
+        self.frames["AdminPanel"] = admin_panel_frame
+
+        login_frame.grid(row=0, column=0, sticky="nsew")
+        admin_panel_frame.grid(row=0, column=0, sticky="nsew")
+
+        self.setup_login_ui(login_frame)
+        self.setup_admin_ui(admin_panel_frame)
+
+    def show_login_frame(self):
+        self.frames["LoginFrame"].tkraise()
+        self.controller.geometry(config.MAIN_WINDOW_GEOMETRY)
+        self.controller.center_window()
+
+    def show_admin_panel_frame(self):
+        self.frames["AdminPanel"].tkraise()
+        self.controller.geometry(config.ADMIN_WINDOW_GEOMETRY)
+        self.controller.center_window()
+
+    def setup_login_ui(self, parent_frame):
+        title_label = tk.Label(parent_frame, text="Acceso Administrativo", font=("Arial", 16, "bold"))
         title_label.pack(pady=30)
         
-        password_frame = tk.Frame(self.root)
+        password_frame = tk.Frame(parent_frame)
         password_frame.pack(pady=20)
         
         password_label = tk.Label(password_frame, text="Contraseña:", font=("Arial", 12))
         password_label.pack()
         
-        self.password_entry = tk.Entry(password_frame, show="*", font=("Arial", 12), width=20)
+        self.password_entry = tk.Entry(parent_frame, show="*", font=("Arial", 12), width=20)
         self.password_entry.pack(pady=5)
         self.password_entry.bind('<Return>', lambda event: self.login())
         
-        login_button = tk.Button(self.root, text="Iniciar Sesión", font=("Arial", 12), bg="#2196F3", fg="white", command=self.login, width=15, height=1)
+        login_button = tk.Button(parent_frame, text="Iniciar Sesión", font=("Arial", 12), bg=config.COLOR_PRIMARY, fg=config.COLOR_WHITE, command=self.login, width=15, height=1)
         login_button.pack(pady=20)
-        
-        exit_button = tk.Button(self.root, text="Salir", font=("Arial", 12), bg="#f44336", fg="white", command=self.root.quit, width=15, height=1)
-        exit_button.pack()
-    
+
+        back_button = tk.Button(parent_frame, text="Volver al Menú", font=("Arial", 12), bg=config.COLOR_WARNING, fg=config.COLOR_WHITE, command=lambda: self.controller.show_frame("MainMenu"), width=15, height=1)
+        back_button.pack()
+
     def login(self):
         password = self.password_entry.get()
         if self.auth_manager.verify_admin_password(password):
-            self.root.destroy()
-            self.setup_admin_ui()
+            self.show_admin_panel_frame()
         else:
             messagebox.showerror("Error", "Contraseña incorrecta")
             self.password_entry.delete(0, tk.END)
     
-    def setup_admin_ui(self):
-        self.root = tk.Tk()
-        self.root.title("Panel de Administración - Sistema de Votación Escolar")
-        self.root.geometry("1200x700")
-        self.root.resizable(True, True)
-        
-        # Agregar un botón de cierre para regresar al menú principal
-        close_button = tk.Button(self.root, text="Cerrar Sesión", font=("Arial", 12), bg="#f44336", fg="white", command=self.close_admin_session)
+    def setup_admin_ui(self, parent_frame):
+        close_button = tk.Button(parent_frame, text="Cerrar Sesión", font=("Arial", 12), bg=config.COLOR_DANGER, fg=config.COLOR_WHITE, command=self.logout)
         close_button.pack(pady=5, padx=5, anchor="ne")
         
-        self.notebook = ttk.Notebook(self.root)
+        self.notebook = ttk.Notebook(parent_frame)
         self.notebook.pack(fill='both', expand=True, padx=10, pady=10)
         
         self.candidates_frame = tk.Frame(self.notebook)
@@ -86,6 +104,10 @@ class AdminApp:
         self.notebook.add(self.config_frame, text="Configuración")
         self.setup_config_tab()
 
+    def logout(self):
+        self.password_entry.delete(0, tk.END)
+        self.show_login_frame()
+
     def setup_candidates_tab(self):
         add_frame = tk.LabelFrame(self.candidates_frame, text="Agregar Candidato", padx=10, pady=10)
         add_frame.pack(fill="x", padx=10, pady=10)
@@ -99,37 +121,110 @@ class AdminApp:
         self.apellido_entry.grid(row=0, column=3, padx=5, pady=5)
         
         tk.Label(add_frame, text="Cargo:").grid(row=1, column=0, sticky="w", padx=5, pady=5)
-        self.cargo_var = tk.StringVar(value="DIRECTORA")
-        cargo_combo = ttk.Combobox(add_frame, textvariable=self.cargo_var, values=["DIRECTORA", "VICEDIRECTORA", "COORDINADORA"], state="readonly")
+        self.cargo_var = tk.StringVar(value=config.CARGOS[0])
+        cargo_combo = ttk.Combobox(add_frame, textvariable=self.cargo_var, values=config.CARGOS, state="readonly")
         cargo_combo.grid(row=1, column=1, padx=5, pady=5)
         
         tk.Label(add_frame, text="Grado:").grid(row=1, column=2, sticky="w", padx=5, pady=5)
-        self.grado_var = tk.StringVar(value="Pre Escolar")
-        grado_combo = ttk.Combobox(add_frame, textvariable=self.grado_var, values=["Pre Escolar", "1er Grado", "2do Grado", "3er Grado", "4to Grado", "5to Grado", "6to Grado", "7mo Grado", "8vo Grado", "9no Grado", "1er Curso", "2do Curso", "3er Curso"], state="readonly")
+        self.grado_var = tk.StringVar(value=config.GRADOS_CANDIDATOS[0])
+        grado_combo = ttk.Combobox(add_frame, textvariable=self.grado_var, values=config.GRADOS_CANDIDATOS, state="readonly")
         grado_combo.grid(row=1, column=3, padx=5, pady=5)
         
-        add_button = tk.Button(add_frame, text="Agregar Candidato", command=self.add_candidate, bg="#4CAF50", fg="white")
+        add_button = tk.Button(add_frame, text="Agregar Candidato", command=self.add_candidate, bg=config.COLOR_SUCCESS, fg=config.COLOR_WHITE)
         add_button.grid(row=2, column=0, columnspan=4, pady=10)
         
-        list_frame = tk.LabelFrame(self.candidates_frame, text="Candidatos Registrados", padx=10, pady=10)
-        list_frame.pack(fill="both", expand=True, padx=10, pady=10)
+        list_container = tk.Frame(self.candidates_frame)
+        list_container.pack(fill="both", expand=True, padx=10, pady=10)
+
+        list_frame = tk.LabelFrame(list_container, text="Candidatos Registrados", padx=10, pady=10)
+        list_frame.pack(side="left", fill="both", expand=True)
         
-        columns = ("ID", "Nombre", "Apellido", "Cargo", "Grado")
+        columns = ("ID", "Nombre", "Apellido", "Cargo", "Grado", "Foto")
         self.candidates_tree = ttk.Treeview(list_frame, columns=columns, show="headings", height=15)
         
         for col in columns:
             self.candidates_tree.heading(col, text=col)
-            self.candidates_tree.column(col, width=150)
+            self.candidates_tree.column(col, width=120)
+        self.candidates_tree.column("Foto", width=50, anchor="center")
+        
+        self.candidates_tree.bind('<<TreeviewSelect>>', self.on_candidate_select)
         
         scrollbar = ttk.Scrollbar(list_frame, orient="vertical", command=self.candidates_tree.yview)
         self.candidates_tree.configure(yscrollcommand=scrollbar.set)
         self.candidates_tree.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
+
+        preview_frame = tk.LabelFrame(list_container, text="Vista Previa", padx=10, pady=10)
+        preview_frame.pack(side="right", fill="y", padx=(10,0))
+        self.photo_preview = tk.Label(preview_frame, width=20, height=10, relief="groove")
+        self.photo_preview.pack()
+
+        buttons_frame_candidates = tk.Frame(list_frame)
+        buttons_frame_candidates.pack(pady=10)
         
-        delete_button = tk.Button(list_frame, text="Eliminar Candidato Seleccionado", command=self.delete_candidate, bg="#f44336", fg="white")
-        delete_button.pack(pady=10)
+        self.update_photo_button = tk.Button(buttons_frame_candidates, text="Actualizar Foto", command=self.update_candidate_photo, state="disabled")
+        self.update_photo_button.pack(side="left", padx=5)
+
+        delete_button = tk.Button(buttons_frame_candidates, text="Eliminar Candidato", command=self.delete_candidate, bg=config.COLOR_DANGER, fg=config.COLOR_WHITE)
+        delete_button.pack(side="left", padx=5)
         
         self.refresh_candidates_list()
+
+    def on_candidate_select(self, event):
+        selected_item = self.candidates_tree.selection()
+        if selected_item:
+            self.update_photo_button.config(state="normal")
+            # Obtener la ruta de la foto de la DB, no del treeview
+            candidato_id = self.candidates_tree.item(selected_item)['values'][0]
+            # Esto es ineficiente, pero para la UI es aceptable
+            candidatos = self.db_manager.get_candidatos() 
+            photo_path = config.DEFAULT_CANDIDATE_IMAGE
+            for c in candidatos:
+                if c[0] == candidato_id:
+                    photo_path = c[5]
+                    break
+            
+            try:
+                img = Image.open(photo_path).resize((150, 150), Image.Resampling.LANCZOS)
+                photo = ImageTk.PhotoImage(img)
+                self.photo_preview.config(image=photo, width=150, height=150)
+                self.photo_preview.image = photo
+            except:
+                self.photo_preview.config(image='', text="Sin imagen")
+        else:
+            self.update_photo_button.config(state="disabled")
+            self.photo_preview.config(image='', text="")
+
+
+    def update_candidate_photo(self):
+        selected_item = self.candidates_tree.selection()
+        if not selected_item:
+            messagebox.showwarning("Advertencia", "Por favor, seleccione un candidato para actualizar su foto.")
+            return
+
+        candidato_id = self.candidates_tree.item(selected_item)['values'][0]
+        
+        file_path = filedialog.askopenfilename(
+            title="Seleccionar foto del candidato",
+            filetypes=[("Archivos de Imagen", "*.jpg *.jpeg *.png"), ("Todos los archivos", "*.*")]
+        )
+        if not file_path:
+            return
+
+        try:
+            file_extension = os.path.splitext(file_path)[1]
+            new_filename = f"candidate_{candidato_id}{file_extension}"
+            destination_path = os.path.join(config.IMG_DIR, new_filename)
+
+            shutil.copy(file_path, destination_path)
+
+            self.db_manager.update_candidate_photo(candidato_id, destination_path)
+            
+            self.refresh_candidates_list()
+            messagebox.showinfo("Éxito", "Foto del candidato actualizada correctamente.")
+
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudo actualizar la foto: {e}")
 
     def setup_voters_tab(self):
         add_frame = tk.LabelFrame(self.voters_frame, text="Agregar Votante", padx=10, pady=10)
@@ -148,11 +243,11 @@ class AdminApp:
         self.apellido_voter_entry.grid(row=1, column=1, padx=5, pady=5)
         
         tk.Label(add_frame, text="Grado/Curso:").grid(row=1, column=2, sticky="w", padx=5, pady=5)
-        self.grado_curso_var = tk.StringVar(value="Pre Escolar")
-        grado_curso_combo = ttk.Combobox(add_frame, textvariable=self.grado_curso_var, values=["Pre Escolar", "1er Grado", "2do Grado", "3er Grado", "4to Grado", "5to Grado", "6to Grado", "7mo Grado", "8vo Grado", "9no Grado", "1er Curso", "2do Curso", "3er Curso"], state="readonly", width=17)
+        self.grado_curso_var = tk.StringVar(value=config.GRADOS_VOTANTES[0])
+        grado_curso_combo = ttk.Combobox(add_frame, textvariable=self.grado_curso_var, values=config.GRADOS_VOTANTES, state="readonly", width=17)
         grado_curso_combo.grid(row=1, column=3, padx=5, pady=5)
         
-        add_voter_button = tk.Button(add_frame, text="Agregar Votante", command=self.add_voter, bg="#4CAF50", fg="white")
+        add_voter_button = tk.Button(add_frame, text="Agregar Votante", command=self.add_voter, bg=config.COLOR_SUCCESS, fg=config.COLOR_WHITE)
         add_voter_button.grid(row=2, column=0, columnspan=4, pady=10)
         
         import_frame = tk.LabelFrame(self.voters_frame, text="Importar Votantes desde Archivo", padx=10, pady=10)
@@ -161,8 +256,8 @@ class AdminApp:
         import_desc = tk.Label(import_frame, text="Importar votantes desde archivo CSV (CI,Nombre,Apellido,Grado/Curso)")
         import_desc.pack(pady=5)
         
-        import_button = tk.Button(import_frame, text="Seleccionar Archivo CSV", command=self.import_voters_from_file, bg="#FF9800", fg="white")
-        import_button.pack(pady=5)
+        self.import_button = tk.Button(import_frame, text="Seleccionar Archivo CSV", command=self.import_voters_from_file, bg=config.COLOR_WARNING, fg=config.COLOR_WHITE)
+        self.import_button.pack(pady=5)
         
         list_frame = tk.LabelFrame(self.voters_frame, text="Votantes Registrados", padx=10, pady=10)
         list_frame.pack(fill="both", expand=True, padx=10, pady=10)
@@ -184,36 +279,31 @@ class AdminApp:
         buttons_frame = tk.Frame(list_frame)
         buttons_frame.pack(pady=10)
         
-        delete_voter_button = tk.Button(buttons_frame, text="Eliminar Votante Seleccionado", command=self.delete_voter, bg="#f44336", fg="white")
+        delete_voter_button = tk.Button(buttons_frame, text="Eliminar Votante Seleccionado", command=self.delete_voter, bg=config.COLOR_DANGER, fg=config.COLOR_WHITE)
         delete_voter_button.pack(side="left", padx=5)
         
-        refresh_voters_button = tk.Button(buttons_frame, text="Actualizar Lista", command=self.refresh_voters_list, bg="#2196F3", fg="white")
+        refresh_voters_button = tk.Button(buttons_frame, text="Actualizar Lista", command=self.refresh_voters_list, bg=config.COLOR_PRIMARY, fg=config.COLOR_WHITE)
         refresh_voters_button.pack(side="left", padx=5)
         
         self.refresh_voters_list()
 
     def setup_results_tab(self):
-        # Controles en la parte superior
         controls_frame = tk.Frame(self.results_frame)
         controls_frame.pack(fill="x", padx=10, pady=10)
-        refresh_button = tk.Button(controls_frame, text="Actualizar Resultados", command=self.refresh_results, bg="#2196F3", fg="white")
+        refresh_button = tk.Button(controls_frame, text="Actualizar Resultados", command=self.refresh_results, bg=config.COLOR_PRIMARY, fg=config.COLOR_WHITE)
         refresh_button.pack(side="left", padx=5)
-        reset_button = tk.Button(controls_frame, text="Reiniciar Votación", command=self.reset_votes, bg="#FF9800", fg="white")
+        reset_button = tk.Button(controls_frame, text="Reiniciar Votación", command=self.reset_votes, bg=config.COLOR_WARNING, fg=config.COLOR_WHITE)
         reset_button.pack(side="left", padx=5)
 
-        # Notebook para sub-pestañas (Resumen y Gráficos)
         results_notebook = ttk.Notebook(self.results_frame)
         results_notebook.pack(fill="both", expand=True, padx=10, pady=10)
 
-        # Sub-pestaña de Resumen
         summary_frame = tk.Frame(results_notebook)
         results_notebook.add(summary_frame, text="Resumen")
         self.setup_summary_tab(summary_frame)
 
-        # Sub-pestaña de Gráficos
         self.graphs_frame = tk.Frame(results_notebook)
         results_notebook.add(self.graphs_frame, text="Gráficos")
-        # El contenido de los gráficos se genera en refresh_results
 
         self.refresh_results()
 
@@ -223,7 +313,7 @@ class AdminApp:
         winners_frame.grid_columnconfigure((0, 1, 2), weight=1)
 
         self.winners_widgets = {}
-        for i, cargo in enumerate(["DIRECTORA", "VICEDIRECTORA", "COORDINADORA"]):
+        for i, cargo in enumerate(config.CARGOS):
             cargo_frame = tk.Frame(winners_frame)
             cargo_frame.grid(row=0, column=i, padx=10, pady=10, sticky="n")
             tk.Label(cargo_frame, text=cargo, font=("Arial", 16, "bold"), fg="#2980b9").pack(pady=(0,10))
@@ -260,10 +350,10 @@ class AdminApp:
         button_frame = tk.Frame(status_frame)
         button_frame.pack(pady=10)
         
-        activate_button = tk.Button(button_frame, text="Activar Votación", command=lambda: self.set_votation_status('activa'), bg="#4CAF50", fg="white", width=15)
+        activate_button = tk.Button(button_frame, text="Activar Votación", command=lambda: self.set_votation_status(config.VOTACION_ACTIVA), bg=config.COLOR_SUCCESS, fg=config.COLOR_WHITE, width=15)
         activate_button.pack(side="left", padx=5)
         
-        deactivate_button = tk.Button(button_frame, text="Cerrar Votación", command=lambda: self.set_votation_status('cerrada'), bg="#f44336", fg="white", width=15)
+        deactivate_button = tk.Button(button_frame, text="Cerrar Votación", command=lambda: self.set_votation_status(config.VOTACION_CERRADA), bg=config.COLOR_DANGER, fg=config.COLOR_WHITE, width=15)
         deactivate_button.pack(side="left", padx=5)
         
         password_frame = tk.LabelFrame(self.config_frame, text="Cambiar Contraseña de Administrador", padx=10, pady=10)
@@ -281,7 +371,7 @@ class AdminApp:
         self.confirm_password_entry = tk.Entry(password_frame, show="*", width=20)
         self.confirm_password_entry.grid(row=2, column=1, padx=5, pady=5)
         
-        change_password_button = tk.Button(password_frame, text="Cambiar Contraseña", command=self.change_password, bg="#FF9800", fg="white")
+        change_password_button = tk.Button(password_frame, text="Cambiar Contraseña", command=self.change_password, bg=config.COLOR_WARNING, fg=config.COLOR_WHITE)
         change_password_button.grid(row=3, column=0, columnspan=2, pady=10)
         
         self.update_status_display()
@@ -348,11 +438,17 @@ class AdminApp:
         file_path = filedialog.askopenfilename(title="Seleccionar archivo CSV", filetypes=[("Archivos CSV", "*.csv"), ("Todos los archivos", "*.*")])
         if not file_path:
             return
+
+        self.controller.config(cursor="watch")
+        self.import_button.config(state="disabled", text="Importando...")
+        self.controller.update_idletasks()
+
         try:
             import csv
             votantes_list = []
             with open(file_path, 'r', encoding='utf-8') as file:
                 reader = csv.reader(file)
+                next(reader)  # Omitir el encabezado
                 for row in reader:
                     if len(row) >= 4:
                         ci, nombre, apellido, grado_curso = row[0].strip(), row[1].strip(), row[2].strip(), row[3].strip()
@@ -368,13 +464,17 @@ class AdminApp:
                 messagebox.showwarning("Advertencia", "No se encontraron votantes válidos en el archivo")
         except Exception as e:
             messagebox.showerror("Error", f"Error al leer el archivo: {str(e)}")
+        finally:
+            self.controller.config(cursor="")
+            self.import_button.config(state="normal", text="Seleccionar Archivo CSV")
     
     def refresh_candidates_list(self):
         for item in self.candidates_tree.get_children():
             self.candidates_tree.delete(item)
         candidatos = self.db_manager.get_candidatos()
         for candidato in candidatos:
-            values = (candidato[0], candidato[1], candidato[2], candidato[3], candidato[4])
+            has_photo = "Sí" if candidato[5] and candidato[5] != config.DEFAULT_CANDIDATE_IMAGE else "No"
+            values = (candidato[0], candidato[1], candidato[2], candidato[3], candidato[4], has_photo)
             self.candidates_tree.insert('', 'end', values=values)
     
     def refresh_voters_list(self):
@@ -387,20 +487,16 @@ class AdminApp:
             self.voters_tree.insert('', 'end', values=values)
     
     def refresh_results(self):
-        # 1. Limpiar datos antiguos
         for item in self.results_tree.get_children():
             self.results_tree.delete(item)
         for widget in self.graphs_frame.winfo_children():
             widget.destroy()
 
-        # 2. Obtener nuevos resultados
         resultados, _ = self.db_manager.get_resultados()
         
-        # 3. Llenar la tabla de detalles
         for resultado in resultados:
             self.results_tree.insert('', 'end', values=resultado)
 
-        # 4. Encontrar y mostrar ganadores
         winners = {}
         for row in resultados:
             cargo, votos = row[2], row[4]
@@ -427,17 +523,15 @@ class AdminApp:
                 widgets['name'].config(text="")
                 widgets['votes'].config(text="")
 
-        # 5. Crear y mostrar gráficos
         self._update_graphs(resultados)
 
     def _update_graphs(self, resultados):
-        # Limpiar gráficos anteriores
         for widget in self.graphs_frame.winfo_children():
             widget.destroy()
 
         fig = plt.figure(figsize=(12, 6))
         
-        for i, cargo in enumerate(["DIRECTORA", "VICEDIRECTORA", "COORDINADORA"]):
+        for i, cargo in enumerate(config.CARGOS):
             ax = fig.add_subplot(1, 3, i + 1)
             
             cargo_results = [row for row in resultados if row[2] == cargo]
@@ -455,9 +549,8 @@ class AdminApp:
             ax.barh(nombres, votos, color='#3498db')
             ax.set_title(cargo)
             ax.set_xlabel('Votos')
-            ax.invert_yaxis() # La más votada arriba
+            ax.invert_yaxis()
 
-            # Añadir el número de votos en cada barra
             for index, value in enumerate(votos):
                 ax.text(value, index, f' {value}')
 
@@ -477,13 +570,13 @@ class AdminApp:
     def set_votation_status(self, status):
         self.db_manager.set_estado_votacion(status)
         self.update_status_display()
-        status_text = "activa" if status == 'activa' else "cerrada"
+        status_text = "activa" if status == config.VOTACION_ACTIVA else "cerrada"
         messagebox.showinfo("Éxito", f"La votación ha sido {status_text}")
     
     def update_status_display(self):
         status = self.db_manager.get_estado_votacion()
-        status_text = f"Estado actual: Votación {'ACTIVA' if status == 'activa' else 'CERRADA'}"
-        self.status_label.config(text=status_text, fg="green" if status == 'activa' else "red")
+        status_text = f"Estado actual: Votación {'ACTIVA' if status == config.VOTACION_ACTIVA else 'CERRADA'}"
+        self.status_label.config(text=status_text, fg="green" if status == config.VOTACION_ACTIVA else "red")
     
     def change_password(self):
         current_password = self.current_password_entry.get()
@@ -505,17 +598,3 @@ class AdminApp:
             self.confirm_password_entry.delete(0, tk.END)
         else:
             messagebox.showerror("Error", "Contraseña actual incorrecta")
-    
-    def close_admin_session(self):
-        """Cierra la sesión de administración y regresa al menú principal"""
-        self.root.destroy()
-        from main import MainApp
-        main_app = MainApp()
-        main_app.run()
-    
-    def run(self):
-        self.root.mainloop()
-
-if __name__ == "__main__":
-    app = AdminApp()
-    app.run()

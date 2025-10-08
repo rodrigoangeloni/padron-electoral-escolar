@@ -1,192 +1,117 @@
 # Sistema de Votación Escolar
 
-Aplicación de escritorio para elecciones estudiantiles en una escuela, donde los estudiantes pueden votar para elegir a su directora, vice directora y coordinadora.
+Aplicación de escritorio para gestionar elecciones estudiantiles, permitiendo a los estudiantes votar por sus representantes para los cargos de Directora, Vice Directora y Coordinadora.
 
-## Características
+## Tabla de Contenidos
+1. [Descripción General](#descripción-general)
+2. [Arquitectura del Proyecto](#arquitectura-del-proyecto)
+3. [Instalación y Uso](#instalación-y-uso)
+4. [Módulos del Sistema](#módulos-del-sistema)
+5. [Flujo de la Aplicación](#flujo-de-la-aplicación)
+6. [Funcionalidades Principales](#funcionalidades-principales)
+7. [Desarrollo y Contribución](#desarrollo-y-contribución)
 
-- Interfaz de votación en pantalla completa
-- Registro de votos en base de datos SQLite
-- Panel de administración para gestionar candidatos y ver resultados
-- Control de acceso con contraseña para el modo administrativo
-- Prevención de votos duplicados (opcional)
-- Sistema de resultados en tiempo real con gráficos visuales
-- Autenticación por Cédula de Identidad (CI) de votantes
-- Gestión de votantes por grado/curso
-- Importación masiva de votantes desde archivos CSV
-- Soporte para 3 cargos: Directora, Vice Directora y Coordinadora
-- Candidatos organizados por grado que representan
+## Descripción General
 
-## Requisitos
+El Sistema de Votación Escolar es una aplicación de escritorio desarrollada en Python con Tkinter que facilita elecciones escolares. La aplicación permite la gestión completa del proceso electoral, desde la inscripción de candidatos y votantes hasta la emisión y conteo de votos en tiempo real.
 
-- Python 3.7 o superior
-- Librerías: tkinter, sqlite3, Pillow, matplotlib
+### Características Principales
+- **Interfaz Unificada:** La aplicación se ejecuta en una única ventana con una navegación fluida entre el menú principal, el panel de administración y la interfaz de votación.
+- **Arquitectura Moderna:** Sigue un patrón de controlador principal que mejora la eficiencia y la mantenibilidad.
+- **Gestión de Datos Optimizada:** Utiliza una base de datos SQLite con una conexión única y persistente para un rendimiento superior.
+- **Panel de Administración Avanzado:**
+    - Gestión de candidatos con **actualización de fotos individual** y **vista previa**.
+    - Gestión de votantes con importación masiva desde CSV.
+    - Configuración de la elección (activar/cerrar votación, cambio de contraseña).
+- **Votación Adaptable y Segura:**
+    - Autenticación de votantes por Cédula de Identidad (CI) y prevención de votos duplicados.
+    - **Diseño de grilla adaptable** que ajusta la disposición de los candidatos al tamaño de la pantalla.
+    - **Modo de pantalla completa opcional** para la votación.
+- **Resultados en Tiempo Real:** Visualización de los resultados con tablas detalladas y gráficos.
+- **Configuración Centralizada:** Todas las constantes y rutas del proyecto están en `config.py` para una fácil personalización.
+- **Datos de Prueba:** La base de datos se puebla automáticamente con candidatos de ejemplo para facilitar las pruebas.
 
-## Instalación
+## Arquitectura del Proyecto
 
-1. Clonar o descargar el proyecto
-2. Opcional: Configurar entorno virtual (recomendado para maximizar el rendimiento):
-   ```bash
-   python setup_env.py
-   ```
-   Esto creará un entorno virtual e instalará las dependencias en él.
-
-3. Si no usas el script de configuración, instalar directamente las dependencias:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-## Uso
-
-### Iniciar la aplicación
-
-Opción 1: Ejecutar directamente (asegúrate de tener las dependencias instaladas)
-```bash
-python main.py
-```
-
-Opción 2: Usar el script de ejecución (recomendado, usa el entorno virtual si está disponible)
-```bash
-python run_app.py
-```
-
-## Contraseña de Administrador
-
-- Por defecto: `admin123`
-- Se recomienda cambiarla después de la primera configuración
-- Se puede cambiar desde la pestaña "Configuración" en el modo administrativo
-
-## Funcionalidades
-
-### Modo Votación
-- Interfaz en pantalla completa
-- Autenticación por Cédula de Identidad (CI) de 7-8 dígitos
-- Verificación automática de votantes registrados
-- Prevención de votos duplicados
-- Visualización de 3 columnas por cargo (Directora, Vice Directora, Coordinadora)
-- Candidatos organizados por grado que representan
-- Selección intuitiva de candidatos
-- Confirmación de voto
-
-### Modo Administración
-- Gestión de candidatos (agregar, eliminar)
-- Gestión de votantes por CI (agregar, eliminar, importar desde CSV)
-- Visualización de resultados en tiempo real
-- Resultados generales y por grado/curso
-- Activación/cierre de la votación
-- Cambio de contraseña de administrador
-- Reinicio de votos (funcionalidad de limpieza)
-- Visualización de gráficos de resultados
-
-## Gestión de Candidatos
-
-### Registrar Candidatos
-1. Ir a la pestaña "Candidatos" en el modo administración
-2. Completar los campos: Nombre, Apellido, Cargo (DIRECTORA, VICEDIRECTORA, COORDINADORA), Grado
-3. Hacer clic en "Agregar Candidato"
-
-### Cargos Disponibles
-- DIRECTORA
-- VICEDIRECTORA
-- COORDINADORA
-
-### Grados Disponibles para Candidatos
-- Pre Escolar
-- 1er Grado a 9no Grado
-- 1er Curso a 3er Curso
-
-## Gestión de Votantes
-
-### Agregar Votantes Individualmente
-1. Ir a la pestaña "Votantes" en el modo administración
-2. Completar los campos: CI, Nombre, Apellido, Grado/Curso
-3. Hacer clic en "Agregar Votante"
-
-### Importar Votantes desde Archivo CSV
-1. Crear un archivo CSV con el formato: `CI,Nombre,Apellido,Grado/Curso`
-2. Ir a la pestaña "Votantes" en el modo administración
-3. Hacer clic en "Seleccionar Archivo CSV"
-4. Seleccionar el archivo y confirmar la importación
-
-**Nota**: Se incluye un archivo de ejemplo `ejemplo_votantes.csv` en el proyecto con datos de prueba.
-
-### Grados/Cursos Disponibles para Votantes
-- Pre Escolar
-- 1er Grado, 2do Grado, 3er Grado, 4to Grado, 5to Grado, 6to Grado, 7mo Grado, 8vo Grado, 9no Grado
-- 1er Curso, 2do Curso, 3er Curso
-
-## Estructura del Proyecto
+La arquitectura sigue un patrón de controlador principal para una gestión eficiente de las vistas.
 
 ```
 padron-electoral/
-├── main.py                 # Punto de entrada principal
+├── main.py                 # Controlador principal y punto de entrada
+├── config.py               # Módulo de configuración central
 ├── database.py             # Manejo de la base de datos
-├── voting_app.py           # Interfaz de votación
-├── admin_app.py            # Interfaz de administración
-├── setup_env.py            # Script para configurar entorno virtual
-├── run_app.py              # Script para ejecutar la aplicación
-├── ejemplo_votantes.csv    # Archivo de ejemplo para importar votantes
-├── requirements.txt        # Dependencias
-├── README.md              # Documentación
-├── .gitignore             # Archivos a ignorar
-├── models/
-│   ├── __init__.py        # Inicialización del paquete
-│   ├── candidate.py       # Modelo de candidato
-│   └── vote.py            # Modelo de voto
-├── utils/
-│   ├── __init__.py        # Inicialización del paquete
-│   └── auth.py            # Funciones de autenticación
+├── voting_app.py           # Frame de la interfaz de votación
+├── admin_app.py            # Frame de la interfaz de administración
+├── requirements.txt        # Dependencias del proyecto
+├── README.md               # Documentación principal
+├── CHANGELOG.md            # Registro de cambios
+├── ...
 └── assets/
-    ├── config/
-    │   └── .admin_password # Contraseña de administrador (hasheada)
-    ├── db/
-    │   └── election.db    # Base de datos SQLite
-    └── images/
-        └── default_candidate.jpg # Imagen por defecto para candidatos
+    └── ...
 ```
 
-## Base de Datos
+## Instalación y Uso
 
-La aplicación utiliza SQLite para almacenar:
+### Requisitos
+- Python 3.7 o superior
+- Librerías: `tkinter`, `sqlite3`, `Pillow`, `matplotlib`
 
-- Información de candidatos (nombre, apellido, cargo, grado, imagen)
-- Información de votantes (CI, nombre, apellido, grado/curso, estado de votación)
-- Votos registrados (con referencia a candidato y CI del votante)
-- Configuración del sistema (estado de la votación)
+### Instalación
+1. Clona o descarga el proyecto.
+2. Crea un entorno virtual (recomendado): `python -m venv venv`
+3. Instala las dependencias:
+   ```bash
+   # En Windows
+   .\venv\Scripts\python.exe -m pip install -r requirements.txt
+   # En macOS/Linux
+   source venv/bin/activate && pip install -r requirements.txt
+   ```
 
-### Tablas de la Base de Datos
+### Uso
+Para iniciar la aplicación, ejecuta el siguiente comando en la raíz del proyecto:
+```bash
+# En Windows
+.\venv\Scripts\python.exe main.py
+# En macOS/Linux
+python main.py
+```
 
-1. **candidatos**: Almacena información de los candidatos
-2. **votantes**: Almacena información de los votantes registrados
-3. **votos**: Registra cada voto emitido
-4. **configuracion**: Almacena la configuración del sistema
+## Módulos del Sistema
 
-## Seguridad
+- **`main.py`**: Punto de entrada y controlador principal (`MainApp`). Gestiona la ventana única de la aplicación y el cambio entre las diferentes vistas.
+- **`config.py`**: Centraliza todas las constantes de la aplicación.
+- **`database.py`**: Gestiona todas las operaciones con la base de datos SQLite.
+- **`admin_app.py`**: Frame (`tk.Frame`) que implementa la interfaz de administración.
+- **`voting_app.py`**: Frame (`tk.Frame`) que implementa la interfaz de votación.
+- **`utils/auth.py`**: Maneja la lógica de autenticación.
 
-- Contraseña para acceso administrativo (hasheada con SHA-256)
-- Autenticación obligatoria por CI para votar
-- Control automático de votos duplicados
-- Verificación de formato de CI (7-8 dígitos numéricos)
-- Almacenamiento seguro de datos sensibles
+## Flujo de la Aplicación
 
-## Personalización
+1.  **Inicio:** La aplicación se inicia ejecutando `main.py`, que crea una única ventana principal y muestra el menú.
+2.  **Navegación:** El usuario puede seleccionar "Iniciar Votación" o "Modo Administración". El controlador principal cambia la vista activa dentro de la misma ventana.
+3.  **Votación:** El votante se autentica, selecciona sus candidatos (con sus fotos visibles en una grilla adaptable) y confirma su voto.
+4.  **Administración:** El administrador se autentica y accede a un panel con pestañas para gestionar candidatos (incluyendo la carga de fotos), votantes, ver resultados y configurar la elección.
 
-La aplicación puede ser personalizada según las necesidades específicas:
+## Funcionalidades Principales
 
-- Cambiar la contraseña de administrador
-- Agregar imágenes de candidatas
-- Modificar tiempos de votación
-- Adaptar la interfaz gráfica
-- Configurar grados/cursos disponibles
+### Gestión de Candidatos
+- Agregar y eliminar candidatos.
+- **Actualizar Foto:** Selecciona un candidato de la lista y presiona "Actualizar Foto" para asignarle una imagen personalizada. Una vista previa y una columna en la tabla te indicarán quién ya tiene foto.
 
-## Desarrollo
+### Gestión de Votantes
+- Agregar y eliminar votantes individualmente.
+- **Importación Masiva:** Importar votantes desde un archivo CSV con el formato `CI,Nombre,Apellido,Grado/Curso`.
 
-Para contribuir al proyecto:
+### Resultados
+- Visualización de resultados en tiempo real con tablas y gráficos de barras.
 
-1. Hacer fork del repositorio
-2. Crear una rama para la nueva funcionalidad
-3. Realizar los cambios
-4. Enviar un pull request
+### Contraseña de Administrador
+- La contraseña por defecto es `admin123`. Se recomienda cambiarla desde la pestaña "Configuración".
 
-## Licencia
+## Desarrollo y Contribución
 
-Este proyecto es de código abierto y puede ser utilizado libremente para fines educativos.
+Este proyecto es de código abierto. Para contribuir:
+1.  Haz un fork del repositorio.
+2.  Crea una nueva rama.
+3.  Realiza tus cambios.
+4.  Envía un pull request.

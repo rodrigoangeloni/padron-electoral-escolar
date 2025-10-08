@@ -3,74 +3,94 @@ from tkinter import messagebox
 import sys
 import os
 
-# Añadir el directorio raíz al path para importar módulos
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from voting_app import VotingApp
 from admin_app import AdminApp
 from database import DatabaseManager
+import config
 
-class MainApp:
-    def __init__(self):
-        self.root = tk.Tk()
-        self.root.title("Sistema de Votación Escolar")
-        self.root.geometry("400x300")
-        self.root.resizable(False, False)
-        
+class MainApp(tk.Tk):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.title("Sistema de Votación Escolar")
+        self.geometry(config.MAIN_WINDOW_GEOMETRY)
+        self.resizable(False, False)
+
         self.db_manager = DatabaseManager()
-        
-        self.setup_ui()
-    
-    def setup_ui(self):
-        """Configura la interfaz de usuario principal"""
-        # Título
-        title_label = tk.Label(self.root, text="Sistema de Votación Escolar", font=("Arial", 16, "bold"))
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+        container = tk.Frame(self)
+        container.pack(side="top", fill="both", expand=True)
+        container.grid_rowconfigure(0, weight=1)
+        container.grid_columnconfigure(0, weight=1)
+
+        self.frames = {}
+        for F in (MainMenu, AdminApp, VotingApp):
+            page_name = F.__name__
+            frame = F(parent=container, controller=self)
+            self.frames[page_name] = frame
+            frame.grid(row=0, column=0, sticky="nsew")
+
+        self.show_frame("MainMenu")
+        self.center_window()
+
+    def show_frame(self, page_name):
+        '''Muestra un frame para la página dada'''
+        frame = self.frames[page_name]
+        frame.tkraise()
+        if page_name == "MainMenu":
+            self.geometry(config.MAIN_WINDOW_GEOMETRY)
+            self.resizable(False, False)
+            self.center_window()
+
+    def center_window(self):
+        """Centra la ventana en la pantalla"""
+        self.update_idletasks()
+        width = self.winfo_width()
+        height = self.winfo_height()
+        x = (self.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.winfo_screenheight() // 2) - (height // 2)
+        self.geometry(f'{width}x{height}+{x}+{y}')
+
+    def on_closing(self):
+        """Maneja el evento de cierre de la ventana."""
+        if messagebox.askokcancel("Salir", "¿Está seguro que desea salir?"):
+            self.db_manager.close()
+            self.quit() # Usar quit() para terminar el mainloop
+            self.destroy() # Asegurarse de que la ventana se destruya
+
+class MainMenu(tk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+
+        title_label = tk.Label(self, text="Sistema de Votación Escolar", font=("Arial", 16, "bold"))
         title_label.pack(pady=20)
         
-        # Botón para iniciar votación
-        vote_button = tk.Button(self.root, text="Iniciar Votación", font=("Arial", 12), 
-                               command=self.start_voting, bg="#4CAF50", fg="white", 
+        vote_button = tk.Button(self, text="Iniciar Votación", font=("Arial", 12), 
+                               command=self.start_voting, bg=config.COLOR_SUCCESS, fg=config.COLOR_WHITE, 
                                width=20, height=2)
         vote_button.pack(pady=10)
         
-        # Botón para modo administración
-        admin_button = tk.Button(self.root, text="Modo Administración", font=("Arial", 12),
-                                command=self.start_admin, bg="#2196F3", fg="white",
+        admin_button = tk.Button(self, text="Modo Administración", font=("Arial", 12),
+                                command=lambda: controller.show_frame("AdminApp"), bg=config.COLOR_PRIMARY, fg=config.COLOR_WHITE,
                                 width=20, height=2)
         admin_button.pack(pady=10)
         
-        # Botón para salir
-        exit_button = tk.Button(self.root, text="Salir", font=("Arial", 12),
-                               command=self.root.quit, bg="#f44336", fg="white",
+        exit_button = tk.Button(self, text="Salir", font=("Arial", 12),
+                               command=controller.on_closing, bg=config.COLOR_DANGER, fg=config.COLOR_WHITE,
                                width=20, height=1)
         exit_button.pack(pady=10)
-    
+
     def start_voting(self):
-        """Inicia la aplicación de votación"""
-        if self.db_manager.get_estado_votacion() != 'activa':
+        if self.controller.db_manager.get_estado_votacion() != config.VOTACION_ACTIVA:
             messagebox.showwarning("Votación no activa", "La votación no está activa. Contacte al administrador.")
             return
-        
-        self.root.destroy()
-        voting_app = VotingApp()
-        voting_app.run()
-    
-    def start_admin(self):
-        """Inicia la aplicación de administración"""
-        self.root.destroy()
-        admin_app = AdminApp()
-        admin_app.run()
-    
-    def run(self):
-        """Ejecuta la aplicación principal"""
-        # Centrar la ventana
-        self.root.update_idletasks()
-        x = (self.root.winfo_screenwidth() // 2) - (self.root.winfo_width() // 2)
-        y = (self.root.winfo_screenheight() // 2) - (self.root.winfo_height() // 2)
-        self.root.geometry(f"+{x}+{y}")
-        
-        self.root.mainloop()
+        self.controller.show_frame("VotingApp")
+
 
 if __name__ == "__main__":
     app = MainApp()
-    app.run()
+    app.mainloop()
