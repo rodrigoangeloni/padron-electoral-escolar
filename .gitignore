@@ -1,0 +1,33 @@
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.venv
+
+# Archivos de SQLite
+*.db
+*.db-journal
+
+# Archivos de configuración personales
+assets/config/.admin_password
+
+# Archivos temporales del sistema
+.DS_Store
+Thumbs.db
