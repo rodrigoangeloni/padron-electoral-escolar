@@ -9,7 +9,7 @@ Aplicación de escritorio para elecciones estudiantiles en una escuela, donde lo
 - Panel de administración para gestionar candidatos y ver resultados
 - Control de acceso con contraseña para el modo administrativo
 - Prevención de votos duplicados (opcional)
-- Sistema de resultados en tiempo real
+- Sistema de resultados en tiempo real con gráficos visuales
 - Autenticación por Cédula de Identidad (CI) de votantes
 - Gestión de votantes por grado/curso
 - Importación masiva de votantes desde archivos CSV
@@ -19,7 +19,7 @@ Aplicación de escritorio para elecciones estudiantiles en una escuela, donde lo
 ## Requisitos
 
 - Python 3.7 o superior
-- Librerías: tkinter, sqlite3, Pillow
+- Librerías: tkinter, sqlite3, Pillow, matplotlib
 
 ## Instalación
 
@@ -28,18 +28,18 @@ Aplicación de escritorio para elecciones estudiantiles en una escuela, donde lo
    ```bash
    python setup_env.py
    ```
-   Esto creará un entorno virtual e instalará Pillow en él.
+   Esto creará un entorno virtual e instalará las dependencias en él.
 
-3. Si no usas el script de configuración, instalar directamente Pillow:
+3. Si no usas el script de configuración, instalar directamente las dependencias:
    ```bash
-   pip install Pillow
+   pip install -r requirements.txt
    ```
 
 ## Uso
 
 ### Iniciar la aplicación
 
-Opción 1: Ejecutar directamente (asegúrate de tener Pillow instalado)
+Opción 1: Ejecutar directamente (asegúrate de tener las dependencias instaladas)
 ```bash
 python main.py
 ```
@@ -75,6 +75,7 @@ python run_app.py
 - Activación/cierre de la votación
 - Cambio de contraseña de administrador
 - Reinicio de votos (funcionalidad de limpieza)
+- Visualización de gráficos de resultados
 
 ## Gestión de Candidatos
 
