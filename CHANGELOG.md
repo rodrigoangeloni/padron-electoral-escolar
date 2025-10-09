@@ -18,6 +18,20 @@
 ---
 
 ## 🚀 [1.3.3] - 2025-10-09 - Solución de Persistencia de Datos en Versión Compilada
+## 🚀 [1.3.4] - 2025-10-09 - Compilación para Windows con Icono Personalizado
+
+<div align="center">
+
+[![](https://img.shields.io/badge/Changed-%2B1_Feature-yellow?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+
+</div>
+
+### 🔧 Cambiado
+
+- **🖼️ Icono Personalizado en Ejecutable**: Se ha actualizado la configuración de PyInstaller para incluir correctamente el icono personalizado (icon.ico) en el archivo ejecutable de Windows, mejorando la identidad visual del sistema.
+
+---
+
 
 &lt;div align="center"&gt;
 
