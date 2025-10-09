@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/Version-1.2.0-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![Version](https://img.shields.io/badge/Version-1.3.2-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![Python](https://img.shields.io/badge/Python-3.7+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
 </div>
@@ -17,11 +17,30 @@
 
 ---
 
-## 🚀 [1.3.1] - 2025-10-09 - Corrección de Registro de Votos Múltiples
+## 🚀 [1.3.2] - 2025-10-09 - Disponibilidad de Ejecutable para Windows
 
 <div align="center">
 
 [![](https://img.shields.io/badge/Added-%2B1_Feature-green?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![](https://img.shields.io/badge/Changed-%2B1_Feature-yellow?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+
+</div>
+
+### ✨ Añadido
+
+- **📦 Distribución como Ejecutable**: Se ha añadido soporte para crear un ejecutable de Windows (.exe) usando PyInstaller, facilitando la instalación del sistema en entornos escolares sin necesidad de Python o dependencias adicionales. El archivo `SistemaVotacionEscolar.exe` puede descargarse y ejecutarse directamente en sistemas Windows sin instalación adicional.
+
+### 🔧 Cambiado
+
+- **📝 Documentación Actualizada**: Se ha actualizado el README.md para incluir instrucciones claras sobre cómo descargar y usar el ejecutable directamente, además de la instalación tradicional desde código fuente.
+
+---
+
+## 🚀 [1.3.1] - 2025-10-09 - Corrección de Registro de Votos Múltiples y Creación del Instalador
+
+<div align="center">
+
+[![](https://img.shields.io/badge/Added-%2B2_Features-green?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![](https://img.shields.io/badge/Fixed-%2B1_Bug-red?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 
 </div>
@@ -29,6 +48,7 @@
 ### ✨ Añadido
 
 - **💾 Nuevo Método `add_multiple_votes`**: Se ha añadido un nuevo método en `DatabaseManager` que permite registrar múltiples votos para un mismo votante y marcarlo como que ya votó solo después de registrar todos los votos.
+- **📦 Script de Instalación para Windows**: Se ha añadido soporte para crear un instalador de Windows (.exe) usando NSIS, facilitando la instalación del sistema en entornos escolares sin necesidad de Python o dependencias adicionales.
 
 ### 🐛 Corregido
 
@@ -54,6 +74,7 @@
 - **📦 Gestión de Dependencias**: El proceso de ejecución ahora se encarga automáticamente de la creación del entorno virtual y la instalación de dependencias, simplificando el inicio de la aplicación.
 
 ---
+
 ## 🎉 [1.2.0] - 2025-10-08 - Mejoras de Usabilidad y Funcionalidad
 
 <div align="center">
@@ -134,9 +155,12 @@
 
 | Versión | Fecha de Lanzamiento | Características | Correcciones | Tamaño del Código |
 |:---:|:---:|:---:|
+| 1.3.2 | 2025-10-09 | 1 | 0 | 📈 Aumentado |
+| 1.3.1 | 2025-10-09 | 2 | 1 | 📈 Aumentado |
+| 1.3.0 | 2025-10-09 | 1 | 0 | 🔄 Mejorado |
 | 1.2.0 | 2025-10-08 | 3 | 3 | 📈 Aumentado |
 | 1.1.0 | 2025-10-08 | 3 | 0 | 🔄 Refactorizado |
-| 1.0.0 | 2025-10-07 | 4 | 0 | 🆕 Inicial |
+| 1.0 | 2025-10-07 | 4 | 0 | 🆕 Inicial |
 
 </div>
 

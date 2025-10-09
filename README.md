@@ -23,6 +23,7 @@
 - [✨ Características Principales](#-características-principales)
 - [🛠️ Tecnologías Utilizadas](#️-tecnologías-utilizadas)
 - [⚙️ Instalación y Uso](#️-instalación-y-uso)
+- [📦 Ejecutable para Windows](#-ejecutable-para-windows)
 - [🏗️ Arquitectura del Proyecto](#️-arquitectura-del-proyecto)
 - [💻 Módulos del Sistema](#-módulos-del-sistema)
 - [🔄 Flujo de la Aplicación](#-flujo-de-la-aplicación)
@@ -64,7 +65,7 @@
 <div align="center">
 
 | Tecnología | Versión Mínima | Descripción |
-|:---:|:---:|:---:|
+|:---:|:---:|
 | [🐍 Python](https://www.python.org/) | 3.7+ | Lenguaje principal del sistema |
 | [🖼️ Tkinter](https://docs.python.org/3/library/tkinter.html) | Built-in | Interfaz gráfica de usuario |
 | [💾 SQLite](https://www.sqlite.org/) | Built-in | Base de datos ligera y eficiente |
@@ -119,6 +120,27 @@ python main.py
 # En macOS/Linux
 python3 main.py
 ```
+
+## 📦 Ejecutable para Windows
+
+### 🚀 Opción 1: Ejecutable Directo (Recomendado para usuarios finales)
+
+Descarga la versión compilada del sistema para Windows sin necesidad de instalar Python:
+
+1. **Descargar el ejecutable**:
+   - Ve a la sección de [Releases](https://github.com/rodrigoangeloni/padron-electoral-escolar/releases) del repositorio
+   - Descarga el archivo `SistemaVotacionEscolar.exe` correspondiente a la versión más reciente
+   - Ejecuta el archivo directamente en tu sistema Windows
+
+2. **Características del ejecutable**:
+   - Incluye todas las dependencias necesarias
+   - No requiere instalación de Python ni bibliotecas adicionales
+   - Totalmente portátil y listo para usar
+   - Icono personalizado y metadatos del desarrollador
+
+### 🔧 Opción 2: Instalación desde código fuente (Desarrolladores)
+
+Sigue las instrucciones de instalación anteriores si deseas ejecutar desde el código fuente o contribuir al desarrollo.
 
 ---
 
