@@ -142,6 +142,40 @@ class DatabaseManager:
         self.cursor.execute('INSERT INTO votos (candidato_id, ci_votante) VALUES (?, ?)', (candidato_id, ci_votante))
         self.cursor.execute('UPDATE votantes SET ya_voto = 1 WHERE ci = ?', (ci_votante,))
         self.conn.commit()
+    
+    def add_multiple_votes(self, candidato_ids, ci_votante):
+        """
+        Registra múltiples votos para un votante y marca al votante como que ya votó
+        solo después de registrar todos los votos.
+        
+        Args:
+            candidato_ids: Lista de IDs de candidatos por los que votó el votante
+            ci_votante: Cédula de identidad del votante
+            
+        Returns:
+            bool: True si todos los votos se registraron exitosamente, False en caso contrario
+        """
+        # Verificar que el votante no haya votado aún
+        self.cursor.execute('SELECT ya_voto FROM votantes WHERE ci = ?', (ci_votante,))
+        result = self.cursor.fetchone()
+        
+        if result is None:
+            return False, "Votante no registrado"
+        if result[0] == 1:
+            return False, "El votante ya ha emitido su voto"
+        
+        # Registrar todos los votos en una transacción
+        try:
+            for candidato_id in candidato_ids:
+                self.cursor.execute('INSERT INTO votos (candidato_id, ci_votante) VALUES (?, ?)', (candidato_id, ci_votante))
+            
+            # Marcar al votante como que ya votó solo después de registrar todos los votos
+            self.cursor.execute('UPDATE votantes SET ya_voto = 1 WHERE ci = ?', (ci_votante,))
+            self.conn.commit()
+            return True, "Votos registrados exitosamente"
+        except Exception as e:
+            self.conn.rollback()
+            return False, f"Error al registrar votos: {str(e)}"
         return True, "Voto registrado exitosamente"
     
     def get_resultados(self):

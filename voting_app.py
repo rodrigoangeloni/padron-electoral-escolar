@@ -221,6 +221,26 @@ class VotingApp(tk.Frame):
         """Guarda los votos en la BD y reinicia la app para el siguiente votante."""
         ci_votante = self.current_votante[1]
         
+        # Obtener los IDs de los candidatos seleccionados
+        candidato_ids = [self.selected_candidates[role][0] for role in self.roles]
+        
+        # Registrar todos los votos de una vez
+        success, message = self.db_manager.add_multiple_votes(candidato_ids, ci_votante)
+        
+        if not success:
+            messagebox.showerror("Error", message)
+            self.show_ci_input()
+            return
+
+        self._clear_screen()
+        thanks_label = tk.Label(self, text="¡Gracias por tu voto!", font=("Arial", 40, "bold"), bg=config.COLOR_WHITE, fg=config.COLOR_SUCCESS)
+        thanks_label.place(relx=0.5, rely=0.5, anchor='center')
+        
+        self.after(2000, self.show_ci_input)
+    def _save_vote_and_reset(self):
+        """Guarda los votos en la BD y reinicia la app para el siguiente votante."""
+        ci_votante = self.current_votante[1]
+        
         for role in self.roles:
             candidato_id = self.selected_candidates[role][0]
             self.db_manager.add_voto(candidato_id, ci_votante)
