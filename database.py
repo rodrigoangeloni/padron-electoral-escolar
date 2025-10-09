@@ -142,6 +142,7 @@ class DatabaseManager:
         self.cursor.execute('INSERT INTO votos (candidato_id, ci_votante) VALUES (?, ?)', (candidato_id, ci_votante))
         self.cursor.execute('UPDATE votantes SET ya_voto = 1 WHERE ci = ?', (ci_votante,))
         self.conn.commit()
+        return True, "Voto registrado exitosamente"
     
     def add_multiple_votes(self, candidato_ids, ci_votante):
         """
