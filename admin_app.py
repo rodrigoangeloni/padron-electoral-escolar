@@ -1,8 +1,10 @@
 import tkinter as tk
-from tkinter import messagebox, ttk, filedialog
+from tkinter import messagebox, ttk, filedialog, simpledialog
 import sys
 import os
 import shutil
+import secrets
+import string
 from PIL import Image, ImageTk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -25,13 +27,10 @@ class AdminApp(tk.Frame):
 
         if not os.path.exists(config.ADMIN_PASSWORD_FILE):
             # Establecer una contraseña inicial segura cuando no existe archivo de contraseña
-            import secrets
-            import string
             # Generar una contraseña segura inicial
-            initial_password = ''.join(secrets.choice(string.ascii_letters + string.digits + string.punctuation) for _ in range(12))
-            self.auth_manager.set_admin_password(initial_password)
-            print(f"Contraseña inicial generada: {initial_password}")
-            print("Por favor, cambie esta contraseña desde la interfaz de administración")
+            initial_password = self.auth_manager.generate_initial_password()
+            self.auth_manager.set_initial_password(initial_password)
+            self.show_initial_password(initial_password)
 
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
@@ -52,6 +51,60 @@ class AdminApp(tk.Frame):
 
         self.setup_login_ui(login_frame)
         self.setup_admin_ui(admin_panel_frame)
+        
+    def show_initial_password(self, password):
+        """Muestra la contraseña inicial en una ventana emergente con opción de copiar"""
+        # Crear ventana emergente para mostrar la contraseña inicial
+        password_window = tk.Toplevel(self)
+        password_window.title("Contraseña Inicial de Administrador")
+        password_window.geometry("400x200")
+        password_window.resizable(False, False)
+        # Centrar la ventana
+        password_window.transient(self)
+        password_window.grab_set()
+        
+        # Centrar la ventana emergente en la pantalla
+        password_window.update_idletasks()
+        screen_width = password_window.winfo_screenwidth()
+        screen_height = password_window.winfo_screenheight()
+        window_width = 400
+        window_height = 200
+        x = (screen_width // 2) - (window_width // 2)
+        y = (screen_height // 2) - (window_height // 2)
+        password_window.geometry(f'{window_width}x{window_height}+{x}+{y}')
+        
+        # Etiqueta con instrucciones
+        instructions = tk.Label(password_window, text="Se ha generado una contraseña inicial de administrador:", font=("Arial", 10))
+        instructions.pack(pady=10)
+        
+        # Campo para mostrar la contraseña
+        password_var = tk.StringVar(value=password)
+        password_display = tk.Entry(password_window, textvariable=password_var, font=("Arial", 12), justify="center", state="readonly")
+        password_display.pack(pady=5, padx=20, fill="x")
+        
+        # Botón para copiar la contraseña
+        copy_button = tk.Button(password_window, text="Copiar Contraseña", font=("Arial", 10), bg=config.COLOR_PRIMARY, fg=config.COLOR_WHITE,
+                                command=lambda: self.copy_password(password, password_window))
+        copy_button.pack(pady=10)
+        
+        # Botón para continuar
+        continue_button = tk.Button(password_window, text="Entendido", font=("Arial", 10), bg=config.COLOR_SUCCESS, fg=config.COLOR_WHITE,
+                                    command=password_window.destroy)
+        continue_button.pack(pady=5)
+        
+        # Advertencia
+        warning = tk.Label(password_window, text="Por favor, cambie esta contraseña desde la interfaz de administración", 
+                          font=("Arial", 9), fg="red")
+        warning.pack(pady=10)
+        
+        # Esperar a que se cierre la ventana antes de continuar
+        password_window.wait_window()
+        
+    def copy_password(self, password, window):
+        """Copia la contraseña al portapapeles"""
+        self.clipboard_clear()
+        self.clipboard_append(password)
+        messagebox.showinfo("Copiado", "Contraseña copiada al portapapeles", parent=window)
 
     def show_login_frame(self):
         self.frames["LoginFrame"].tkraise()
@@ -76,7 +129,7 @@ class AdminApp(tk.Frame):
         self.password_entry = tk.Entry(parent_frame, show="*", font=("Arial", 12), width=20)
         self.password_entry.pack(pady=5)
         self.password_entry.bind('<Return>', lambda event: self.login())
-        
+
         login_button = tk.Button(parent_frame, text="Iniciar Sesión", font=("Arial", 12), bg=config.COLOR_PRIMARY, fg=config.COLOR_WHITE, command=self.login, width=15, height=1)
         login_button.pack(pady=20)
 
@@ -86,7 +139,14 @@ class AdminApp(tk.Frame):
     def login(self):
         password = self.password_entry.get()
         if self.auth_manager.verify_admin_password(password):
-            self.show_admin_panel_frame()
+            # Verificar si se está usando la contraseña inicial
+            if self.auth_manager.is_initial_password_used():
+                messagebox.showwarning("Contraseña Inicial", "Está usando la contraseña inicial. Por favor, cámbiela antes de continuar.")
+                self.show_admin_panel_frame()
+                # Mostrar directamente la pestaña de configuración para cambiar la contraseña
+                self.notebook.select(3)  # Seleccionar la pestaña de configuración (índice 3)
+            else:
+                self.show_admin_panel_frame()
         else:
             messagebox.showerror("Error", "Contraseña incorrecta")
             self.password_entry.delete(0, tk.END)
