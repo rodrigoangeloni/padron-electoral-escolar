@@ -40,7 +40,7 @@
 <div align="center">
 
 | Característica | Descripción |
-|:---:|:---:|
+|:---:|
 | 🎨 **Interfaz Intuitiva** | Diseño limpio y amigable para usuarios escolares |
 | 🔐 **Autenticación Segura** | Validación por CI con prevención de votos duplicados |
 | 📊 **Resultados en Tiempo Real** | Visualización instantánea de votos y gráficos |
@@ -64,13 +64,14 @@
 
 <div align="center">
 
-| Tecnología | Versión Mínima | Descripción |
+| Tecnología | Versión Exacta | Descripción |
 |:---:|:---:|
-| [🐍 Python](https://www.python.org/) | 3.7+ | Lenguaje principal del sistema |
+| [🐍 Python](https://www.python.org/) | 3.11.8 | Lenguaje principal del sistema |
 | [🖼️ Tkinter](https://docs.python.org/3/library/tkinter.html) | Built-in | Interfaz gráfica de usuario |
 | [💾 SQLite](https://www.sqlite.org/) | Built-in | Base de datos ligera y eficiente |
-| [📊 Matplotlib](https://matplotlib.org/) | 3.0+ | Visualización de gráficos |
-| [🖼️ Pillow](https://python-pillow.org/) | 8.0+ | Procesamiento de imágenes |
+| [📊 Matplotlib](https://matplotlib.org/) | 3.10.7 | Visualización de gráficos |
+| [🖼️ Pillow](https://python-pillow.org/) | 11.3.0 | Procesamiento de imágenes |
+| [⚙️ PyInstaller](https://pyinstaller.org/) | 6.16.0 | Empaquetado de aplicaciones |
 
 </div>
 
@@ -81,7 +82,7 @@
 ### 📋 Requisitos del Sistema
 
 - **Sistema Operativo**: Windows 7+, macOS 10.12+, Linux (Ubuntu 18.04+)
-- **Python**: Versión 3.7 o superior
+- **Python**: Versión 3.11.8
 - **Memoria RAM**: 512 MB mínimo
 - **Espacio en disco**: 100 MB disponible
 
@@ -96,8 +97,8 @@
 2. **Crear un entorno virtual (recomendado)**
    ```bash
    # En Windows
-   python -m venv venv
-   .\venv\Scripts\activate
+   python -m venv .venv
+   .\.venv\Scripts\activate
    
    # En macOS/Linux
    python3 -m venv venv

@@ -38,6 +38,7 @@ assets/config/
 # Imágenes de candidatos (ignorar todo en la carpeta, excepto el default)
 assets/images/*
 !assets/images/default_candidate.jpg
+!assets/images/icon.ico
 
 # Archivos temporales del sistema
 .DS_Store
