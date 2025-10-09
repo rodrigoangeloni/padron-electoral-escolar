@@ -1,126 +1,320 @@
-# Sistema de Votación Escolar
+# 🏛️ Sistema de Votación Escolar
 
-Aplicación de escritorio para gestionar elecciones estudiantiles, permitiendo a los estudiantes votar por sus representantes para los cargos de Directora, Vice Directora y Coordinadora.
+<div align="center">
 
-## Tecnologías Utilizadas
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Tkinter](https://img.shields.io/badge/Tkinter-2C5E8B?style=for-the-badge&logo=python&logoColor=white)](https://docs.python.org/3/library/tkinter.html)
+[![SQLite](https://img.shields.io/badge/SQLite-03B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![Matplotlib](https://img.shields.io/badge/Matplotlib-11557c?style=for-the-badge&logo=matplotlib&logoColor=white)](https://matplotlib.org/)
 
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Tkinter](https://img.shields.io/badge/Tkinter-2C5E8B?style=for-the-badge&logo=python&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
-![Matplotlib](https://img.shields.io/badge/Matplotlib-11557c?style=for-the-badge&logo=matplotlib&logoColor=white)
+</div>
 
 ---
 
-## Tabla de Contenidos
-1. [Descripción General](#descripción-general)
-2. [Arquitectura del Proyecto](#arquitectura-del-proyecto)
-3. [Instalación y Uso](#instalación-y-uso)
-4. [Módulos del Sistema](#módulos-del-sistema)
-5. [Flujo de la Aplicación](#flujo-de-la-aplicación)
-6. [Funcionalidades Principales](#funcionalidades-principales)
-7. [Desarrollo y Contribución](#desarrollo-y-contribución)
+<div align="center">
+  <h3>🗳️ Gestión completa de elecciones escolares con interfaz intuitiva y segura</h3>
+  <p>Aplicación de escritorio para gestionar elecciones estudiantiles, permitiendo a los estudiantes votar por sus representantes para los cargos de Directora, Vice Directora y Coordinadora.</p>
+</div>
 
-## Descripción General
+---
 
-El Sistema de Votación Escolar es una aplicación de escritorio desarrollada en Python con Tkinter que facilita elecciones escolares. La aplicación permite la gestión completa del proceso electoral, desde la inscripción de candidatos y votantes hasta la emisión y conteo de votos en tiempo real.
+## 📋 Tabla de Contenidos
 
-### Características Principales
-- **Interfaz Unificada:** La aplicación se ejecuta en una única ventana con una navegación fluida entre el menú principal, el panel de administración y la interfaz de votación.
-- **Arquitectura Moderna:** Sigue un patrón de controlador principal que mejora la eficiencia y la mantenibilidad.
-- **Gestión de Datos Optimizada:** Utiliza una base de datos SQLite con una conexión única y persistente para un rendimiento superior.
-- **Panel de Administración Avanzado:**
-    - Gestión de candidatos con **actualización de fotos individual** y **vista previa**.
-    - Gestión de votantes con importación masiva desde CSV.
-    - Configuración de la elección (activar/cerrar votación, cambio de contraseña).
-- **Votación Adaptable y Segura:**
-    - Autenticación de votantes por Cédula de Identidad (CI) y prevención de votos duplicados.
-    - **Diseño de grilla adaptable** que ajusta la disposición de los candidatos al tamaño de la pantalla.
-    - **Modo de pantalla completa opcional** para la votación.
-- **Resultados en Tiempo Real:** Visualización de los resultados con tablas detalladas y gráficos.
-- **Configuración Centralizada:** Todas las constantes y rutas del proyecto están en `config.py` para una fácil personalización.
-- **Datos de Prueba:** La base de datos se puebla automáticamente con candidatos de ejemplo para facilitar las pruebas.
+- [✨ Características Principales](#-características-principales)
+- [🛠️ Tecnologías Utilizadas](#️-tecnologías-utilizadas)
+- [⚙️ Instalación y Uso](#️-instalación-y-uso)
+- [🏗️ Arquitectura del Proyecto](#️-arquitectura-del-proyecto)
+- [💻 Módulos del Sistema](#-módulos-del-sistema)
+- [🔄 Flujo de la Aplicación](#-flujo-de-la-aplicación)
+- [🎯 Funcionalidades Principales](#-funcionalidades-principales)
+- [🔐 Seguridad y Autenticación](#-seguridad-y-autenticación)
+- [📈 Resultados y Estadísticas](#-resultados-y-estadísticas)
+- [🔧 Desarrollo y Contribución](#-desarrollo-y-contribución)
+- [📄 Licencia](#-licencia)
 
-## Arquitectura del Proyecto
+---
 
-La arquitectura sigue un patrón de controlador principal para una gestión eficiente de las vistas.
+## ✨ Características Principales
 
-```
-padron-electoral/
-├── main.py                 # Controlador principal y punto de entrada
-├── config.py               # Módulo de configuración central
-├── database.py             # Manejo de la base de datos
-├── voting_app.py           # Frame de la interfaz de votación
-├── admin_app.py            # Frame de la interfaz de administración
-├── requirements.txt        # Dependencias del proyecto
-├── README.md               # Documentación principal
-├── CHANGELOG.md            # Registro de cambios
-├── ...
-└── assets/
-    └── ...
-```
+<div align="center">
 
-## Instalación y Uso
+| Característica | Descripción |
+|:---:|:---:|
+| 🎨 **Interfaz Intuitiva** | Diseño limpio y amigable para usuarios escolares |
+| 🔐 **Autenticación Segura** | Validación por CI con prevención de votos duplicados |
+| 📊 **Resultados en Tiempo Real** | Visualización instantánea de votos y gráficos |
+| 📈 **Gestión Completa** | Administración de candidatos, votantes y elecciones |
+| 📱 **Diseño Adaptativo** | Interfaz que se adapta a diferentes tamaños de pantalla |
+| 🗂️ **Importación Masiva** | Carga de votantes desde archivos CSV |
 
-### Requisitos
-- Python 3.7 o superior
-- Librerías: `tkinter`, `sqlite3`, `Pillow`, `matplotlib`
+</div>
 
-### Instalación
-1. Clona o descarga el proyecto.
-2. Crea un entorno virtual (recomendado): `python -m venv venv`
-3. Instala las dependencias:
+### 🎯 Beneficios del Sistema
+
+- **Simplicidad**: Interfaz clara y sencilla de usar
+- **Seguridad**: Control de identidad y prevención de fraudes
+- **Eficiencia**: Proceso de votación rápido y confiable
+- **Transparencia**: Resultados visibles y verificables
+- **Mantenibilidad**: Código modular y bien documentado
+
+---
+
+## 🛠️ Tecnologías Utilizadas
+
+<div align="center">
+
+| Tecnología | Versión Mínima | Descripción |
+|:---:|:---:|:---:|
+| [🐍 Python](https://www.python.org/) | 3.7+ | Lenguaje principal del sistema |
+| [🖼️ Tkinter](https://docs.python.org/3/library/tkinter.html) | Built-in | Interfaz gráfica de usuario |
+| [💾 SQLite](https://www.sqlite.org/) | Built-in | Base de datos ligera y eficiente |
+| [📊 Matplotlib](https://matplotlib.org/) | 3.0+ | Visualización de gráficos |
+| [🖼️ Pillow](https://python-pillow.org/) | 8.0+ | Procesamiento de imágenes |
+
+</div>
+
+---
+
+## ⚙️ Instalación y Uso
+
+### 📋 Requisitos del Sistema
+
+- **Sistema Operativo**: Windows 7+, macOS 10.12+, Linux (Ubuntu 18.04+)
+- **Python**: Versión 3.7 o superior
+- **Memoria RAM**: 512 MB mínimo
+- **Espacio en disco**: 100 MB disponible
+
+### 📦 Instalación
+
+1. **Clonar o descargar el proyecto**
    ```bash
-   # En Windows
-   .\venv\Scripts\python.exe -m pip install -r requirements.txt
-   # En macOS/Linux
-   source venv/bin/activate && pip install -r requirements.txt
+   git clone https://github.com/tu-usuario/padron-electoral-escolar.git
+   cd padron-electoral-escolar
    ```
 
-### Uso
+2. **Crear un entorno virtual (recomendado)**
+   ```bash
+   # En Windows
+   python -m venv venv
+   .\venv\Scripts\activate
+   
+   # En macOS/Linux
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+
+3. **Instalar dependencias**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### 🚀 Uso
+
 Para iniciar la aplicación, ejecuta el siguiente comando en la raíz del proyecto:
+
 ```bash
 # En Windows
-.\venv\Scripts\python.exe main.py
-# En macOS/Linux
 python main.py
+
+# En macOS/Linux
+python3 main.py
 ```
 
-## Módulos del Sistema
+---
 
-- **`main.py`**: Punto de entrada y controlador principal (`MainApp`). Gestiona la ventana única de la aplicación y el cambio entre las diferentes vistas.
-- **`config.py`**: Centraliza todas las constantes de la aplicación.
-- **`database.py`**: Gestiona todas las operaciones con la base de datos SQLite.
-- **`admin_app.py`**: Frame (`tk.Frame`) que implementa la interfaz de administración.
-- **`voting_app.py`**: Frame (`tk.Frame`) que implementa la interfaz de votación.
-- **`utils/auth.py`**: Maneja la lógica de autenticación.
+## 🏗️ Arquitectura del Proyecto
 
-## Flujo de la Aplicación
+```
+padron-electoral-escolar/
+├── 📁 assets/                    # Recursos multimedia
+│   ├── 📁 config/               # Configuraciones
+│   ├── 📁 db/                   # Base de datos
+│   └── 📁 images/               # Imágenes y recursos visuales
+├── 📁 utils/                    # Utilidades y módulos auxiliares
+│   ├── 📄 auth.py               # Autenticación
+│   ├── 📄 candidate_ui.py       # UI de candidatos
+│   ├── 📄 voter_ui.py           # UI de votantes
+│   └── 📄 results_ui.py         # UI de resultados
+├── 📄 main.py                   # Controlador principal
+├── 📄 config.py                 # Configuración central
+├── 📄 database.py               # Gestión de base de datos
+├── 📄 admin_app.py              # Interfaz de administración
+├── 📄 voting_app.py             # Interfaz de votación
+├── 📄 run_app.py                # Script de ejecución
+├── 📄 requirements.txt          # Dependencias
+├── 📄 README.md                 # Documentación principal
+└── 📄 CHANGELOG.md              # Registro de cambios
+```
 
-1.  **Inicio:** La aplicación se inicia ejecutando `main.py`, que crea una única ventana principal y muestra el menú.
-2.  **Navegación:** El usuario puede seleccionar "Iniciar Votación" o "Modo Administración". El controlador principal cambia la vista activa dentro de la misma ventana.
-3.  **Votación:** El votante se autentica, selecciona sus candidatos (con sus fotos visibles en una grilla adaptable) y confirma su voto.
-4.  **Administración:** El administrador se autentica y accede a un panel con pestañas para gestionar candidatos (incluyendo la carga de fotos), votantes, ver resultados y configurar la elección.
+---
 
-## Funcionalidades Principales
+## 💻 Módulos del Sistema
 
-### Gestión de Candidatos
-- Agregar y eliminar candidatos.
-- **Actualizar Foto:** Selecciona un candidato de la lista y presiona "Actualizar Foto" para asignarle una imagen personalizada. Una vista previa y una columna en la tabla te indicarán quién ya tiene foto.
+### 📚 Descripción de Módulos
 
-### Gestión de Votantes
-- Agregar y eliminar votantes individualmente.
-- **Importación Masiva:** Importar votantes desde un archivo CSV con el formato `CI,Nombre,Apellido,Grado/Curso`.
+| Módulo | Función Principal | Responsabilidad |
+|:---:|:---:|
+| `main.py` | Controlador Principal | Gestión de vistas y flujo de la aplicación |
+| `config.py` | Configuración Central | Constantes, rutas y parámetros del sistema |
+| `database.py` | Gestión de Base de Datos | Operaciones CRUD y manejo de datos |
+| `admin_app.py` | Interfaz de Administración | Gestión de candidatos, votantes y resultados |
+| `voting_app.py` | Interfaz de Votación | Proceso de votación y autenticación |
+| `utils/auth.py` | Autenticación | Validación de credenciales administrativas |
+| `utils/candidate_ui.py` | UI de Candidatos | Funcionalidad específica de candidatos |
+| `utils/voter_ui.py` | UI de Votantes | Funcionalidad específica de votantes |
+| `utils/results_ui.py` | UI de Resultados | Visualización de resultados y gráficos |
 
-### Resultados
-- Visualización de resultados en tiempo real con tablas y gráficos de barras.
+---
 
-### Contraseña de Administrador
-- La contraseña por defecto es `admin123`. Se recomienda cambiarla desde la pestaña "Configuración".
+## 🔄 Flujo de la Aplicación
 
-## Desarrollo y Contribución
+<div align="center">
 
-Este proyecto es de código abierto. Para contribuir:
-1.  Haz un fork del repositorio.
-2.  Crea una nueva rama.
-3.  Realiza tus cambios.
-4.  Envía un pull request.
+```mermaid
+graph TD
+    A[Inicio - MainApp] --> B[Menú Principal]
+    B --> C{Opción Seleccionada}
+    C -->|Iniciar Votación| D[Votantes ingresan CI]
+    C -->|Modo Administración| E[Autenticación Admin]
+    D --> F[Validación CI]
+    F -->|CI válida y no votó| G[Selección de Candidatos]
+    F -->|CI inválida o ya votó| H[Error/Mensaje]
+    G --> I[Confirmación de Voto]
+    I --> J[Registro de Voto]
+    E -->|Contraseña correcta| K[Panel de Administración]
+    E -->|Contraseña incorrecta| L[Error de Autenticación]
+    K --> M[Gestión de Candidatos]
+    K --> N[Gestión de Votantes]
+    K --> O[Configuración de Elección]
+    K --> P[Visualización de Resultados]
+```
+
+</div>
+
+---
+
+## 🎯 Funcionalidades Principales
+
+### 👤 Gestión de Candidatos
+
+- **Agregar/Editar/Eliminar**: Administración completa de perfiles de candidatos
+- **Subida de Fotos**: Carga de imágenes personalizadas para cada candidato
+- **Filtros Avanzados**: Búsqueda por cargo, grado y otros criterios
+- **Vista Previa**: Visualización de imágenes antes de confirmar
+
+### 👥 Gestión de Votantes
+
+- **Registro Individual**: Agregar votantes manualmente
+- **Importación Masiva**: Carga desde archivos CSV con formato específico
+- **Validación CI**: Control de identidad y prevención de duplicados
+- **Estado de Votación**: Seguimiento de quién ya votó y quién no
+
+### 📊 Visualización de Resultados
+
+- **Tablas Dinámicas**: Resultados actualizados en tiempo real
+- **Gráficos Interactivos**: Visualización de tendencias y comparativas
+- **Exportación**: Opción de exportar resultados en diferentes formatos
+- **Resumen por Cargos**: Presentación organizada por posición electoral
+
+### ⚙️ Configuración del Sistema
+
+- **Control de Estado**: Activación y cierre de la votación
+- **Cambio de Contraseña**: Seguridad de acceso administrativo
+- **Personalización**: Configuración de cargos, grados y otros parámetros
+
+---
+
+## 🔐 Seguridad y Autenticación
+
+### 🛡️ Medidas de Seguridad Implementadas
+
+- **Hash de Contraseñas**: Almacenamiento seguro de credenciales administrativas
+- **Validación de CI**: Control de identidad para prevenir votos duplicados
+- **Sesiones Seguras**: Gestión de estado de votación para cada usuario
+- **Auditoría de Acciones**: Registro de operaciones críticas
+
+### 📝 Política de Seguridad
+
+- Las contraseñas se almacenan con hash SHA-256
+- Se previene el acceso concurrente de votantes
+- Se mantiene un registro de cambios en la configuración
+- Se implementa control de acceso basado en roles
+
+---
+
+## 📈 Resultados y Estadísticas
+
+### 📊 Tipos de Resultados Disponibles
+
+- **Resultados por Cargo**: Visualización detallada de votos por posición
+- **Resultados por Grado**: Comparativas entre diferentes niveles educativos
+- **Gráficos de Barras**: Representación visual de tendencias
+- **Ganadores por Cargo**: Destacado de candidatos ganadores
+- **Participación**: Porcentaje de participación electoral
+
+---
+
+## 🔧 Desarrollo y Contribución
+
+### 🤝 Cómo Contribuir
+
+1. **Fork** el repositorio
+2. **Crea una rama** (`git checkout -b feature/nueva-funcionalidad`)
+3. **Realiza tus cambios** y haz commit (`git commit -m 'Añadir nueva funcionalidad'`)
+4. **Sube los cambios** (`git push origin feature/nueva-funcionalidad`)
+5. **Abre un Pull Request**
+
+### 🧪 Pruebas
+
+- El sistema incluye pruebas de funcionalidad básicas
+- Se recomienda probar cada módulo individualmente
+- Verificar la compatibilidad con diferentes resoluciones de pantalla
+
+### 📝 Estándares de Código
+
+- **PEP 8**: Estándar de codificación para Python
+- **Documentación**: Cada función debe estar documentada
+- **Nomenclatura**: Nombres descriptivos para variables y funciones
+- **Comentarios**: Explicación de lógica compleja
+
+---
+
+## 📄 Licencia
+
+<div align="center">
+
+```
+MIT License
+
+Copyright (c) 2025 Sistema de Votación Escolar
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+</div>
+
+---
+
+<div align="center">
+
+### 🙏 Agradecimientos
+
+Este proyecto fue desarrollado para facilitar procesos democráticos entornos escolares. Agradecemos a todos los contribuyentes y usuarios que hacen posible su mejora continua.
+
+</div>

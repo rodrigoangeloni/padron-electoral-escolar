@@ -3,6 +3,7 @@ import os
 from config import DB_PATH, DEFAULT_CANDIDATE_IMAGE, VOTACION_CERRADA, CARGOS, GRADOS_CANDIDATOS
 import random
 
+
 class DatabaseManager:
     def __init__(self, db_path=DB_PATH):
         self.db_path = db_path
@@ -63,23 +64,21 @@ class DatabaseManager:
         self.conn.commit()
 
     def _seed_data(self):
-        """Puebla la base de datos con candidatos de prueba si la tabla está vacía."""
-        self.cursor.execute('SELECT COUNT(*) FROM candidatos')
-        if self.cursor.fetchone()[0] == 0:
-            nombres = ["Sofía", "Valentina", "Isabella", "Camila", "Mariana", "Luciana", "Daniela", "Valeria", "Renata", "Victoria", "Martina", "Emma", "Catalina", "Julieta", "Mía", "Antonella"]
-            apellidos = ["González", "Rodríguez", "Gómez", "Fernández", "López", "Díaz", "Martínez", "Pérez", "García", "Sánchez", "Romero", "Torres", "Álvarez", "Ruiz", "Ramírez", "Flores"]
-            
-            candidatos_a_insertar = []
-            for cargo in CARGOS:
-                for i in range(8):
-                    nombre = random.choice(nombres)
-                    apellido = random.choice(apellidos)
-                    grado = random.choice(GRADOS_CANDIDATOS)
-                    candidatos_a_insertar.append((nombre, apellido, cargo, grado, DEFAULT_CANDIDATE_IMAGE))
-            
-            self.cursor.executemany('INSERT INTO candidatos (nombre, apellido, cargo, grado, foto) VALUES (?, ?, ?, ?, ?)', candidatos_a_insertar)
+        """No agrega datos de ejemplo a la base de datos."""
+        # Esta función ahora está vacía, ya que no queremos datos de ejemplo
+        pass
 
     def get_candidatos(self, cargo=None, grado=None):
+        """
+        Obtiene candidatos con filtros opcionales
+        
+        Args:
+            cargo: Filtro por cargo (opcional)
+            grado: Filtro por grado (opcional)
+            
+        Returns:
+            list: Lista de tuplas (id, nombre, apellido, cargo, grado, foto)
+        """
         if cargo and grado:
             self.cursor.execute('SELECT id, nombre, apellido, cargo, grado, foto FROM candidatos WHERE cargo = ? AND grado = ?', (cargo, grado))
         elif cargo:
@@ -92,6 +91,19 @@ class DatabaseManager:
 
     def get_candidato_by_name(self, nombre, apellido):
         self.cursor.execute('SELECT * FROM candidatos WHERE nombre = ? AND apellido = ?', (nombre, apellido))
+        return self.cursor.fetchone()
+    
+    def get_candidato_by_id(self, candidato_id):
+        """
+        Obtiene un candidato por su ID
+        
+        Args:
+            candidato_id: ID del candidato a buscar
+            
+        Returns:
+            tuple: (id, nombre, apellido, cargo, grado, foto) o None si no se encuentra
+        """
+        self.cursor.execute('SELECT id, nombre, apellido, cargo, grado, foto FROM candidatos WHERE id = ?', (candidato_id,))
         return self.cursor.fetchone()
     
     def add_candidato(self, nombre, apellido, cargo, grado, foto=DEFAULT_CANDIDATE_IMAGE):
@@ -168,6 +180,12 @@ class DatabaseManager:
         self.conn.commit()
     
     def get_votantes(self):
+        """
+        Obtiene todos los votantes registrados
+        
+        Returns:
+            list: Lista de tuplas (id, ci, nombre, apellido, grado_curso, ya_voto)
+        """
         self.cursor.execute('SELECT id, ci, nombre, apellido, grado_curso, ya_voto FROM votantes')
         return self.cursor.fetchall()
     

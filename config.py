@@ -19,7 +19,7 @@ DB_PATH = os.path.join(DB_DIR, 'election.db')
 
 # --- Autenticación ---
 ADMIN_PASSWORD_FILE = os.path.join(CONFIG_DIR, '.admin_password')
-DEFAULT_ADMIN_PASSWORD = "admin123"
+# DEFAULT_ADMIN_PASSWORD = "admin123" # Eliminado por razones de seguridad
 
 # --- Candidatos ---
 DEFAULT_CANDIDATE_IMAGE = os.path.join(IMG_DIR, 'default_candidate.jpg')
