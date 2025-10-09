@@ -21,6 +21,12 @@ wheels/
 *.egg
 .venv
 venv/
+.venv/
+.env
+env/
+ENV/
+venv.bak/
+.venv.bak/
 
 # Archivos de SQLite
 *.db
