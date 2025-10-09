@@ -221,6 +221,8 @@ graph TD
 - **Control de Estado**: Activación y cierre de la votación
 - **Cambio de Contraseña**: Seguridad de acceso administrativo
 - **Personalización**: Configuración de cargos, grados y otros parámetros
+- **Votos Múltiples Correctamente Registrados**: Sistema asegura que todos los votos (Directora, Vice Directora y Coordinadora) se registren correctamente para cada votante
+
 
 ---
 

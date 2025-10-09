@@ -17,6 +17,25 @@
 
 ---
 
+## 🚀 [1.3.1] - 2025-10-09 - Corrección de Registro de Votos Múltiples
+
+<div align="center">
+
+[![](https://img.shields.io/badge/Added-%2B1_Feature-green?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![](https://img.shields.io/badge/Fixed-%2B1_Bug-red?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+
+</div>
+
+### ✨ Añadido
+
+- **💾 Nuevo Método `add_multiple_votes`**: Se ha añadido un nuevo método en `DatabaseManager` que permite registrar múltiples votos para un mismo votante y marcarlo como que ya votó solo después de registrar todos los votos.
+
+### 🐛 Corregido
+
+- **🗳️ Registro Completo de Votos por Cargo**: Se corrigió el problema donde solo se registraba el voto para DIRECTORA y no para VICEDIRECTORA y COORDINADORA. Ahora todos los votos seleccionados se registran correctamente en la base de datos antes de marcar al votante como que ya votó.
+
+---
+
 ## 🚀 [1.3.0] - 2025-10-09 - Mejora en la Ejecución de la Aplicación
 
 <div align="center">
