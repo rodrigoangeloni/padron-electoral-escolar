@@ -177,7 +177,6 @@ class DatabaseManager:
         except Exception as e:
             self.conn.rollback()
             return False, f"Error al registrar votos: {str(e)}"
-        return True, "Voto registrado exitosamente"
     
     def get_resultados(self):
         self.cursor.execute('''
