@@ -6,7 +6,7 @@
 [![Tkinter](https://img.shields.io/badge/Tkinter-2C5E8B?style=for-the-badge&logo=python&logoColor=white)](https://docs.python.org/3/library/tkinter.html)
 [![SQLite](https://img.shields.io/badge/SQLite-03B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Matplotlib](https://img.shields.io/badge/Matplotlib-11557c?style=for-the-badge&logo=matplotlib&logoColor=white)](https://matplotlib.org/)
-[![Version](https://img.shields.io/badge/Version-v1.3.4-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![Version](https://img.shields.io/badge/Version-v1.3.5-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 
 </div>
 
@@ -48,6 +48,7 @@
 | 📈 **Gestión Completa** | Administración de candidatos, votantes y elecciones |
 | 📱 **Diseño Adaptativo** | Interfaz que se adapta a diferentes tamaños de pantalla |
 | 🗂️ **Importación Masiva** | Carga de votantes desde archivos CSV |
+| 📄 **Exportación a PDF** | Generación de informes de resultados en formato PDF |
 
 </div>
 
@@ -69,9 +70,10 @@
 |:---:|:---:|
 | [🐍 Python](https://www.python.org/) | 3.11.8 | Lenguaje principal del sistema |
 | [🖼️ Tkinter](https://docs.python.org/3/library/tkinter.html) | Built-in | Interfaz gráfica de usuario |
-| [💾 SQLite](https://www.sqlite.org/) | Built-in | Base de datos ligera y eficiente |
+| [💾 SQLite](https.sqlite.org/) | Built-in | Base de datos ligera y eficiente |
 | [📊 Matplotlib](https://matplotlib.org/) | 3.10.7 | Visualización de gráficos |
 | [🖼️ Pillow](https://python-pillow.org/) | 11.3.0 | Procesamiento de imágenes |
+| [📄 FPDF2](https://pyfpdf.github.io/fpdf2/) | 2.7.9 | Generación de archivos PDF |
 | [⚙️ PyInstaller](https://pyinstaller.org/) | 6.16.0 | Empaquetado de aplicaciones |
 
 </div>
@@ -175,7 +177,8 @@ padron-electoral-escolar/
 │   ├── 📄 auth.py               # Autenticación
 │   ├── 📄 candidate_ui.py       # UI de candidatos
 │   ├── 📄 voter_ui.py           # UI de votantes
-│   └── 📄 results_ui.py         # UI de resultados
+│   ├── 📄 results_ui.py         # UI de resultados
+│   └── 📄 pdf_exporter.py       # Exportación de resultados a PDF
 ├── 📄 main.py                   # Controlador principal
 ├── 📄 config.py                 # Configuración central
 ├── 📄 database.py               # Gestión de base de datos
@@ -206,6 +209,7 @@ padron-electoral-escolar/
 | `utils/candidate_ui.py` | UI de Candidatos | Funcionalidad específica de candidatos |
 | `utils/voter_ui.py` | UI de Votantes | Funcionalidad específica de votantes |
 | `utils/results_ui.py` | UI de Resultados | Visualización de resultados y gráficos |
+| `utils/pdf_exporter.py` | Exportación a PDF | Generación de informes en formato PDF |
 
 ---
 
@@ -256,7 +260,7 @@ graph TD
 
 - **Tablas Dinámicas**: Resultados actualizados en tiempo real
 - **Gráficos Interactivos**: Visualización de tendencias y comparativas
-- **Exportación**: Opción de exportar resultados en diferentes formatos
+- **Exportación a PDF**: Genera informes profesionales de los resultados, incluyendo ganadores y un desglose detallado de los votos, listos para ser compartidos o archivados.
 - **Resumen por Cargos**: Presentación organizada por posición electoral
 
 ### ⚙️ Configuración del Sistema

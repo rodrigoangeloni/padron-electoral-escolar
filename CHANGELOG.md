@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/Version-v1.3.4-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![Version](https://img.shields.io/badge/Version-v1.3.5-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![Python](https://img.shields.io/badge/Python-3.7+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
 </div>
@@ -14,6 +14,26 @@
 ### 🔄 Registro de Cambios y Actualizaciones del Sistema de Votación Escolar
 
 </div>
+
+---
+
+## 🚀 [v1.3.5] - 2025-10-10 - Exportación de Resultados a PDF y Mejoras de Diseño
+
+<div align="center">
+
+[![](https://img.shields.io/badge/Added-%2B3_Features-green?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![](https://img.shields.io/badge/Changed-%2B2_Features-yellow?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+
+</div>
+
+### ✨ Añadido
+- **📄 Exportación de Resultados a PDF**: Se ha añadido la capacidad de exportar los resultados de las elecciones a un archivo PDF. Esta funcionalidad permite a los administradores generar un informe profesional con los ganadores y un resumen detallado de los votos.
+- **📦 Nuevo Módulo `pdf_exporter`**: Se ha creado el módulo `utils/pdf_exporter.py` para encapsular la lógica de generación de archivos PDF, utilizando la librería `fpdf2`.
+- **➕ Nueva Dependencia `fpdf2`**: Se ha añadido `fpdf2` al archivo `requirements.txt` para soportar la creación de documentos PDF.
+
+### 🔧 Cambiado
+- **🎨 Interfaz de Resultados Mejorada**: Se ha añadido un botón "Exportar a PDF" en la pestaña de resultados del panel de administración, permitiendo una fácil generación de informes.
+- **📄 Diseño del Reporte PDF Mejorado**: Se ha mejorado el diseño del PDF exportado, incluyendo un título más prominente y un pie de página con créditos de desarrollador.
 
 ---
 

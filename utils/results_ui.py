@@ -2,12 +2,13 @@
 Módulo para la funcionalidad de UI de resultados
 """
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import messagebox, ttk, filedialog
 from PIL import Image, ImageTk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import config
 from utils.path_handler import get_images_dir
+from utils.pdf_exporter import export_results_to_pdf
 
 
 class ResultsUI:
@@ -27,6 +28,9 @@ class ResultsUI:
         refresh_button.pack(side="left", padx=5)
         reset_button = tk.Button(controls_frame, text="Reiniciar Votación", command=reset_callback, bg=config.COLOR_WARNING, fg=config.COLOR_WHITE)
         reset_button.pack(side="left", padx=5)
+        
+        export_button = tk.Button(controls_frame, text="Exportar a PDF", command=self._export_results_to_pdf, bg=config.COLOR_SUCCESS, fg=config.COLOR_WHITE)
+        export_button.pack(side="left", padx=5)
 
         results_notebook = ttk.Notebook(self.parent_frame)
         results_notebook.pack(fill="both", expand=True, padx=10, pady=10)
@@ -146,3 +150,34 @@ class ResultsUI:
         canvas = FigureCanvasTkAgg(fig, master=self.graphs_frame)
         canvas.draw()
         canvas.get_tk_widget().pack(fill='both', expand=True)
+
+    def _export_results_to_pdf(self):
+        """Exporta los resultados actuales a un archivo PDF."""
+        resultados, _ = self.db_manager.get_resultados()
+        
+        if not resultados:
+            messagebox.showinfo("Exportar a PDF", "No hay resultados para exportar.")
+            return
+
+        winners = {}
+        for row in resultados:
+            cargo, votos = row[2], row[4]
+            if cargo not in winners or votos > winners[cargo]['votos']:
+                candidato_obj = self.db_manager.get_candidato_by_name(row[0], row[1])
+                if candidato_obj:
+                    winners[cargo] = {'nombre': row[0], 'apellido': row[1], 'votos': votos}
+
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".pdf",
+            filetypes=[("PDF Files", "*.pdf"), ("All files", "*.*")],
+            title="Guardar resultados como PDF"
+        )
+        
+        if not file_path:
+            return
+
+        try:
+            export_results_to_pdf(winners, resultados, file_path)
+            messagebox.showinfo("Exportar a PDF", f"Resultados exportados exitosamente a:\n{file_path}")
+        except Exception as e:
+            messagebox.showerror("Error de Exportación", f"No se pudo exportar el archivo PDF.\nError: {e}")
