@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/Version-1.3.3-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![Version](https://img.shields.io/badge/Version-1.3.4-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![Python](https://img.shields.io/badge/Python-3.7+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
 </div>
@@ -17,28 +17,36 @@
 
 ---
 
-## 🚀 [1.3.3] - 2025-10-09 - Solución de Persistencia de Datos en Versión Compilada
-## 🚀 [1.3.4] - 2025-10-09 - Compilación para Windows con Icono Personalizado
+## 🚀 [1.3.4] - 2025-10-10 - Metadatos y Personalización del Ejecutable
 
 <div align="center">
 
-[![](https://img.shields.io/badge/Changed-%2B1_Feature-yellow?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![](https://img.shields.io/badge/Added-%2B1_Feature-green?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![](https://img.shields.io/badge/Changed-%2B2_Features-yellow?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![](https://img.shields.io/badge/Fixed-%2B1_Bug-red?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 
 </div>
 
-### 🔧 Cambiado
+### ✨ Añadido
+- **📝 Metadatos Detallados en Ejecutable**: Se ha incorporado un archivo de información de versión (`version_info.txt`) para enriquecer el ejecutable de Windows con metadatos profesionales, incluyendo descripción, versión, nombre del producto, copyright y compañía.
 
-- **🖼️ Icono Personalizado en Ejecutable**: Se ha actualizado la configuración de PyInstaller para incluir correctamente el icono personalizado (icon.ico) en el archivo ejecutable de Windows, mejorando la identidad visual del sistema.
+### 🔧 Cambiado
+- **🖼️ Icono Personalizado**: Se ha configurado PyInstaller para utilizar un ícono personalizado (`icon.ico`) en el ejecutable, mejorando la identidad visual de la aplicación.
+- **🌐 Idioma de Metadatos**: Se ha ajustado el idioma en las propiedades del ejecutable a "Español" para una correcta localización y presentación.
+
+### 🐛 Corregido
+- **🔢 Sincronización de Versiones**: Se corrigió la discrepancia en las propiedades del ejecutable, asegurando que tanto la "Versión del archivo" como la "Versión del producto" muestren `1.3.4.0`.
 
 ---
 
+## 🚀 [1.3.3] - 2025-10-09 - Solución de Persistencia de Datos en Versión Compilada
 
-&lt;div align="center"&gt;
+<div align="center">
 
 [![](https://img.shields.io/badge/Added-%2B2_Features-green?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![](https://img.shields.io/badge/Fixed-%2B1_Bug-red?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 
-&lt;/div&gt;
+</div>
 
 ### ✨ Añadido
 

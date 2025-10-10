@@ -91,7 +91,7 @@
 
 1. **Clonar o descargar el proyecto**
    ```bash
-   git clone https://github.com/tu-usuario/padron-electoral-escolar.git
+   git clone https://github.com/rodrigoangeloni/padron-electoral-escolar.git
    cd padron-electoral-escolar
    ```
 
@@ -130,16 +130,16 @@ python3 main.py
 Descarga la versión compilada del sistema para Windows sin necesidad de instalar Python:
 
 1. **Descargar el ejecutable**:
-   - Ve a la sección de [Releases](https://github.com/rodrigoangeloni/padron-electoral-escolar/releases) del repositorio
-   - Descarga el archivo `SistemaVotacionEscolar.exe` correspondiente a la versión más reciente
-   - Ejecuta el archivo directamente en tu sistema Windows
+   - Ve a la sección de [Releases](https://github.com/rodrigoangeloni/padron-electoral-escolar/releases) del repositorio.
+   - Descarga el archivo `SistemaVotacionEscolar.exe` correspondiente a la versión más reciente.
+   - Ejecuta el archivo directamente en tu sistema Windows.
 
 2. **Características del ejecutable**:
-   - Incluye todas las dependencias necesarias
-   - No requiere instalación de Python ni bibliotecas adicionales
-   - Totalmente portátil y listo para usar
-   - Icono personalizado y metadatos del desarrollador
-   - **Persistencia de datos**: A partir de la versión 1.3.2, los datos se almacenan en ubicaciones persistentes fuera del directorio temporal, lo que permite mantener la información entre ejecuciones del programa
+   - Incluye todas las dependencias necesarias.
+   - No requiere instalación de Python ni bibliotecas adicionales.
+   - Totalmente portátil y listo para usar.
+   - **Metadatos Profesionales**: Incluye un ícono de aplicación personalizado e información detallada del producto, como versión, autor y descripción, visible en las propiedades del archivo en Windows.
+   - **Persistencia de datos**: A partir de la versión 1.3.3, los datos se almacenan en ubicaciones persistentes, permitiendo mantener la información entre ejecuciones.
 
 ### 🔧 Opción 2: Instalación desde código fuente (Desarrolladores)
 
@@ -156,10 +156,10 @@ pip install pyinstaller
 Luego, ejecuta el siguiente comando en la raíz del proyecto:
 
 ```bash
-pyinstaller SistemaVotacionEscolar.spec
+pyinstaller main.spec
 ```
 
-El archivo `SistemaVotacionEscolar.spec` está configurado para manejar correctamente las rutas de archivos y garantizar la persistencia de datos en la versión compilada.
+El archivo `main.spec` está configurado para incluir el ícono, los metadatos de versión y garantizar la persistencia de datos en la compilación.
 
 ---
 
@@ -183,6 +183,8 @@ padron-electoral-escolar/
 ├── 📄 voting_app.py             # Interfaz de votación
 ├── 📄 run_app.py                # Script de ejecución
 ├── 📄 requirements.txt          # Dependencias
+├── 📄 main.spec                 # Configuración de PyInstaller
+├── 📄 version_info.txt          # Metadatos del ejecutable
 ├── 📄 README.md                 # Documentación principal
 └── 📄 CHANGELOG.md              # Registro de cambios
 ```
