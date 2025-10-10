@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/Version-1.3.4-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![Version](https://img.shields.io/badge/Version-v1.3.4-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![Python](https://img.shields.io/badge/Python-3.7+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
 </div>
@@ -17,7 +17,7 @@
 
 ---
 
-## 🚀 [1.3.4] - 2025-10-10 - Metadatos y Personalización del Ejecutable
+## 🚀 [v1.3.4] - 2025-10-10 - Metadatos y Personalización del Ejecutable
 
 <div align="center">
 
