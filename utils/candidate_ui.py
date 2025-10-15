@@ -22,6 +22,7 @@ class CandidateUI:
         self.candidates_tree = None
         self.photo_preview = None
         self.update_photo_button = None
+        self.cargo_combo = None
 
     def setup_candidates_tab(self):
         """Configura la pestaña de candidatos"""
@@ -37,9 +38,12 @@ class CandidateUI:
         self.apellido_entry.grid(row=0, column=3, padx=5, pady=5)
         
         tk.Label(add_frame, text="Cargo:").grid(row=1, column=0, sticky="w", padx=5, pady=5)
-        self.cargo_var = tk.StringVar(value=config.CARGOS[0])
-        cargo_combo = ttk.Combobox(add_frame, textvariable=self.cargo_var, values=config.CARGOS, state="readonly")
-        cargo_combo.grid(row=1, column=1, padx=5, pady=5)
+        self.cargo_var = tk.StringVar()
+        cargos = self.db_manager.get_cargos()
+        self.cargo_combo = ttk.Combobox(add_frame, textvariable=self.cargo_var, values=cargos, state="readonly")
+        if cargos:
+            self.cargo_var.set(cargos[0])
+        self.cargo_combo.grid(row=1, column=1, padx=5, pady=5)
         
         tk.Label(add_frame, text="Grado:").grid(row=1, column=2, sticky="w", padx=5, pady=5)
         self.grado_var = tk.StringVar(value=config.GRADOS_CANDIDATOS[0])
@@ -85,6 +89,15 @@ class CandidateUI:
         delete_button.pack(side="left", padx=5)
         
         self.refresh_candidates_list()
+
+    def update_cargos_combobox(self):
+        """Actualiza la lista de cargos en el combobox."""
+        cargos = self.db_manager.get_cargos()
+        self.cargo_combo['values'] = cargos
+        if cargos:
+            self.cargo_var.set(cargos[0])
+        else:
+            self.cargo_var.set("")
 
     def on_candidate_select(self, event):
         """Maneja la selección de un candidato"""
@@ -152,6 +165,10 @@ class CandidateUI:
         if not nombre or not apellido:
             messagebox.showerror("Error", "Por favor, ingrese el nombre y apellido del candidato")
             return
+        if not cargo:
+            messagebox.showerror("Error", "Por favor, seleccione un cargo.")
+            return
+
         self.db_manager.add_candidato(nombre, apellido, cargo, grado)
         self.nombre_entry.delete(0, tk.END)
         self.apellido_entry.delete(0, tk.END)

@@ -212,8 +212,17 @@ class AdminApp(tk.Frame):
         self.graphs_frame = self.results_ui.graphs_frame
 
     def setup_config_tab(self):
-        status_frame = tk.LabelFrame(self.config_frame, text="Estado de la Votación", padx=10, pady=10)
-        status_frame.pack(fill="x", padx=10, pady=10)
+        # Frame principal para la pestaña de configuración
+        main_config_frame = tk.Frame(self.config_frame)
+        main_config_frame.pack(fill="both", expand=True, padx=10, pady=10)
+        main_config_frame.grid_columnconfigure(0, weight=1)
+
+        # --- Frame para Estado de Votación y Contraseña ---
+        left_frame = tk.Frame(main_config_frame)
+        left_frame.grid(row=0, column=0, sticky="nsew", padx=(0, 5))
+        
+        status_frame = tk.LabelFrame(left_frame, text="Estado de la Votación", padx=10, pady=10)
+        status_frame.pack(fill="x", pady=(0, 10))
         
         self.status_label = tk.Label(status_frame, text="", font=("Arial", 12, "bold"))
         self.status_label.pack(pady=10)
@@ -227,26 +236,106 @@ class AdminApp(tk.Frame):
         deactivate_button = tk.Button(button_frame, text="Cerrar Votación", command=lambda: self.set_votation_status(config.VOTACION_CERRADA), bg=config.COLOR_DANGER, fg=config.COLOR_WHITE, width=15)
         deactivate_button.pack(side="left", padx=5)
         
-        password_frame = tk.LabelFrame(self.config_frame, text="Cambiar Contraseña de Administrador", padx=10, pady=10)
-        password_frame.pack(fill="x", padx=10, pady=10)
+        password_frame = tk.LabelFrame(left_frame, text="Cambiar Contraseña de Administrador", padx=10, pady=10)
+        password_frame.pack(fill="x")
         
         tk.Label(password_frame, text="Contraseña Actual:").grid(row=0, column=0, sticky="w", padx=5, pady=5)
-        self.current_password_entry = tk.Entry(password_frame, show="*", width=20)
+        self.current_password_entry = tk.Entry(password_frame, show="*", width=30)
         self.current_password_entry.grid(row=0, column=1, padx=5, pady=5)
         
         tk.Label(password_frame, text="Nueva Contraseña:").grid(row=1, column=0, sticky="w", padx=5, pady=5)
-        self.new_password_entry = tk.Entry(password_frame, show="*", width=20)
+        self.new_password_entry = tk.Entry(password_frame, show="*", width=30)
         self.new_password_entry.grid(row=1, column=1, padx=5, pady=5)
         
         tk.Label(password_frame, text="Confirmar Nueva Contraseña:").grid(row=2, column=0, sticky="w", padx=5, pady=5)
-        self.confirm_password_entry = tk.Entry(password_frame, show="*", width=20)
+        self.confirm_password_entry = tk.Entry(password_frame, show="*", width=30)
         self.confirm_password_entry.grid(row=2, column=1, padx=5, pady=5)
         
         change_password_button = tk.Button(password_frame, text="Cambiar Contraseña", command=self.change_password, bg=config.COLOR_WARNING, fg=config.COLOR_WHITE)
         change_password_button.grid(row=3, column=0, columnspan=2, pady=10)
+
+        # --- Frame para Gestión de Cargos ---
+        right_frame = tk.Frame(main_config_frame)
+        right_frame.grid(row=0, column=1, sticky="nsew", padx=(5, 0))
+        main_config_frame.grid_columnconfigure(1, weight=1)
+
+        cargos_frame = tk.LabelFrame(right_frame, text="Gestionar Cargos", padx=10, pady=10)
+        cargos_frame.pack(fill="both", expand=True)
+
+        # Frame para agregar cargo
+        add_cargo_frame = tk.Frame(cargos_frame)
+        add_cargo_frame.pack(fill="x", pady=5)
+        tk.Label(add_cargo_frame, text="Nuevo Cargo:").pack(side="left", padx=(0, 5))
+        self.new_cargo_entry = tk.Entry(add_cargo_frame, width=25)
+        self.new_cargo_entry.pack(side="left", expand=True, fill="x", padx=5)
+        add_cargo_button = tk.Button(add_cargo_frame, text="Agregar", command=self.add_cargo, bg=config.COLOR_SUCCESS, fg=config.COLOR_WHITE)
+        add_cargo_button.pack(side="left", padx=(5, 0))
+
+        # Frame para la lista de cargos
+        cargos_list_frame = tk.Frame(cargos_frame)
+        cargos_list_frame.pack(fill="both", expand=True, pady=5)
+        
+        self.cargos_tree = ttk.Treeview(cargos_list_frame, columns=("Cargo",), show="headings", height=8)
+        self.cargos_tree.heading("Cargo", text="Cargo")
+        self.cargos_tree.pack(side="left", fill="both", expand=True)
+        
+        cargos_scrollbar = ttk.Scrollbar(cargos_list_frame, orient="vertical", command=self.cargos_tree.yview)
+        self.cargos_tree.configure(yscrollcommand=cargos_scrollbar.set)
+        cargos_scrollbar.pack(side="right", fill="y")
+        
+        delete_cargo_button = tk.Button(cargos_frame, text="Eliminar Cargo Seleccionado", command=self.delete_cargo, bg=config.COLOR_DANGER, fg=config.COLOR_WHITE)
+        delete_cargo_button.pack(pady=5)
         
         self.update_status_display()
-    
+        self.refresh_cargos_list()
+
+    def add_cargo(self):
+        """Agrega un nuevo cargo a la base de datos."""
+        new_cargo = self.new_cargo_entry.get().strip()
+        if not new_cargo:
+            messagebox.showerror("Error", "El nombre del cargo no puede estar vacío.")
+            return
+        
+        success, message = self.db_manager.add_cargo(new_cargo)
+        if success:
+            messagebox.showinfo("Éxito", message)
+            self.new_cargo_entry.delete(0, tk.END)
+            self.refresh_cargos_list()
+            # Actualizar el combobox de candidatos
+            if hasattr(self, 'candidate_ui'):
+                self.candidate_ui.update_cargos_combobox()
+        else:
+            messagebox.showerror("Error", message)
+
+    def delete_cargo(self):
+        """Elimina el cargo seleccionado de la lista."""
+        selected_item = self.cargos_tree.selection()
+        if not selected_item:
+            messagebox.showwarning("Advertencia", "Por favor, seleccione un cargo para eliminar.")
+            return
+            
+        cargo_name = self.cargos_tree.item(selected_item, 'values')[0]
+        
+        if messagebox.askyesno("Confirmar Eliminación", f"¿Está seguro de que desea eliminar el cargo '{cargo_name}'?"):
+            success, message = self.db_manager.delete_cargo(cargo_name)
+            if success:
+                messagebox.showinfo("Éxito", message)
+                self.refresh_cargos_list()
+                # Actualizar el combobox de candidatos
+                if hasattr(self, 'candidate_ui'):
+                    self.candidate_ui.update_cargos_combobox()
+            else:
+                messagebox.showerror("Error", message)
+
+    def refresh_cargos_list(self):
+        """Actualiza la lista de cargos en la interfaz."""
+        for item in self.cargos_tree.get_children():
+            self.cargos_tree.delete(item)
+        
+        cargos = self.db_manager.get_cargos()
+        for cargo in cargos:
+            self.cargos_tree.insert("", "end", values=(cargo,))
+
     def refresh_results(self):
         self.results_ui.refresh_results()
     

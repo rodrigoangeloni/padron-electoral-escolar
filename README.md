@@ -6,15 +6,15 @@
 [![Tkinter](https://img.shields.io/badge/Tkinter-2C5E8B?style=for-the-badge&logo=python&logoColor=white)](https://docs.python.org/3/library/tkinter.html)
 [![SQLite](https://img.shields.io/badge/SQLite-03B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Matplotlib](https://img.shields.io/badge/Matplotlib-11557c?style=for-the-badge&logo=matplotlib&logoColor=white)](https://matplotlib.org/)
-[![Version](https://img.shields.io/badge/Version-v1.3.5-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![Version](https://img.shields.io/badge/Version-v1.4.0-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 
 </div>
 
 ---
 
 <div align="center">
-  <h3>🗳️ Gestión completa de elecciones escolares con interfaz intuitiva y segura</h3>
-  <p>Aplicación de escritorio para gestionar elecciones estudiantiles, permitiendo a los estudiantes votar por sus representantes para los cargos de Directora, Vice Directora y Coordinadora.</p>
+  <h3>🗳️ Gestión completa y dinámica de elecciones escolares con interfaz intuitiva y segura</h3>
+  <p>Aplicación de escritorio para gestionar elecciones estudiantiles, permitiendo a los administradores definir los cargos a elegir y a los estudiantes votar por sus representantes.</p>
 </div>
 
 ---
@@ -45,6 +45,7 @@
 | 🎨 **Interfaz Intuitiva** | Diseño limpio y amigable para usuarios escolares |
 | 🔐 **Autenticación Segura** | Validación por CI con prevención de votos duplicados |
 | 📊 **Resultados en Tiempo Real** | Visualización instantánea de votos y gráficos |
+| ⚙️ **Gestión Dinámica de Cargos** | Añade, edita o elimina los cargos a elegir |
 | 📈 **Gestión Completa** | Administración de candidatos, votantes y elecciones |
 | 📱 **Diseño Adaptativo** | Interfaz que se adapta a diferentes tamaños de pantalla |
 | 🗂️ **Importación Masiva** | Carga de votantes desde archivos CSV |
@@ -54,11 +55,12 @@
 
 ### 🎯 Beneficios del Sistema
 
-- **Simplicidad**: Interfaz clara y sencilla de usar
-- **Seguridad**: Control de identidad y prevención de fraudes
-- **Eficiencia**: Proceso de votación rápido y confiable
-- **Transparencia**: Resultados visibles y verificables
-- **Mantenibilidad**: Código modular y bien documentado
+- **Flexibilidad**: Adapta la elección a cualquier estructura de gobierno estudiantil.
+- **Simplicidad**: Interfaz clara y sencilla de usar.
+- **Seguridad**: Control de identidad y prevención de fraudes.
+- **Eficiencia**: Proceso de votación rápido y confiable.
+- **Transparencia**: Resultados visibles y verificables.
+- **Mantenibilidad**: Código modular y bien documentado.
 
 ---
 
@@ -68,7 +70,7 @@
 
 | Tecnología | Versión Exacta | Descripción |
 |:---:|:---:|
-| [🐍 Python](https://www.python.org/) | 3.11.8 | Lenguaje principal del sistema |
+| [🐍 Python](https.www.python.org/) | 3.11.8 | Lenguaje principal del sistema |
 | [🖼️ Tkinter](https://docs.python.org/3/library/tkinter.html) | Built-in | Interfaz gráfica de usuario |
 | [💾 SQLite](https.sqlite.org/) | Built-in | Base de datos ligera y eficiente |
 | [📊 Matplotlib](https://matplotlib.org/) | 3.10.7 | Visualización de gráficos |
@@ -149,7 +151,23 @@ Sigue las instrucciones de instalación anteriores si deseas ejecutar desde el c
 
 ### 🛠️ Compilación del Ejecutable
 
-Para compilar el ejecutable tú mismo, asegúrate de tener instalado PyInstaller:
+#### Método 1: Script Automatizado (Recomendado en Windows)
+
+Para una compilación rápida y sencilla en Windows, simplemente ejecuta el script `build.bat`:
+
+```bash
+build.bat
+```
+
+Este script se encargará de:
+- Activar el entorno virtual si existe.
+- Verificar e instalar PyInstaller si es necesario.
+- Limpiar compilaciones anteriores.
+- Generar el ejecutable en la carpeta `dist/`.
+
+#### Método 2: Manualmente
+
+Si prefieres compilar manualmente, asegúrate de tener instalado PyInstaller:
 
 ```bash
 pip install pyinstaller
@@ -185,6 +203,7 @@ padron-electoral-escolar/
 ├── 📄 admin_app.py              # Interfaz de administración
 ├── 📄 voting_app.py             # Interfaz de votación
 ├── 📄 run_app.py                # Script de ejecución
+├── 📄 build.bat                 # Script de compilación para Windows
 ├── 📄 requirements.txt          # Dependencias
 ├── 📄 main.spec                 # Configuración de PyInstaller
 ├── 📄 version_info.txt          # Metadatos del ejecutable
@@ -242,34 +261,39 @@ graph TD
 
 ## 🎯 Funcionalidades Principales
 
+### ⚙️ Gestión de Cargos (¡Nuevo!)
+
+- **Añadir y Eliminar Cargos**: Desde la pestaña de **Configuración**, el administrador puede añadir nuevos cargos para la elección (ej. "Presidente", "Tesorero") o eliminar los existentes.
+- **Actualización Dinámica**: La interfaz de votación y los resultados se actualizan automáticamente para reflejar los cargos configurados.
+- **Flexibilidad Total**: Permite adaptar el sistema a cualquier estructura de gobierno estudiantil, sin límites en la cantidad o nombre de los cargos.
+
 ### 👤 Gestión de Candidatos
 
-- **Agregar/Editar/Eliminar**: Administración completa de perfiles de candidatos
-- **Subida de Fotos**: Carga de imágenes personalizadas para cada candidato
-- **Filtros Avanzados**: Búsqueda por cargo, grado y otros criterios
-- **Vista Previa**: Visualización de imágenes antes de confirmar
+- **Agregar/Editar/Eliminar**: Administración completa de perfiles de candidatos.
+- **Asignación de Cargos Dinámica**: Asigna a cada candidato uno de los cargos que hayas creado.
+- **Subida de Fotos**: Carga de imágenes personalizadas para cada candidato.
+- **Filtros Avanzados**: Búsqueda por cargo, grado y otros criterios.
+- **Vista Previa**: Visualización de imágenes antes de confirmar.
 
 ### 👥 Gestión de Votantes
 
-- **Registro Individual**: Agregar votantes manualmente
-- **Importación Masiva**: Carga desde archivos CSV con formato específico
-- **Validación CI**: Control de identidad y prevención de duplicados
-- **Estado de Votación**: Seguimiento de quién ya votó y quién no
+- **Registro Individual**: Agregar votantes manualmente.
+- **Importación Masiva**: Carga desde archivos CSV con formato específico.
+- **Validación CI**: Control de identidad y prevención de duplicados.
+- **Estado de Votación**: Seguimiento de quién ya votó y quién no.
 
 ### 📊 Visualización de Resultados
 
-- **Tablas Dinámicas**: Resultados actualizados en tiempo real
-- **Gráficos Interactivos**: Visualización de tendencias y comparativas
+- **Tablas Dinámicas**: Resultados actualizados en tiempo real.
+- **Gráficos Interactivos**: Visualización de tendencias y comparativas.
 - **Exportación a PDF**: Genera informes profesionales de los resultados, incluyendo ganadores y un desglose detallado de los votos, listos para ser compartidos o archivados.
-- **Resumen por Cargos**: Presentación organizada por posición electoral
+- **Resumen por Cargos**: Presentación organizada por posición electoral.
 
 ### ⚙️ Configuración del Sistema
 
-- **Control de Estado**: Activación y cierre de la votación
-- **Cambio de Contraseña**: Seguridad de acceso administrativo
-- **Personalización**: Configuración de cargos, grados y otros parámetros
-- **Votos Múltiples Correctamente Registrados**: Sistema asegura que todos los votos (Directora, Vice Directora y Coordinadora) se registren correctamente para cada votante
-
+- **Control de Estado**: Activación y cierre de la votación.
+- **Cambio de Contraseña**: Seguridad de acceso administrativo.
+- **Votos Múltiples Correctamente Registrados**: El sistema asegura que todos los votos se registren correctamente para cada votante.
 
 ---
 
@@ -277,17 +301,17 @@ graph TD
 
 ### 🛡️ Medidas de Seguridad Implementadas
 
-- **Hash de Contraseñas**: Almacenamiento seguro de credenciales administrativas
-- **Validación de CI**: Control de identidad para prevenir votos duplicados
-- **Sesiones Seguras**: Gestión de estado de votación para cada usuario
-- **Auditoría de Acciones**: Registro de operaciones críticas
+- **Hash de Contraseñas**: Almacenamiento seguro de credenciales administrativas.
+- **Validación de CI**: Control de identidad para prevenir votos duplicados.
+- **Sesiones Seguras**: Gestión de estado de votación para cada usuario.
+- **Auditoría de Acciones**: Registro de operaciones críticas.
 
 ### 📝 Política de Seguridad
 
-- Las contraseñas se almacenan con hash SHA-256
-- Se previene el acceso concurrente de votantes
-- Se mantiene un registro de cambios en la configuración
-- Se implementa control de acceso basado en roles
+- Las contraseñas se almacenan con hash SHA-256.
+- Se previene el acceso concurrente de votantes.
+- Se mantiene un registro de cambios en la configuración.
+- Se implementa control de acceso basado en roles.
 
 ---
 
@@ -295,11 +319,11 @@ graph TD
 
 ### 📊 Tipos de Resultados Disponibles
 
-- **Resultados por Cargo**: Visualización detallada de votos por posición
-- **Resultados por Grado**: Comparativas entre diferentes niveles educativos
-- **Gráficos de Barras**: Representación visual de tendencias
-- **Ganadores por Cargo**: Destacado de candidatos ganadores
-- **Participación**: Porcentaje de participación electoral
+- **Resultados por Cargo**: Visualización detallada de votos por posición.
+- **Resultados por Grado**: Comparativas entre diferentes niveles educativos.
+- **Gráficos de Barras**: Representación visual de tendencias.
+- **Ganadores por Cargo**: Destacado de candidatos ganadores.
+- **Participación**: Porcentaje de participación electoral.
 
 ---
 
@@ -307,24 +331,24 @@ graph TD
 
 ### 🤝 Cómo Contribuir
 
-1. **Fork** el repositorio
-2. **Crea una rama** (`git checkout -b feature/nueva-funcionalidad`)
-3. **Realiza tus cambios** y haz commit (`git commit -m 'Añadir nueva funcionalidad'`)
-4. **Sube los cambios** (`git push origin feature/nueva-funcionalidad`)
-5. **Abre un Pull Request**
+1. **Fork** el repositorio.
+2. **Crea una rama** (`git checkout -b feature/nueva-funcionalidad`).
+3. **Realiza tus cambios** y haz commit (`git commit -m 'Añadir nueva funcionalidad'`).
+4. **Sube los cambios** (`git push origin feature/nueva-funcionalidad`).
+5. **Abre un Pull Request**.
 
 ### 🧪 Pruebas
 
-- El sistema incluye pruebas de funcionalidad básicas
-- Se recomienda probar cada módulo individualmente
-- Verificar la compatibilidad con diferentes resoluciones de pantalla
+- El sistema incluye pruebas de funcionalidad básicas.
+- Se recomienda probar cada módulo individualmente.
+- Verificar la compatibilidad con diferentes resoluciones de pantalla.
 
 ### 📝 Estándares de Código
 
-- **PEP 8**: Estándar de codificación para Python
-- **Documentación**: Cada función debe estar documentada
-- **Nomenclatura**: Nombres descriptivos para variables y funciones
-- **Comentarios**: Explicación de lógica compleja
+- **PEP 8**: Estándar de codificación para Python.
+- **Documentación**: Cada función debe estar documentada.
+- **Nomenclatura**: Nombres descriptivos para variables y funciones.
+- **Comentarios**: Explicación de lógica compleja.
 
 ---
 
@@ -364,6 +388,6 @@ O CUALQUIER OTRO TRATO EN EL SOFTWARE.
 
 ### 🙏 Agradecimientos
 
-Este proyecto fue desarrollado para facilitar procesos democráticos entornos escolares. Agradecemos a todos los contribuyentes y usuarios que hacen posible su mejora continua.
+Este proyecto fue desarrollado para facilitar procesos democráticos en entornos escolares. Agradecemos a todos los contribuyentes y usuarios que hacen posible su mejora continua.
 
 </div>

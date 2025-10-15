@@ -44,12 +44,36 @@ class ResultsUI:
 
     def setup_summary_tab(self, parent_frame):
         """Configura la pestaña de resumen de resultados"""
-        winners_frame = tk.LabelFrame(parent_frame, text="Ganadoras de la Elección", font=("Arial", 14, "bold"), padx=20, pady=20)
-        winners_frame.pack(fill="x", padx=10, pady=10)
-        winners_frame.grid_columnconfigure((0, 1, 2), weight=1)
+        self.winners_frame = tk.LabelFrame(parent_frame, text="Ganadoras de la Elección", font=("Arial", 14, "bold"), padx=20, pady=20)
+        self.winners_frame.pack(fill="x", padx=10, pady=10)
+        
+        self.results_general_frame = tk.LabelFrame(parent_frame, text="Resultados Detallados", padx=10, pady=10)
+        self.results_general_frame.pack(fill="both", expand=True, padx=10, pady=5)
+        
+        columns = ("Nombre", "Apellido", "Cargo", "Grado", "Votos")
+        self.results_tree = ttk.Treeview(self.results_general_frame, columns=columns, show="headings", height=10)
+        
+        for col in columns:
+            self.results_tree.heading(col, text=col)
+            self.results_tree.column(col, width=120, anchor="center")
+        
+        scrollbar = ttk.Scrollbar(self.results_general_frame, orient="vertical", command=self.results_tree.yview)
+        self.results_tree.configure(yscrollcommand=scrollbar.set)
+        self.results_tree.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
 
-        for i, cargo in enumerate(config.CARGOS):
-            cargo_frame = tk.Frame(winners_frame)
+    def _setup_winners_ui(self, cargos):
+        """Crea la UI de ganadores dinámicamente."""
+        for widget in self.winners_frame.winfo_children():
+            widget.destroy()
+        
+        self.winners_widgets = {}
+        
+        num_cargos = len(cargos)
+        self.winners_frame.grid_columnconfigure(tuple(range(num_cargos)), weight=1)
+        
+        for i, cargo in enumerate(cargos):
+            cargo_frame = tk.Frame(self.winners_frame)
             cargo_frame.grid(row=0, column=i, padx=10, pady=10, sticky="n")
             tk.Label(cargo_frame, text=cargo, font=("Arial", 16, "bold"), fg="#2980b9").pack(pady=(0,10))
             img_label = tk.Label(cargo_frame, text="Esperando...", font=("Arial", 10), wraplength=150, height=8, width=20, relief="groove")
@@ -60,23 +84,11 @@ class ResultsUI:
             votes_label.pack()
             self.winners_widgets[cargo] = {'img': img_label, 'name': name_label, 'votes': votes_label}
 
-        results_general_frame = tk.LabelFrame(parent_frame, text="Resultados Detallados", padx=10, pady=10)
-        results_general_frame.pack(fill="both", expand=True, padx=10, pady=5)
-        
-        columns = ("Nombre", "Apellido", "Cargo", "Grado", "Votos")
-        self.results_tree = ttk.Treeview(results_general_frame, columns=columns, show="headings", height=10)
-        
-        for col in columns:
-            self.results_tree.heading(col, text=col)
-            self.results_tree.column(col, width=120, anchor="center")
-        
-        scrollbar = ttk.Scrollbar(results_general_frame, orient="vertical", command=self.results_tree.yview)
-        self.results_tree.configure(yscrollcommand=scrollbar.set)
-        self.results_tree.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
-
     def refresh_results(self):
         """Actualiza los resultados mostrados"""
+        cargos = self.db_manager.get_cargos()
+        self._setup_winners_ui(cargos)
+
         for item in self.results_tree.get_children():
             self.results_tree.delete(item)
         for widget in self.graphs_frame.winfo_children():
@@ -113,17 +125,21 @@ class ResultsUI:
                 widgets['name'].config(text="")
                 widgets['votes'].config(text="")
 
-        self._update_graphs(resultados)
+        self._update_graphs(resultados, cargos)
 
-    def _update_graphs(self, resultados):
+    def _update_graphs(self, resultados, cargos):
         """Actualiza los gráficos de resultados"""
         for widget in self.graphs_frame.winfo_children():
             widget.destroy()
 
-        fig = plt.figure(figsize=(12, 6))
+        num_cargos = len(cargos)
+        if num_cargos == 0:
+            return
+            
+        fig = plt.figure(figsize=(4 * num_cargos, 6))
         
-        for i, cargo in enumerate(config.CARGOS):
-            ax = fig.add_subplot(1, 3, i + 1)
+        for i, cargo in enumerate(cargos):
+            ax = fig.add_subplot(1, num_cargos, i + 1)
             
             cargo_results = [row for row in resultados if row[2] == cargo]
             

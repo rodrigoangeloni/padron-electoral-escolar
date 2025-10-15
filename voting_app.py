@@ -21,7 +21,7 @@ class VotingApp(tk.Frame):
         # --- Estado de la Aplicación ---
         self.current_votante = None
         self.current_step = 0
-        self.roles = config.CARGOS
+        self.roles = self.db_manager.get_cargos() # Cargos dinámicos desde la BD
         self.is_fullscreen = False
         
         # --- Selecciones ---
@@ -40,6 +40,8 @@ class VotingApp(tk.Frame):
     def show_ci_input(self):
         """Muestra la interfaz para ingresar la CI del votante."""
         self._clear_screen()
+        # Recargar roles por si cambiaron
+        self.roles = self.db_manager.get_cargos()
         
         main_frame = tk.Frame(self, bg=config.COLOR_WHITE)
         main_frame.place(relx=0.5, rely=0.5, anchor='center')
@@ -102,6 +104,11 @@ class VotingApp(tk.Frame):
     def start_voting_flow(self):
         """Inicia el proceso de votación paso a paso."""
         # Recargar los candidatos cada vez que se inicia un nuevo voto
+        if not self.roles:
+            messagebox.showerror("Error de Configuración", "No hay cargos configurados para la votación.")
+            self.show_ci_input()
+            return
+        
         self.all_candidates = {role: self.db_manager.get_candidatos(role) for role in self.roles}
         
         self.current_step = 0
@@ -182,7 +189,7 @@ class VotingApp(tk.Frame):
             self.show_final_confirmation()
 
     def show_final_confirmation(self):
-        """Muestra las 3 selecciones finales antes de guardar el voto."""
+        """Muestra las selecciones finales antes de guardar el voto."""
         self._clear_screen()
 
         title_label = tk.Label(self, text="Revisa tu selección", font=("Arial", 32, "bold"), bg=config.COLOR_WHITE, fg='#2c3e50')
@@ -192,8 +199,10 @@ class VotingApp(tk.Frame):
         selections_frame.pack(expand=True)
 
         for i, role in enumerate(self.roles):
-            candidato = self.selected_candidates[role]
-            
+            candidato = self.selected_candidates.get(role)
+            if not candidato:
+                continue # Omitir si no hay candidato para un rol
+
             selection_frame = tk.Frame(selections_frame, bg=config.COLOR_WHITE)
             selection_frame.grid(row=0, column=i, padx=20)
 
@@ -223,7 +232,7 @@ class VotingApp(tk.Frame):
         ci_votante = self.current_votante[1]
         
         # Obtener los IDs de los candidatos seleccionados
-        candidato_ids = [self.selected_candidates[role][0] for role in self.roles]
+        candidato_ids = [self.selected_candidates[role][0] for role in self.roles if role in self.selected_candidates]
         
         # Registrar todos los votos de una vez
         success, message = self.db_manager.add_multiple_votes(candidato_ids, ci_votante)

@@ -22,12 +22,6 @@ ADMIN_PASSWORD_FILE = os.path.join(CONFIG_DIR, '.admin_password')
 # --- Candidatos ---
 DEFAULT_CANDIDATE_IMAGE = os.path.join(IMG_DIR, 'default_candidate.jpg')
 
-CARGOS = [
-    "DIRECTORA",
-    "VICEDIRECTORA",
-    "COORDINADORA"
-]
-
 GRADOS_CANDIDATOS = [
     "Pre Escolar", "1er Grado", "2do Grado", "3er Grado", "4to Grado",
     "5to Grado", "6to Grado", "7mo Grado", "8vo Grado", "9no Grado",

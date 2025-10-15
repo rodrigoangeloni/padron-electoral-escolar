@@ -1,6 +1,6 @@
 import sqlite3
 import os
-from config import DB_PATH, DEFAULT_CANDIDATE_IMAGE, VOTACION_CERRADA, CARGOS, GRADOS_CANDIDATOS
+from config import DB_PATH, DEFAULT_CANDIDATE_IMAGE, VOTACION_CERRADA, GRADOS_CANDIDATOS
 from utils.path_handler import get_images_dir
 import random
 
@@ -57,6 +57,13 @@ class DatabaseManager:
             )
         ''')
         
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS cargos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nombre TEXT NOT NULL UNIQUE
+            )
+        ''')
+
         self.cursor.execute('SELECT COUNT(*) FROM configuracion')
         if self.cursor.fetchone()[0] == 0:
             self.cursor.execute('INSERT INTO configuracion (id, estado_votacion) VALUES (1, ?)', (VOTACION_CERRADA,))
@@ -65,10 +72,41 @@ class DatabaseManager:
         self.conn.commit()
 
     def _seed_data(self):
-        """No agrega datos de ejemplo a la base de datos."""
-        # Esta función ahora está vacía, ya que no queremos datos de ejemplo
-        pass
+        """Puebla la tabla de cargos con valores iniciales si está vacía."""
+        self.cursor.execute('SELECT COUNT(*) FROM cargos')
+        if self.cursor.fetchone()[0] == 0:
+            default_cargos = ["DIRECTORA", "VICEDIRECTORA", "COORDINADORA"]
+            for cargo in default_cargos:
+                try:
+                    self.cursor.execute('INSERT INTO cargos (nombre) VALUES (?)', (cargo,))
+                except sqlite3.IntegrityError:
+                    pass
+    
+    # --- Gestión de Cargos ---
+    def get_cargos(self):
+        """Obtiene todos los cargos de la base de datos."""
+        self.cursor.execute('SELECT nombre FROM cargos ORDER BY nombre')
+        return [row[0] for row in self.cursor.fetchall()]
 
+    def add_cargo(self, nombre_cargo):
+        """Agrega un nuevo cargo a la base de datos."""
+        try:
+            self.cursor.execute('INSERT INTO cargos (nombre) VALUES (?)', (nombre_cargo,))
+            self.conn.commit()
+            return True, "Cargo agregado exitosamente."
+        except sqlite3.IntegrityError:
+            return False, f"El cargo '{nombre_cargo}' ya existe."
+
+    def delete_cargo(self, nombre_cargo):
+        """Elimina un cargo de la base de datos."""
+        self.cursor.execute('SELECT COUNT(*) FROM candidatos WHERE cargo = ?', (nombre_cargo,))
+        if self.cursor.fetchone()[0] > 0:
+            return False, "No se puede eliminar el cargo porque está asignado a uno o más candidatos."
+        
+        self.cursor.execute('DELETE FROM cargos WHERE nombre = ?', (nombre_cargo,))
+        self.conn.commit()
+        return True, "Cargo eliminado exitosamente."
+        
     def get_candidatos(self, cargo=None, grado=None):
         """
         Obtiene candidatos con filtros opcionales

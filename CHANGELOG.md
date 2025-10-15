@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/Version-v1.3.5-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![Version](https://img.shields.io/badge/Version-v1.4.0-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![Python](https://img.shields.io/badge/Python-3.7+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
 </div>
@@ -14,6 +14,30 @@
 ### 🔄 Registro de Cambios y Actualizaciones del Sistema de Votación Escolar
 
 </div>
+
+---
+
+## 🚀 [v1.4.0] - 2025-10-15 - Gestión Dinámica de Cargos Electorales
+
+<div align="center">
+
+[![](https://img.shields.io/badge/Added-%2B1_Feature-green?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![](https://img.shields.io/badge/Changed-%2B4_Features-yellow?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![](https://img.shields.io/badge/Removed-%2B1_Component-red?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+
+</div>
+
+### ✨ Añadido
+- **⚙️ Gestión Dinámica de Cargos**: Se ha introducido una nueva sección en la pestaña "Configuración" que permite al administrador **añadir y eliminar los cargos electorales** (ej. "Presidente", "Secretario", etc.). Esto otorga una flexibilidad total para adaptar la elección a las necesidades de cada institución.
+
+### 🔧 Cambiado
+- **🗃️ Base de Datos Actualizada**: Se ha añadido una tabla `cargos` a la base de datos para almacenar los cargos de forma dinámica.
+- **🗳️ Interfaz de Candidatos Mejorada**: El menú desplegable para asignar un cargo a un candidato ahora se puebla dinámicamente desde la base de datos, mostrando siempre los cargos disponibles.
+- **🔄 Flujo de Votación Adaptativo**: La pantalla de votación ahora presenta los pasos de selección basados en los cargos configurados en la base de datos, en lugar de una lista fija.
+- **📊 Resultados Dinámicos**: La visualización de resultados y los gráficos ahora se generan dinámicamente en función de los cargos existentes, asegurando que todos los puestos elegidos se muestren correctamente.
+
+### ❌ Eliminado
+- **🗑️ Lista Estática de Cargos**: Se ha eliminado la lista `CARGOS` del archivo `config.py`. Toda la lógica de la aplicación ahora depende de la base de datos para una gestión centralizada y dinámica.
 
 ---
 
