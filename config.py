@@ -42,9 +42,10 @@ VOTACION_CERRADA = 'cerrada'
 # --- Interfaz Gráfica ---
 # Dimensiones de la ventana principal
 MAIN_WINDOW_GEOMETRY = "400x300"
+VOTING_WINDOW_GEOMETRY = "1200x680"
 
 # Dimensiones del panel de administración
-ADMIN_WINDOW_GEOMETRY = "1200x700"
+ADMIN_WINDOW_GEOMETRY = "1200x680"
 
 # Colores (ejemplos, se pueden ampliar)
 COLOR_PRIMARY = "#2196F3"

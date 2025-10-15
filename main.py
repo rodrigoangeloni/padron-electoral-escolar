@@ -40,10 +40,15 @@ class MainApp(tk.Tk):
         '''Muestra un frame para la página dada'''
         frame = self.frames[page_name]
         frame.tkraise()
+        
         if page_name == "MainMenu":
             self.geometry(config.MAIN_WINDOW_GEOMETRY)
             self.resizable(False, False)
-            self.center_window()
+        elif page_name == "VotingApp":
+            self.geometry(config.VOTING_WINDOW_GEOMETRY)
+            self.resizable(True, True)
+        
+        self.center_window()
 
     def center_window(self):
         """Centra la ventana en la pantalla"""
