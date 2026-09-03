@@ -9,6 +9,7 @@ import shutil
 from tkinter import filedialog
 import config
 from utils.path_handler import get_images_dir
+from utils.foto_utils import validar_foto_candidato
 
 
 class CandidateUI:
@@ -141,8 +142,13 @@ class CandidateUI:
         if not file_path:
             return
 
+        foto_valida, motivo = validar_foto_candidato(file_path)
+        if not foto_valida:
+            messagebox.showerror("Error", motivo)
+            return
+
         try:
-            file_extension = os.path.splitext(file_path)[1]
+            file_extension = os.path.splitext(file_path)[1].lower()
             new_filename = f"candidate_{candidato_id}{file_extension}"
             destination_path = os.path.join(get_images_dir(), new_filename)
 
