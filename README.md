@@ -1,393 +1,123 @@
-# 🏛️ Sistema de Votación Escolar
+# Sistema de Votación Escolar
 
-<div align="center">
+Aplicación de escritorio para gestionar elecciones estudiantiles: cargos dinámicos, candidatos, padrón de votantes, votación por CI y resultados con gráficos y PDF.
 
-[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![Tkinter](https://img.shields.io/badge/Tkinter-2C5E8B?style=for-the-badge&logo=python&logoColor=white)](https://docs.python.org/3/library/tkinter.html)
-[![SQLite](https://img.shields.io/badge/SQLite-03B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
-[![Matplotlib](https://img.shields.io/badge/Matplotlib-11557c?style=for-the-badge&logo=matplotlib&logoColor=white)](https://matplotlib.org/)
-[![Version](https://img.shields.io/badge/Version-v1.4.2-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![Version](https://img.shields.io/badge/Version-v1.4.2-blue.svg?style=flat-square)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![Platform](https://img.shields.io/badge/Windows-exe-0078D6?style=flat-square&logo=windows&logoColor=white)](https://github.com/rodrigoangeloni/padron-electoral-escolar/releases)
+[![Tests](https://img.shields.io/badge/tests-23_passed-brightgreen?style=flat-square)](tests/)
 
-</div>
+## Características
 
----
+- **Cargos dinámicos**: crear y eliminar cargos desde Configuración, sin tocar código.
+- **Candidatos**: alta, baja y fotos (JPG/PNG hasta 5 MB, validadas).
+- **Votantes**: registro individual o importación masiva desde CSV, validación de CI (7-8 dígitos) y prevención de voto duplicado.
+- **Votación guiada**: un paso por cargo, confirmación final y comprobante en pantalla.
+- **Resultados**: tabla, ganadores por cargo (con empates), gráficos y exportación a PDF.
+- **Seguridad**: contraseña admin con PBKDF2 + salt, bloqueo tras intentos fallidos y control de estado (activa/cerrada).
 
-<div align="center">
-  <h3>🗳️ Gestión completa y dinámica de elecciones escolares con interfaz intuitiva y segura</h3>
-  <p>Aplicación de escritorio para gestionar elecciones estudiantiles, permitiendo a los administradores definir los cargos a elegir y a los estudiantes votar por sus representantes.</p>
-</div>
+## Descarga rápida (usuarios finales)
 
----
+1. Ve a [Releases](https://github.com/rodrigoangeloni/padron-electoral-escolar/releases) y descarga `SistemaVotacionEscolar.exe`.
+2. Ejecuta el archivo. No requiere instalar Python ni nada más.
+3. Los datos se guardan junto al ejecutable y persisten entre sesiones.
 
-## 📋 Tabla de Contenidos
+## Instalación desde código (desarrolladores)
 
-- [✨ Características Principales](#-características-principales)
-- [🛠️ Tecnologías Utilizadas](#️-tecnologías-utilizadas)
-- [⚙️ Instalación y Uso](#️-instalación-y-uso)
-- [📦 Ejecutable para Windows](#-ejecutable-para-windows)
-- [🏗️ Arquitectura del Proyecto](#️-arquitectura-del-proyecto)
-- [💻 Módulos del Sistema](#-módulos-del-sistema)
-- [🔄 Flujo de la Aplicación](#-flujo-de-la-aplicación)
-- [🎯 Funcionalidades Principales](#-funcionalidades-principales)
-- [🔐 Seguridad y Autenticación](#-seguridad-y-autenticación)
-- [📈 Resultados y Estadísticas](#-resultados-y-estadísticas)
-- [🔧 Desarrollo y Contribución](#-desarrollo-y-contribución)
-- [📄 Licencia](#-licencia)
-
----
-
-## ✨ Características Principales
-
-<div align="center">
-
-| Característica | Descripción |
-|:---:|
-| 🎨 **Interfaz Intuitiva** | Diseño limpio y amigable para usuarios escolares |
-| 🔐 **Autenticación Segura** | Validación por CI con prevención de votos duplicados |
-| 📊 **Resultados en Tiempo Real** | Visualización instantánea de votos y gráficos |
-| ⚙️ **Gestión Dinámica de Cargos** | Añade, edita o elimina los cargos a elegir |
-| 📈 **Gestión Completa** | Administración de candidatos, votantes y elecciones |
-| 📱 **Diseño Adaptativo** | Interfaz que se adapta a diferentes tamaños de pantalla |
-| 🗂️ **Importación Masiva** | Carga de votantes desde archivos CSV |
-| 📄 **Exportación a PDF** | Generación de informes de resultados en formato PDF |
-
-</div>
-
-### 🎯 Beneficios del Sistema
-
-- **Flexibilidad**: Adapta la elección a cualquier estructura de gobierno estudiantil.
-- **Simplicidad**: Interfaz clara y sencilla de usar.
-- **Seguridad**: Control de identidad y prevención de fraudes.
-- **Eficiencia**: Proceso de votación rápido y confiable.
-- **Transparencia**: Resultados visibles y verificables.
-- **Mantenibilidad**: Código modular y bien documentado.
-
----
-
-## 🛠️ Tecnologías Utilizadas
-
-<div align="center">
-
-| Tecnología | Versión Exacta | Descripción |
-|:---:|:---:|
-| [🐍 Python](https.www.python.org/) | 3.11.8 | Lenguaje principal del sistema |
-| [🖼️ Tkinter](https://docs.python.org/3/library/tkinter.html) | Built-in | Interfaz gráfica de usuario |
-| [💾 SQLite](https.sqlite.org/) | Built-in | Base de datos ligera y eficiente |
-| [📊 Matplotlib](https://matplotlib.org/) | 3.10.7 | Visualización de gráficos |
-| [🖼️ Pillow](https://python-pillow.org/) | 11.3.0 | Procesamiento de imágenes |
-| [📄 FPDF2](https://pyfpdf.github.io/fpdf2/) | 2.7.9 | Generación de archivos PDF |
-| [⚙️ PyInstaller](https://pyinstaller.org/) | 6.16.0 | Empaquetado de aplicaciones |
-
-</div>
-
----
-
-## ⚙️ Instalación y Uso
-
-### 📋 Requisitos del Sistema
-
-- **Sistema Operativo**: Windows 7+, macOS 10.12+, Linux (Ubuntu 18.04+)
-- **Python**: Versión 3.11.8
-- **Memoria RAM**: 512 MB mínimo
-- **Espacio en disco**: 100 MB disponible
-
-### 📦 Instalación
-
-1. **Clonar o descargar el proyecto**
-   ```bash
-   git clone https://github.com/rodrigoangeloni/padron-electoral-escolar.git
-   cd padron-electoral-escolar
-   ```
-
-2. **Crear un entorno virtual (recomendado)**
-   ```bash
-   # En Windows
-   python -m venv .venv
-   .\.venv\Scripts\activate
-   
-   # En macOS/Linux
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-
-3. **Instalar dependencias**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-### 🚀 Uso
-
-Para iniciar la aplicación, ejecuta el siguiente comando en la raíz del proyecto:
+Requisitos: Windows 7+ (también funciona en macOS/Linux desde código), Python 3.11, 512 MB RAM.
 
 ```bash
-# En Windows
-python main.py
+git clone https://github.com/rodrigoangeloni/padron-electoral-escolar.git
+cd padron-electoral-escolar
 
-# En macOS/Linux
-python3 main.py
+python -m venv .venv
+.\.venv\Scripts\activate        # macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
-## 📦 Ejecutable para Windows
+Para desarrollo y tests:
 
-### 🚀 Opción 1: Ejecutable Directo (Recomendado para usuarios finales)
+```bash
+pip install -r requirements-dev.txt
+```
 
-Descarga la versión compilada del sistema para Windows sin necesidad de instalar Python:
+## Uso
 
-1. **Descargar el ejecutable**:
-   - Ve a la sección de [Releases](https://github.com/rodrigoangeloni/padron-electoral-escolar/releases) del repositorio.
-   - Descarga el archivo `SistemaVotacionEscolar.exe` correspondiente a la versión más reciente.
-   - Ejecuta el archivo directamente en tu sistema Windows.
+```bash
+python main.py        # o: python run_app.py (crea el .venv si falta)
+```
 
-2. **Características del ejecutable**:
-   - Incluye todas las dependencias necesarias.
-   - No requiere instalación de Python ni bibliotecas adicionales.
-   - Totalmente portátil y listo para usar.
-   - **Metadatos Profesionales**: Incluye un ícono de aplicación personalizado e información detallada del producto, como versión, autor y descripción, visible en las propiedades del archivo en Windows.
-   - **Persistencia de datos**: A partir de la versión 1.3.3, los datos se almacenan en ubicaciones persistentes, permitiendo mantener la información entre ejecuciones.
+### Primer uso (administrador)
 
-### 🔧 Opción 2: Instalación desde código fuente (Desarrolladores)
+1. Entra a **Modo Administración**. La primera vez se genera una contraseña inicial aleatoria: cópiala y guárdala.
+2. Cambia la contraseña en la pestaña **Configuración**.
+3. Carga **cargos**, **candidatos** y **votantes**, y pulsa **Activar Votación**.
 
-Sigue las instrucciones de instalación anteriores si deseas ejecutar desde el código fuente o contribuir al desarrollo.
+### Votación
 
-### 🛠️ Compilación del Ejecutable
+1. En el menú principal pulsa **Iniciar Votación** (requiere votación activa).
+2. Ingresa la CI (7-8 dígitos numéricos).
+3. Elige un candidato por cargo, revisa y confirma. Cada CI vota una sola vez.
 
-#### Método 1: Script Automatizado (Recomendado en Windows)
+### Importar votantes desde CSV
 
-Para una compilación rápida y sencilla en Windows, simplemente ejecuta el script `build.bat`:
+Archivo UTF-8 con encabezado (ver `ejemplo_votantes.csv`):
+
+```csv
+CI,Nombre,Apellido,Grado/Curso
+1234567,María,González,Pre Escolar
+2345678,Juan,Pérez,1er Grado
+```
+
+## Tests
+
+```bash
+.\.venv\Scripts\python -m pytest tests/ -q
+```
+
+Suite en `tests/` (23 tests, DB aislada por test con `tmp_path`): integridad de la base de datos, reglas de voto, seguridad de auth, validación de fotos y rendimiento de resultados.
+
+## Seguridad
+
+- Contraseñas con PBKDF2-HMAC-SHA256 (200.000 iteraciones, salt aleatorio, comparación en tiempo constante). Los hashes antiguos migran solos al cambiar la clave.
+- Bloqueo temporal tras 5 intentos fallidos de login.
+- Consultas SQL parametrizadas y claves foráneas activas (`PRAGMA foreign_keys = ON`).
+- Fotos validadas por extensión, tamaño y contenido real.
+- La base de datos (`.db`) y la contraseña nunca se suben al repo (ver `.gitignore`).
+
+## Arquitectura
+
+```
+main.py            Controlador MainApp: menú, AdminApp y VotingApp en una ventana
+config.py          Constantes centrales (rutas, grados, estados, colores)
+database.py        DatabaseManager: SQLite, cargos/candidatos/votantes/votos
+admin_app.py       Login + panel (Candidatos / Votantes / Resultados / Configuración)
+voting_app.py      Flujo CI → selección por cargo → confirmación
+utils/auth.py      AuthManager (PBKDF2, rate-limit)
+utils/candidate_ui.py · voter_ui.py · results_ui.py   Pestañas del panel
+utils/foto_utils.py   Validación de fotos (testeable sin GUI)
+utils/pdf_exporter.py Exportación de resultados a PDF (fpdf2)
+utils/path_handler.py Rutas dev vs compilado (persistencia junto al exe)
+```
+
+## Compilar el ejecutable
 
 ```bash
 build.bat
+# o manual: pip install pyinstaller && pyinstaller main.spec
+# salida: dist/SistemaVotacionEscolar.exe (versión en version_info.txt)
 ```
 
-Este script se encargará de:
-- Activar el entorno virtual si existe.
-- Verificar e instalar PyInstaller si es necesario.
-- Limpiar compilaciones anteriores.
-- Generar el ejecutable en la carpeta `dist/`.
+## Cómo contribuir
 
-#### Método 2: Manualmente
+1. Haz fork y crea una rama (`git checkout -b feature/mi-cambio`).
+2. Agrega o actualiza tests en `tests/` y verifica con `pytest tests/ -q`.
+3. Sigue PEP 8, docstrings y mensajes en español.
+4. Abre un Pull Request.
 
-Si prefieres compilar manualmente, asegúrate de tener instalado PyInstaller:
+## Licencia
 
-```bash
-pip install pyinstaller
-```
-
-Luego, ejecuta el siguiente comando en la raíz del proyecto:
-
-```bash
-pyinstaller main.spec
-```
-
-El archivo `main.spec` está configurado para incluir el ícono, los metadatos de versión y garantizar la persistencia de datos en la compilación.
+Copyright (c) 2025 Rodrigo Angeloni. Uso, copia y modificación libres incluyendo el aviso de copyright; **prohibida la venta** sin permiso escrito. Ver [`LICENSE`](LICENSE). Detalle de cambios en [`CHANGELOG.md`](CHANGELOG.md).
 
 ---
-
-## 🏗️ Arquitectura del Proyecto
-
-```
-padron-electoral-escolar/
-├── 📁 assets/                    # Recursos multimedia
-│   ├── 📁 config/               # Configuraciones
-│   ├── 📁 db/                   # Base de datos
-│   └── 📁 images/               # Imágenes y recursos visuales
-├── 📁 utils/                    # Utilidades y módulos auxiliares
-│   ├── 📄 auth.py               # Autenticación
-│   ├── 📄 candidate_ui.py       # UI de candidatos
-│   ├── 📄 voter_ui.py           # UI de votantes
-│   ├── 📄 results_ui.py         # UI de resultados
-│   └── 📄 pdf_exporter.py       # Exportación de resultados a PDF
-├── 📄 main.py                   # Controlador principal
-├── 📄 config.py                 # Configuración central
-├── 📄 database.py               # Gestión de base de datos
-├── 📄 admin_app.py              # Interfaz de administración
-├── 📄 voting_app.py             # Interfaz de votación
-├── 📄 run_app.py                # Script de ejecución
-├── 📄 build.bat                 # Script de compilación para Windows
-├── 📄 requirements.txt          # Dependencias
-├── 📄 main.spec                 # Configuración de PyInstaller
-├── 📄 version_info.txt          # Metadatos del ejecutable
-├── 📄 README.md                 # Documentación principal
-└── 📄 CHANGELOG.md              # Registro de cambios
-```
-
----
-
-## 💻 Módulos del Sistema
-
-### 📚 Descripción de Módulos
-
-| Módulo | Función Principal | Responsabilidad |
-|:---:|:---:|
-| `main.py` | Controlador Principal | Gestión de vistas y flujo de la aplicación |
-| `config.py` | Configuración Central | Constantes, rutas y parámetros del sistema |
-| `database.py` | Gestión de Base de Datos | Operaciones CRUD y manejo de datos |
-| `admin_app.py` | Interfaz de Administración | Gestión de candidatos, votantes y resultados |
-| `voting_app.py` | Interfaz de Votación | Proceso de votación y autenticación |
-| `utils/auth.py` | Autenticación | Validación de credenciales administrativas |
-| `utils/candidate_ui.py` | UI de Candidatos | Funcionalidad específica de candidatos |
-| `utils/voter_ui.py` | UI de Votantes | Funcionalidad específica de votantes |
-| `utils/results_ui.py` | UI de Resultados | Visualización de resultados y gráficos |
-| `utils/pdf_exporter.py` | Exportación a PDF | Generación de informes en formato PDF |
-
----
-
-## 🔄 Flujo de la Aplicación
-
-<div align="center">
-
-```mermaid
-graph TD
-    A[Inicio - MainApp] --> B[Menú Principal]
-    B --> C{Opción Seleccionada}
-    C -->|Iniciar Votación| D[Votantes ingresan CI]
-    C -->|Modo Administración| E[Autenticación Admin]
-    D --> F[Validación CI]
-    F -->|CI válida y no votó| G[Selección de Candidatos]
-    F -->|CI inválida o ya votó| H[Error/Mensaje]
-    G --> I[Confirmación de Voto]
-    I --> J[Registro de Voto]
-    E -->|Contraseña correcta| K[Panel de Administración]
-    E -->|Contraseña incorrecta| L[Error de Autenticación]
-    K --> M[Gestión de Candidatos]
-    K --> N[Gestión de Votantes]
-    K --> O[Configuración de Elección]
-    K --> P[Visualización de Resultados]
-```
-
-</div>
-
----
-
-## 🎯 Funcionalidades Principales
-
-### ⚙️ Gestión de Cargos (¡Nuevo!)
-
-- **Añadir y Eliminar Cargos**: Desde la pestaña de **Configuración**, el administrador puede añadir nuevos cargos para la elección (ej. "Presidente", "Tesorero") o eliminar los existentes.
-- **Actualización Dinámica**: La interfaz de votación y los resultados se actualizan automáticamente para reflejar los cargos configurados.
-- **Flexibilidad Total**: Permite adaptar el sistema a cualquier estructura de gobierno estudiantil, sin límites en la cantidad o nombre de los cargos.
-
-### 👤 Gestión de Candidatos
-
-- **Agregar/Editar/Eliminar**: Administración completa de perfiles de candidatos.
-- **Asignación de Cargos Dinámica**: Asigna a cada candidato uno de los cargos que hayas creado.
-- **Subida de Fotos**: Carga de imágenes personalizadas para cada candidato.
-- **Filtros Avanzados**: Búsqueda por cargo, grado y otros criterios.
-- **Vista Previa**: Visualización de imágenes antes de confirmar.
-
-### 👥 Gestión de Votantes
-
-- **Registro Individual**: Agregar votantes manualmente.
-- **Importación Masiva**: Carga desde archivos CSV con formato específico.
-- **Validación CI**: Control de identidad y prevención de duplicados.
-- **Estado de Votación**: Seguimiento de quién ya votó y quién no.
-
-### 📊 Visualización de Resultados
-
-- **Tablas Dinámicas**: Resultados actualizados en tiempo real.
-- **Gráficos Interactivos**: Visualización de tendencias y comparativas.
-- **Exportación a PDF**: Genera informes profesionales de los resultados, incluyendo ganadores y un desglose detallado de los votos, listos para ser compartidos o archivados.
-- **Resumen por Cargos**: Presentación organizada por posición electoral.
-
-### ⚙️ Configuración del Sistema
-
-- **Control de Estado**: Activación y cierre de la votación.
-- **Cambio de Contraseña**: Seguridad de acceso administrativo.
-- **Votos Múltiples Correctamente Registrados**: El sistema asegura que todos los votos se registren correctamente para cada votante.
-
----
-
-## 🔐 Seguridad y Autenticación
-
-### 🛡️ Medidas de Seguridad Implementadas
-
-- **Hash de Contraseñas**: Almacenamiento seguro de credenciales administrativas.
-- **Validación de CI**: Control de identidad para prevenir votos duplicados.
-- **Sesiones Seguras**: Gestión de estado de votación para cada usuario.
-- **Auditoría de Acciones**: Registro de operaciones críticas.
-
-### 📝 Política de Seguridad
-
-- Las contraseñas se almacenan con hash SHA-256.
-- Se previene el acceso concurrente de votantes.
-- Se mantiene un registro de cambios en la configuración.
-- Se implementa control de acceso basado en roles.
-
----
-
-## 📈 Resultados y Estadísticas
-
-### 📊 Tipos de Resultados Disponibles
-
-- **Resultados por Cargo**: Visualización detallada de votos por posición.
-- **Resultados por Grado**: Comparativas entre diferentes niveles educativos.
-- **Gráficos de Barras**: Representación visual de tendencias.
-- **Ganadores por Cargo**: Destacado de candidatos ganadores.
-- **Participación**: Porcentaje de participación electoral.
-
----
-
-## 🔧 Desarrollo y Contribución
-
-### 🤝 Cómo Contribuir
-
-1. **Fork** el repositorio.
-2. **Crea una rama** (`git checkout -b feature/nueva-funcionalidad`).
-3. **Realiza tus cambios** y haz commit (`git commit -m 'Añadir nueva funcionalidad'`).
-4. **Sube los cambios** (`git push origin feature/nueva-funcionalidad`).
-5. **Abre un Pull Request**.
-
-### 🧪 Pruebas
-
-- El sistema incluye pruebas de funcionalidad básicas.
-- Se recomienda probar cada módulo individualmente.
-- Verificar la compatibilidad con diferentes resoluciones de pantalla.
-
-### 📝 Estándares de Código
-
-- **PEP 8**: Estándar de codificación para Python.
-- **Documentación**: Cada función debe estar documentada.
-- **Nomenclatura**: Nombres descriptivos para variables y funciones.
-- **Comentarios**: Explicación de lógica compleja.
-
----
-
-## 📄 Licencia
-
-<div align="center">
-
-```
-Copyright (c) 2025 Rodrigo Angeloni
-
-Permiso está garantizado para cualquier persona que obtenga una copia 
-de este software y archivos de documentación asociados (el "Software"), 
-para usar, copiar, modificar, fusionar, publicar, distribuir, sublicenciar, 
-y/o vender copias del Software, sujeto a las siguientes condiciones:
-
-- El aviso de copyright anterior y este aviso de permiso se incluirán 
-  en todas las copias o partes sustanciales del Software.
-
-- Queda prohibida la venta del Software o sus derivados sin el permiso 
-  expreso por escrito del titular del copyright.
-
-EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, 
-EXPRESA O IMPLÍCITA, INCLUYENDO PERO NO LIMITADO A GARANTÍAS DE 
-COMERCIALIZACIÓN, IDONEIDAD PARA UN PROPÓSITO PARTICULAR Y NO INFRACCIÓN. 
-EN NINGÚN CASO LOS TITULARES DEL COPYRIGHT O TITULARES DE DERECHOS 
-SERÁN RESPONSABLES DE NINGUNA RECLAMACIÓN, DAÑO U OTRA RESPONSABILIDAD, 
-YA SEA EN UNA ACCIÓN DE CONTRATO, AGRAVIO O CUALQUIER OTRO MOTIVO, 
-DERIVADA DEL USO DEL SOFTWARE O RELACIONADA CON EL SOFTWARE O SU USO 
-O CUALQUIER OTRO TRATO EN EL SOFTWARE.
-```
-
-</div>
-
----
-
-<div align="center">
-
-### 🙏 Agradecimientos
-
-Este proyecto fue desarrollado para facilitar procesos democráticos en entornos escolares. Agradecemos a todos los contribuyentes y usuarios que hacen posible su mejora continua.
-
-</div>
+*Última revisión: 2026-09-03 (v1.4.2). ¿Algo que agregar o corregir? Abre un [issue](https://github.com/rodrigoangeloni/padron-electoral-escolar/issues).*
