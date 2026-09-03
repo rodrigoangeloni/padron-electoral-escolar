@@ -108,6 +108,16 @@ class VotingApp(tk.Frame):
             messagebox.showerror("Error de Configuración", "No hay cargos configurados para la votación.")
             self.show_ci_input()
             return
+
+        vacios = self.db_manager.cargos_sin_candidatos()
+        if vacios:
+            messagebox.showerror(
+                "Error de Configuración",
+                "Hay cargos sin candidatos: " + ", ".join(vacios)
+                + ". Contacte al administrador."
+            )
+            self.show_ci_input()
+            return
         
         self.all_candidates = {role: self.db_manager.get_candidatos(role) for role in self.roles}
         

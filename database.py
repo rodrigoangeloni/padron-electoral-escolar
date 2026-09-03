@@ -222,9 +222,31 @@ class DatabaseManager:
             self.conn.rollback()
             return False, f"Error al registrar votos: {str(e)}"
     
+    def cargos_sin_candidatos(self):
+        """Devuelve los cargos configurados que no tienen candidatos.
+
+        Returns:
+            list: Nombres de cargos sin candidatos (vacía si la elección
+                está lista para votar).
+        """
+        vacios = []
+        for cargo in self.get_cargos():
+            self.cursor.execute(
+                'SELECT COUNT(*) FROM candidatos WHERE cargo = ?', (cargo,)
+            )
+            if self.cursor.fetchone()[0] == 0:
+                vacios.append(cargo)
+        return vacios
+
     def get_resultados(self):
+        """Obtiene resultados con id de candidato para distinguir homónimos.
+
+        Returns:
+            tuple: (resultados, resultados_por_grado) donde cada fila de
+                resultados es (id, nombre, apellido, cargo, grado, votos).
+        """
         self.cursor.execute('''
-            SELECT c.nombre, c.apellido, c.cargo, c.grado, COUNT(v.id) as votos
+            SELECT c.id, c.nombre, c.apellido, c.cargo, c.grado, COUNT(v.id) as votos
             FROM candidatos c
             LEFT JOIN votos v ON c.id = v.candidato_id
             GROUP BY c.id, c.nombre, c.apellido, c.cargo, c.grado
@@ -243,6 +265,31 @@ class DatabaseManager:
         resultados_por_grado = self.cursor.fetchall()
         
         return resultados, resultados_por_grado
+
+    def get_ganadores(self):
+        """Calcula ganadores por cargo incluyendo empates.
+
+        Returns:
+            dict: {cargo: [{id, nombre, apellido, votos, foto}, ...]} con
+                todos los candidatos que comparten el máximo de votos.
+        """
+        resultados, _ = self.get_resultados()
+        por_cargo = {}
+        for row in resultados:
+            candidato_id, nombre, apellido, cargo, _, votos = row
+            por_cargo.setdefault(cargo, []).append(
+                {"id": candidato_id, "nombre": nombre,
+                 "apellido": apellido, "votos": votos}
+            )
+        ganadores = {}
+        for cargo, candidatos in por_cargo.items():
+            max_votos = max(c["votos"] for c in candidatos)
+            top = [c for c in candidatos if c["votos"] == max_votos]
+            for c in top:
+                candidato_obj = self.get_candidato_by_id(c["id"])
+                c["foto"] = candidato_obj[5] if candidato_obj else None
+            ganadores[cargo] = top
+        return ganadores
     
     def get_estado_votacion(self):
         self.cursor.execute('SELECT estado_votacion FROM configuracion WHERE id = 1')

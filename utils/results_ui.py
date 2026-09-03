@@ -95,30 +95,31 @@ class ResultsUI:
             widget.destroy()
 
         resultados, _ = self.db_manager.get_resultados()
-        
-        for resultado in resultados:
-            self.results_tree.insert('', 'end', values=resultado)
 
-        winners = {}
-        for row in resultados:
-            cargo, votos = row[2], row[4]
-            if cargo not in winners or votos > winners[cargo]['votos']:
-                candidato_obj = self.db_manager.get_candidato_by_name(row[0], row[1])
-                if candidato_obj:
-                    winners[cargo] = {'nombre': row[0], 'apellido': row[1], 'votos': votos, 'foto': candidato_obj[5]}
+        # Columnas visibles: (Nombre, Apellido, Cargo, Grado, Votos); el id
+        # va primero en la tupla y no se muestra.
+        for resultado in resultados:
+            self.results_tree.insert('', 'end', values=resultado[1:])
+
+        winners = self.db_manager.get_ganadores()
 
         for cargo, widgets in self.winners_widgets.items():
-            if cargo in winners:
-                winner_data = winners[cargo]
+            top = winners.get(cargo, [])
+            if top:
+                winner_data = top[0]
                 try:
                     img = Image.open(winner_data['foto']).resize((150, 150), Image.Resampling.LANCZOS)
                     photo = ImageTk.PhotoImage(img)
                 except:
                     photo = None
-                
+
                 widgets['img'].config(image=photo, text="", height=150, width=150)
                 if photo: widgets['img'].image = photo
-                widgets['name'].config(text=f"{winner_data['nombre']} {winner_data['apellido']}")
+                if len(top) == 1:
+                    widgets['name'].config(text=f"{winner_data['nombre']} {winner_data['apellido']}")
+                else:
+                    empatados = ", ".join(f"{c['nombre']} {c['apellido']}" for c in top)
+                    widgets['name'].config(text=f"Empate: {empatados}")
                 widgets['votes'].config(text=f"{winner_data['votos']} votos")
             else:
                 widgets['img'].config(image='', text="Sin votos", height=8, width=20)
@@ -141,7 +142,7 @@ class ResultsUI:
         for i, cargo in enumerate(cargos):
             ax = fig.add_subplot(1, num_cargos, i + 1)
             
-            cargo_results = [row for row in resultados if row[2] == cargo]
+            cargo_results = [row for row in resultados if row[3] == cargo]
             
             if not cargo_results:
                 ax.text(0.5, 0.5, 'Sin datos', ha='center', va='center')
@@ -150,8 +151,8 @@ class ResultsUI:
                 ax.set_yticks([])
                 continue
 
-            nombres = [f"{r[0]} {r[1]}" for r in cargo_results]
-            votos = [r[4] for r in cargo_results]
+            nombres = [f"{r[1]} {r[2]}" for r in cargo_results]
+            votos = [r[5] for r in cargo_results]
             
             ax.barh(nombres, votos, color='#3498db')
             ax.set_title(cargo)
@@ -175,13 +176,17 @@ class ResultsUI:
             messagebox.showinfo("Exportar a PDF", "No hay resultados para exportar.")
             return
 
-        winners = {}
-        for row in resultados:
-            cargo, votos = row[2], row[4]
-            if cargo not in winners or votos > winners[cargo]['votos']:
-                candidato_obj = self.db_manager.get_candidato_by_name(row[0], row[1])
-                if candidato_obj:
-                    winners[cargo] = {'nombre': row[0], 'apellido': row[1], 'votos': votos}
+        winners_pdf = {}
+        for cargo, top in self.db_manager.get_ganadores().items():
+            if len(top) == 1:
+                winners_pdf[cargo] = {'nombre': top[0]['nombre'],
+                                      'apellido': top[0]['apellido'],
+                                      'votos': top[0]['votos']}
+            else:
+                empatados = ", ".join(f"{c['nombre']} {c['apellido']}" for c in top)
+                winners_pdf[cargo] = {'nombre': f"Empate: {empatados}",
+                                      'apellido': "",
+                                      'votos': top[0]['votos']}
 
         file_path = filedialog.asksaveasfilename(
             defaultextension=".pdf",
@@ -193,7 +198,8 @@ class ResultsUI:
             return
 
         try:
-            export_results_to_pdf(winners, resultados, file_path)
+            filas_pdf = [r[1:] for r in resultados]
+            export_results_to_pdf(winners_pdf, filas_pdf, file_path)
             messagebox.showinfo("Exportar a PDF", f"Resultados exportados exitosamente a:\n{file_path}")
         except Exception as e:
             messagebox.showerror("Error de Exportación", f"No se pudo exportar el archivo PDF.\nError: {e}")
