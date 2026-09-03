@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/Version-v1.4.0-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![Version](https://img.shields.io/badge/Version-v1.4.1-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![Python](https://img.shields.io/badge/Python-3.7+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
 </div>
@@ -14,6 +14,45 @@
 ### 🔄 Registro de Cambios y Actualizaciones del Sistema de Votación Escolar
 
 </div>
+
+---
+
+## 🚀 [v1.4.1] - 2026-09-03 - Integridad, Seguridad y Rendimiento
+
+<div align="center">
+
+[![](https://img.shields.io/badge/Added-%2B5_Features-green?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![](https://img.shields.io/badge/Changed-%2B4_Features-yellow?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![](https://img.shields.io/badge/Fixed-%2B7_Bugs-red?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![](https://img.shields.io/badge/Security-%2B3_Hardening-orange?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+
+</div>
+
+### ✨ Añadido
+- **🧪 Suite de Tests con Pytest**: 22 tests automatizados (`tests/`) con DB aislada por test (`tmp_path`): integridad DB, reglas de voto, seguridad de auth, validación de fotos y rendimiento de resultados.
+- **⚙️ Detección de Cargos Vacíos**: Nuevo método `cargos_sin_candidatos()`; la votación se bloquea con mensaje claro si algún cargo no tiene candidatos, en vez de mostrar una pantalla vacía sin salida.
+- **🏆 Ganadores con Empates**: Nuevo método `get_ganadores()` que devuelve todos los candidatos empatados en el máximo de votos; la UI muestra "Empate: ..." y el PDF lo refleja.
+- **🖼️ Validación de Fotos**: Nuevo módulo `utils/foto_utils.py` (`validar_foto_candidato()`): solo JPG/PNG, máximo 5 MB y verificación de contenido real (rechaza ejecutables disfrazados e imágenes corruptas).
+- **📦 Entorno Dev Reproducible**: Nuevo `requirements-dev.txt` (`pytest`) y suite verificada 22/22 con dependencias pinneadas.
+
+### 🔧 Cambiado
+- **🔐 Contraseñas con PBKDF2 + Salt**: `AuthManager` usa `PBKDF2-HMAC-SHA256` (200.000 iteraciones, salt aleatorio) en lugar de SHA-256 plano. Los hashes viejos siguen verificando hasta el próximo cambio de contraseña (migración sin bloqueo).
+- **🗃️ Resultados con ID y Foto**: `get_resultados()` incluye `id` y `foto`, eliminando colisiones de homónimos y el patrón N+1 en ganadores (2 queries fijas).
+- **📊 Gráficos sin Fugas de Memoria**: La creación de figuras se extrajo a `crear_figura_resultados()` (testeable sin display) y `_update_graphs` cierra la figura anterior con `plt.close()`.
+- **🗳️ Voto Vacío Rechazado**: `add_multiple_votes()` con lista vacía retorna error y no marca `ya_voto`.
+
+### 🐛 Corregido
+- **🔑 FK No Aplicadas**: Se activa `PRAGMA foreign_keys = ON` por conexión; eliminar un candidato ya elimina sus votos (antes quedaban huérfanos).
+- **📝 DEFAULT Literal**: El `DEFAULT` de `estado_votacion` era el texto `'{VOTACION_CERRADA}'`; ahora es `'cerrada'`.
+- **🔓 Fallback `admin123` Eliminado**: Sin archivo de contraseña ya no se acepta la clave por defecto; el admin debe crear la inicial.
+- **🚪 Login sin Límite**: Bloqueo tras 5 intentos fallidos (30 segundos) con aviso en la UI.
+- **📂 Permisos del Password**: El archivo `.admin_password` se guarda con `chmod 0600`.
+- **🧹 Código Muerto**: Eliminado `is_using_initial_password()` (siempre retornaba False) y la dependencia de `get_candidato_by_name()` en resultados.
+- **🖼️ Extensión Normalizada**: Las fotos se guardan con extensión en minúsculas.
+
+### 🛡️ Seguridad
+- Hash con salt + comparación en tiempo constante (`hmac.compare_digest`).
+- Rate-limit de login + validación real de uploads + secretos fuera del repo (sin cambios, verificado).
 
 ---
 
@@ -241,6 +280,7 @@
 
 | Versión | Fecha de Lanzamiento | Características | Correcciones | Tamaño del Código |
 |:---:|:---:|:---:|
+| 1.4.1 | 2026-09-03 | 5 | 7 | 🧪 +Suite de tests |
 | 1.3.2 | 2025-10-09 | 1 | 0 | 📈 Aumentado |
 | 1.3.1 | 2025-10-09 | 2 | 1 | 📈 Aumentado |
 | 1.3.0 | 2025-10-09 | 1 | 0 | 🔄 Mejorado |
