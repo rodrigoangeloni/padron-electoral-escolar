@@ -139,6 +139,10 @@ class AdminApp(tk.Frame):
 
     def login(self):
         password = self.password_entry.get()
+        if self.auth_manager.esta_bloqueado():
+            messagebox.showerror("Error", "Demasiados intentos fallidos. Intente de nuevo en unos segundos.")
+            self.password_entry.delete(0, tk.END)
+            return
         if self.auth_manager.verify_admin_password(password):
             # Verificar si se está usando la contraseña inicial
             if self.auth_manager.is_initial_password_used():
