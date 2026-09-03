@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/Version-v1.4.1-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![Version](https://img.shields.io/badge/Version-v1.4.2-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![Python](https://img.shields.io/badge/Python-3.7+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
 </div>
@@ -14,6 +14,13 @@
 ### 🔄 Registro de Cambios y Actualizaciones del Sistema de Votación Escolar
 
 </div>
+
+---
+
+## 🚀 [v1.4.2] - 2026-09-03 - Hotfix crash panel de administración
+
+### 🐛 Corregido
+- **🚨 Crash al Abrir Administración**: `_export_results_to_pdf` había quedado como función anidada muerta tras extraer `crear_figura_resultados()` (Fase 5), por lo que `ResultsUI` perdía el método y el exe fallaba con `AttributeError` al crear el panel. El método vuelve a la clase y se agrega test estructural de regresión (vía AST, corre sin display) que verifica que el método exista.
 
 ---
 
@@ -280,6 +287,7 @@
 
 | Versión | Fecha de Lanzamiento | Características | Correcciones | Tamaño del Código |
 |:---:|:---:|:---:|
+| 1.4.2 | 2026-09-03 | 0 | 1 | 🚨 Hotfix crash admin |
 | 1.4.1 | 2026-09-03 | 5 | 7 | 🧪 +Suite de tests |
 | 1.3.2 | 2025-10-09 | 1 | 0 | 📈 Aumentado |
 | 1.3.1 | 2025-10-09 | 2 | 1 | 📈 Aumentado |

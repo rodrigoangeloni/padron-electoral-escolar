@@ -149,6 +149,42 @@ class ResultsUI:
         canvas.draw()
         canvas.get_tk_widget().pack(fill='both', expand=True)
 
+    def _export_results_to_pdf(self):
+        """Exporta los resultados actuales a un archivo PDF."""
+        resultados, _ = self.db_manager.get_resultados()
+
+        if not resultados:
+            messagebox.showinfo("Exportar a PDF", "No hay resultados para exportar.")
+            return
+
+        winners_pdf = {}
+        for cargo, top in self.db_manager.get_ganadores().items():
+            if len(top) == 1:
+                winners_pdf[cargo] = {'nombre': top[0]['nombre'],
+                                      'apellido': top[0]['apellido'],
+                                      'votos': top[0]['votos']}
+            else:
+                empatados = ", ".join(f"{c['nombre']} {c['apellido']}" for c in top)
+                winners_pdf[cargo] = {'nombre': f"Empate: {empatados}",
+                                      'apellido': "",
+                                      'votos': top[0]['votos']}
+
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".pdf",
+            filetypes=[("PDF Files", "*.pdf"), ("All files", "*.*")],
+            title="Guardar resultados como PDF"
+        )
+
+        if not file_path:
+            return
+
+        try:
+            filas_pdf = [r[1:6] for r in resultados]
+            export_results_to_pdf(winners_pdf, filas_pdf, file_path)
+            messagebox.showinfo("Exportar a PDF", f"Resultados exportados exitosamente a:\n{file_path}")
+        except Exception as e:
+            messagebox.showerror("Error de Exportación", f"No se pudo exportar el archivo PDF.\nError: {e}")
+
 
 def crear_figura_resultados(resultados, cargos):
     """Crea la figura de barras horizontales (un subplot por cargo).
@@ -190,39 +226,3 @@ def crear_figura_resultados(resultados, cargos):
 
     fig.tight_layout(pad=3.0)
     return fig
-
-    def _export_results_to_pdf(self):
-        """Exporta los resultados actuales a un archivo PDF."""
-        resultados, _ = self.db_manager.get_resultados()
-        
-        if not resultados:
-            messagebox.showinfo("Exportar a PDF", "No hay resultados para exportar.")
-            return
-
-        winners_pdf = {}
-        for cargo, top in self.db_manager.get_ganadores().items():
-            if len(top) == 1:
-                winners_pdf[cargo] = {'nombre': top[0]['nombre'],
-                                      'apellido': top[0]['apellido'],
-                                      'votos': top[0]['votos']}
-            else:
-                empatados = ", ".join(f"{c['nombre']} {c['apellido']}" for c in top)
-                winners_pdf[cargo] = {'nombre': f"Empate: {empatados}",
-                                      'apellido': "",
-                                      'votos': top[0]['votos']}
-
-        file_path = filedialog.asksaveasfilename(
-            defaultextension=".pdf",
-            filetypes=[("PDF Files", "*.pdf"), ("All files", "*.*")],
-            title="Guardar resultados como PDF"
-        )
-        
-        if not file_path:
-            return
-
-        try:
-            filas_pdf = [r[1:6] for r in resultados]
-            export_results_to_pdf(winners_pdf, filas_pdf, file_path)
-            messagebox.showinfo("Exportar a PDF", f"Resultados exportados exitosamente a:\n{file_path}")
-        except Exception as e:
-            messagebox.showerror("Error de Exportación", f"No se pudo exportar el archivo PDF.\nError: {e}")

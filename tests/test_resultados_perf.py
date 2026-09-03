@@ -13,6 +13,30 @@ import pytest
 from database import DatabaseManager
 
 
+def _metodos_clase_results_ui():
+    """Métodos directos de la clase ResultsUI (parseo AST, sin GUI)."""
+    import ast
+
+    ruta = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "utils",
+        "results_ui.py",
+    )
+    with open(ruta, encoding="utf-8") as f:
+        arbol = ast.parse(f.read())
+    for nodo in ast.walk(arbol):
+        if isinstance(nodo, ast.ClassDef) and nodo.name == "ResultsUI":
+            return {
+                n.name for n in nodo.body if isinstance(n, ast.FunctionDef)
+            }
+    raise AssertionError("Clase ResultsUI no encontrada")
+
+
+def test_results_ui_expone_exportar_pdf():
+    """Regresión: setup_results_tab usa self._export_results_to_pdf (crash exe)."""
+    assert "_export_results_to_pdf" in _metodos_clase_results_ui()
+
+
 @pytest.fixture
 def db_manager(tmp_path):
     """DB aislada por test en directorio temporal."""
