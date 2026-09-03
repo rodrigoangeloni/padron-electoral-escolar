@@ -18,6 +18,7 @@ class ResultsUI:
         self.results_tree = None
         self.winners_widgets = {}
         self.graphs_frame = None
+        self._figura_actual = None
 
     def setup_results_tab(self, refresh_callback=None, reset_callback=None):
         """Configura la pestaña de resultados"""
@@ -97,9 +98,9 @@ class ResultsUI:
         resultados, _ = self.db_manager.get_resultados()
 
         # Columnas visibles: (Nombre, Apellido, Cargo, Grado, Votos); el id
-        # va primero en la tupla y no se muestra.
+        # va primero y la foto al final: no se muestran.
         for resultado in resultados:
-            self.results_tree.insert('', 'end', values=resultado[1:])
+            self.results_tree.insert('', 'end', values=resultado[1:6])
 
         winners = self.db_manager.get_ganadores()
 
@@ -133,40 +134,62 @@ class ResultsUI:
         for widget in self.graphs_frame.winfo_children():
             widget.destroy()
 
+        if self._figura_actual is not None:
+            plt.close(self._figura_actual)
+            self._figura_actual = None
+
         num_cargos = len(cargos)
         if num_cargos == 0:
             return
-            
-        fig = plt.figure(figsize=(4 * num_cargos, 6))
-        
-        for i, cargo in enumerate(cargos):
-            ax = fig.add_subplot(1, num_cargos, i + 1)
-            
-            cargo_results = [row for row in resultados if row[3] == cargo]
-            
-            if not cargo_results:
-                ax.text(0.5, 0.5, 'Sin datos', ha='center', va='center')
-                ax.set_title(cargo)
-                ax.set_xticks([])
-                ax.set_yticks([])
-                continue
 
-            nombres = [f"{r[1]} {r[2]}" for r in cargo_results]
-            votos = [r[5] for r in cargo_results]
-            
-            ax.barh(nombres, votos, color='#3498db')
-            ax.set_title(cargo)
-            ax.set_xlabel('Votos')
-            ax.invert_yaxis()
-
-            for index, value in enumerate(votos):
-                ax.text(value, index, f' {value}')
-
-        fig.tight_layout(pad=3.0)
+        fig = crear_figura_resultados(resultados, cargos)
+        self._figura_actual = fig
 
         canvas = FigureCanvasTkAgg(fig, master=self.graphs_frame)
         canvas.draw()
         canvas.get_tk_widget().pack(fill='both', expand=True)
+
+
+def crear_figura_resultados(resultados, cargos):
+    """Crea la figura de barras horizontales (un subplot por cargo).
+
+    Función pura sin dependencias de Tk: testeable sin display.
+
+    Args:
+        resultados: filas (id, nombre, apellido, cargo, grado, votos, foto).
+        cargos: lista de nombres de cargo.
+
+    Returns:
+        matplotlib.figure.Figure lista para embeber.
+    """
+    num_cargos = len(cargos)
+    fig = plt.figure(figsize=(4 * num_cargos, 6))
+
+    for i, cargo in enumerate(cargos):
+        ax = fig.add_subplot(1, num_cargos, i + 1)
+
+        cargo_results = [row for row in resultados if row[3] == cargo]
+
+        if not cargo_results:
+            ax.text(0.5, 0.5, 'Sin datos', ha='center', va='center')
+            ax.set_title(cargo)
+            ax.set_xticks([])
+            ax.set_yticks([])
+            continue
+
+        nombres = [f"{r[1]} {r[2]}" for r in cargo_results]
+        votos = [r[5] for r in cargo_results]
+
+        ax.barh(nombres, votos, color='#3498db')
+        ax.set_title(cargo)
+        ax.set_xlabel('Votos')
+        ax.invert_yaxis()
+
+        for index, value in enumerate(votos):
+            ax.text(value, index, f' {value}')
+
+    fig.tight_layout(pad=3.0)
+    return fig
 
     def _export_results_to_pdf(self):
         """Exporta los resultados actuales a un archivo PDF."""
@@ -198,7 +221,7 @@ class ResultsUI:
             return
 
         try:
-            filas_pdf = [r[1:] for r in resultados]
+            filas_pdf = [r[1:6] for r in resultados]
             export_results_to_pdf(winners_pdf, filas_pdf, file_path)
             messagebox.showinfo("Exportar a PDF", f"Resultados exportados exitosamente a:\n{file_path}")
         except Exception as e:

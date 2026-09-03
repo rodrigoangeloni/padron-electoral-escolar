@@ -239,14 +239,15 @@ class DatabaseManager:
         return vacios
 
     def get_resultados(self):
-        """Obtiene resultados con id de candidato para distinguir homónimos.
+        """Obtiene resultados con id y foto para distinguir homónimos sin N+1.
 
         Returns:
             tuple: (resultados, resultados_por_grado) donde cada fila de
-                resultados es (id, nombre, apellido, cargo, grado, votos).
+                resultados es
+                (id, nombre, apellido, cargo, grado, votos, foto).
         """
         self.cursor.execute('''
-            SELECT c.id, c.nombre, c.apellido, c.cargo, c.grado, COUNT(v.id) as votos
+            SELECT c.id, c.nombre, c.apellido, c.cargo, c.grado, COUNT(v.id) as votos, c.foto
             FROM candidatos c
             LEFT JOIN votos v ON c.id = v.candidato_id
             GROUP BY c.id, c.nombre, c.apellido, c.cargo, c.grado
@@ -276,19 +277,15 @@ class DatabaseManager:
         resultados, _ = self.get_resultados()
         por_cargo = {}
         for row in resultados:
-            candidato_id, nombre, apellido, cargo, _, votos = row
+            candidato_id, nombre, apellido, cargo, _, votos, foto = row
             por_cargo.setdefault(cargo, []).append(
                 {"id": candidato_id, "nombre": nombre,
-                 "apellido": apellido, "votos": votos}
+                 "apellido": apellido, "votos": votos, "foto": foto}
             )
         ganadores = {}
         for cargo, candidatos in por_cargo.items():
             max_votos = max(c["votos"] for c in candidatos)
-            top = [c for c in candidatos if c["votos"] == max_votos]
-            for c in top:
-                candidato_obj = self.get_candidato_by_id(c["id"])
-                c["foto"] = candidato_obj[5] if candidato_obj else None
-            ganadores[cargo] = top
+            ganadores[cargo] = [c for c in candidatos if c["votos"] == max_votos]
         return ganadores
     
     def get_estado_votacion(self):
