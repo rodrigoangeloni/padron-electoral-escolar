@@ -10,6 +10,9 @@ class DatabaseManager:
         self.db_path = db_path
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         self.conn = sqlite3.connect(self.db_path)
+        # Las FK están OFF por defecto en SQLite: activar por conexión
+        # (no-op dentro de transacción, por eso va aquí, antes de init_db).
+        self.conn.execute("PRAGMA foreign_keys = ON")
         self.cursor = self.conn.cursor()
         self.init_db()
 
@@ -48,7 +51,7 @@ class DatabaseManager:
             )
         ''')
         
-        self.cursor.execute('''
+        self.cursor.execute(f'''
             CREATE TABLE IF NOT EXISTS configuracion (
                 id INTEGER PRIMARY KEY,
                 estado_votacion TEXT DEFAULT '{VOTACION_CERRADA}',
@@ -203,6 +206,8 @@ class DatabaseManager:
             return False, "Votante no registrado"
         if result[0] == 1:
             return False, "El votante ya ha emitido su voto"
+        if not candidato_ids:
+            return False, "Debe seleccionar al menos un candidato"
         
         # Registrar todos los votos en una transacción
         try:
