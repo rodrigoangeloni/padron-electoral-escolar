@@ -1,0 +1,2 @@
+# Dependencias de desarrollo (tests). Las de producción están en requirements.txt.
+pytest==9.1.1

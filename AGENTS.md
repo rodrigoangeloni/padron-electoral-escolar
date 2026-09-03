@@ -4,8 +4,8 @@ Sistema de votación escolar desktop (Tkinter + SQLite). Gestión de cargos din�
 
 ## Stack
 - Python 3.11.8 (README). Entorno actual verificado: 3.10.11 — funciona pero usar 3.11 para release.
-- Deps pinneadas en `requirements.txt`: `Pillow==11.3.0`, `matplotlib==3.10.7`, `fpdf2==2.7.9`, `pyinstaller==6.16.0`. Tkinter/SQLite son stdlib.
-- Sin suite de tests. Sin linter/formatter configurado. Seguir PEP 8 + docstrings en español.
+- Deps pinneadas en `requirements.txt`: `Pillow==11.3.0`, `matplotlib==3.10.7`, `fpdf2==2.7.9`, `pyinstaller==6.16.0`. Tkinter/SQLite son stdlib. Dev: `requirements-dev.txt` (`pytest==9.1.1`).
+- Suite pytest en `tests/` (22 tests, fixtures `tmp_path` con DB aislada). Sin linter/formatter configurado. Seguir PEP 8 + docstrings en español.
 
 ## Comandos
 ```bash
@@ -19,6 +19,8 @@ python main.py
 # alternativa: crea .venv + instala deps si falta y luego corre main.py
 python run_app.py
 
+# tests (requiere .venv con requirements + requirements-dev)
+.\.venv\Scripts\python -m pytest tests/ -q
 # build Windows exe (preferido)
 build.bat
 # manual:
