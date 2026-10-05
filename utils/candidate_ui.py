@@ -16,6 +16,7 @@ class CandidateUI:
     def __init__(self, parent_frame, db_manager):
         self.parent_frame = parent_frame
         self.db_manager = db_manager
+        self.ci_entry = None
         self.nombre_entry = None
         self.apellido_entry = None
         self.cargo_var = None
@@ -30,29 +31,37 @@ class CandidateUI:
         add_frame = tk.LabelFrame(self.parent_frame, text="Agregar Candidato", padx=10, pady=10)
         add_frame.pack(fill="x", padx=10, pady=10)
         
-        tk.Label(add_frame, text="Nombre:").grid(row=0, column=0, sticky="w", padx=5, pady=5)
+        tk.Label(add_frame, text="CI:").grid(row=0, column=0, sticky="w", padx=5, pady=5)
+        self.ci_entry = tk.Entry(add_frame, width=20)
+        self.ci_entry.grid(row=0, column=1, padx=5, pady=5)
+        self.ci_entry.bind('<Return>', lambda event: self.import_voter_by_ci())
+
+        import_button = tk.Button(add_frame, text="Importar del padrón", command=self.import_voter_by_ci, bg=config.COLOR_PRIMARY, fg=config.COLOR_WHITE)
+        import_button.grid(row=0, column=2, columnspan=2, sticky="w", padx=5, pady=5)
+
+        tk.Label(add_frame, text="Nombre:").grid(row=1, column=0, sticky="w", padx=5, pady=5)
         self.nombre_entry = tk.Entry(add_frame, width=20)
-        self.nombre_entry.grid(row=0, column=1, padx=5, pady=5)
+        self.nombre_entry.grid(row=1, column=1, padx=5, pady=5)
         
-        tk.Label(add_frame, text="Apellido:").grid(row=0, column=2, sticky="w", padx=5, pady=5)
+        tk.Label(add_frame, text="Apellido:").grid(row=1, column=2, sticky="w", padx=5, pady=5)
         self.apellido_entry = tk.Entry(add_frame, width=20)
-        self.apellido_entry.grid(row=0, column=3, padx=5, pady=5)
+        self.apellido_entry.grid(row=1, column=3, padx=5, pady=5)
         
-        tk.Label(add_frame, text="Cargo:").grid(row=1, column=0, sticky="w", padx=5, pady=5)
+        tk.Label(add_frame, text="Cargo:").grid(row=2, column=0, sticky="w", padx=5, pady=5)
         self.cargo_var = tk.StringVar()
         cargos = self.db_manager.get_cargos()
         self.cargo_combo = ttk.Combobox(add_frame, textvariable=self.cargo_var, values=cargos, state="readonly")
         if cargos:
             self.cargo_var.set(cargos[0])
-        self.cargo_combo.grid(row=1, column=1, padx=5, pady=5)
+        self.cargo_combo.grid(row=2, column=1, padx=5, pady=5)
         
-        tk.Label(add_frame, text="Grado:").grid(row=1, column=2, sticky="w", padx=5, pady=5)
+        tk.Label(add_frame, text="Grado:").grid(row=2, column=2, sticky="w", padx=5, pady=5)
         self.grado_var = tk.StringVar(value=config.GRADOS_CANDIDATOS[0])
         grado_combo = ttk.Combobox(add_frame, textvariable=self.grado_var, values=config.GRADOS_CANDIDATOS, state="readonly")
-        grado_combo.grid(row=1, column=3, padx=5, pady=5)
+        grado_combo.grid(row=2, column=3, padx=5, pady=5)
         
         add_button = tk.Button(add_frame, text="Agregar Candidato", command=self.add_candidate, bg=config.COLOR_SUCCESS, fg=config.COLOR_WHITE)
-        add_button.grid(row=2, column=0, columnspan=4, pady=10)
+        add_button.grid(row=3, column=0, columnspan=4, pady=10)
         
         list_container = tk.Frame(self.parent_frame)
         list_container.pack(fill="both", expand=True, padx=10, pady=10)
@@ -162,6 +171,31 @@ class CandidateUI:
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo actualizar la foto: {e}")
 
+    def import_voter_by_ci(self):
+        """Completa nombre, apellido y grado del candidato desde el padrón usando la CI."""
+        ci = self.ci_entry.get().strip()
+        if not ci.isdigit() or not (7 <= len(ci) <= 8):
+            messagebox.showerror("Error", "La CI debe tener de 7 a 8 dígitos.")
+            return
+
+        votante = self.db_manager.get_votante(ci)
+        if not votante:
+            messagebox.showerror("Error", "No se encontró ningún votante con esa CI en el padrón.")
+            return
+
+        nombre, apellido, grado_curso = votante[2], votante[3], votante[4]
+
+        if self.db_manager.get_candidato_by_name(nombre, apellido):
+            if not messagebox.askyesno("Confirmar", "Ya existe un candidato con ese nombre y apellido. ¿Desea importarlo de todos modos?"):
+                return
+
+        self.nombre_entry.delete(0, tk.END)
+        self.nombre_entry.insert(0, nombre)
+        self.apellido_entry.delete(0, tk.END)
+        self.apellido_entry.insert(0, apellido)
+        if grado_curso in config.GRADOS_CANDIDATOS:
+            self.grado_var.set(grado_curso)
+
     def add_candidate(self):
         """Agrega un nuevo candidato"""
         nombre = self.nombre_entry.get().strip()
@@ -176,6 +210,7 @@ class CandidateUI:
             return
 
         self.db_manager.add_candidato(nombre, apellido, cargo, grado)
+        self.ci_entry.delete(0, tk.END)
         self.nombre_entry.delete(0, tk.END)
         self.apellido_entry.delete(0, tk.END)
         self.refresh_candidates_list()
