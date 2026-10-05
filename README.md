@@ -47,6 +47,8 @@ pip install -r requirements-dev.txt
 python main.py        # o: python run_app.py (crea el .venv si falta)
 ```
 
+En Windows también podés doble clic en `1_iniciar.bat`: crea el `.venv` si falta y abre la app sin consola.
+
 ### Primer uso (administrador)
 
 1. Entra a **Modo Administración**. La primera vez se genera una contraseña inicial aleatoria: cópiala y guárdala.
@@ -103,7 +105,7 @@ utils/path_handler.py Rutas dev vs compilado (persistencia junto al exe)
 ## Compilar el ejecutable
 
 ```bash
-build.bat
+2_build.bat
 # o manual: pip install pyinstaller && pyinstaller main.spec
 # salida: dist/SistemaVotacionEscolar.exe (versión en version_info.txt)
 ```

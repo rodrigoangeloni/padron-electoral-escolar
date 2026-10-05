@@ -5,7 +5,7 @@ Sistema de votación escolar desktop (Tkinter + SQLite). Gestión de cargos din�
 ## Stack
 - Python 3.11.8 (README). Entorno actual verificado: 3.10.11 — funciona pero usar 3.11 para release.
 - Deps pinneadas en `requirements.txt`: `Pillow==11.3.0`, `matplotlib==3.10.7`, `fpdf2==2.7.9`, `pyinstaller==6.16.0`. Tkinter/SQLite son stdlib. Dev: `requirements-dev.txt` (`pytest==9.1.1`).
-- Suite pytest en `tests/` (22 tests, fixtures `tmp_path` con DB aislada). Sin linter/formatter configurado. Seguir PEP 8 + docstrings en español.
+- Suite pytest en `tests/` (23 tests, fixtures `tmp_path` con DB aislada). Sin linter/formatter configurado. Seguir PEP 8 + docstrings en español.
 
 ## Comandos
 ```bash
@@ -18,11 +18,13 @@ pip install -r requirements.txt
 python main.py
 # alternativa: crea .venv + instala deps si falta y luego corre main.py
 python run_app.py
+# doble clic en Windows: lanza la app sin consola (crea .venv si falta)
+1_iniciar.bat
 
 # tests (requiere .venv con requirements + requirements-dev)
 .\.venv\Scripts\python -m pytest tests/ -q
 # build Windows exe (preferido)
-build.bat
+2_build.bat
 # manual:
 pip install pyinstaller
 pyinstaller main.spec
@@ -54,6 +56,6 @@ pyinstaller main.spec
 ## Gotchas operativos
 - `.gitignore` ignora `*.db`, `assets/config/`, `assets/images/*` (excepto default + icon), `.venv/`. La DB y password nunca se commitean — no esperar encontrarlas en repo limpio.
 - Estado inicial votación: `cerrada`. Hay que activarla en pestaña Configuración antes de votar (`MainMenu.start_voting` la bloquea si no está activa).
-- `build.bat` activa `.venv` si existe, si no usa python global; limpia `build/` + `dist/`. `main.spec` incluye `datas=[('assets','assets')]`, `console=False`, `icon='icon.ico'`, `version='version_info.txt'`.
+- `2_build.bat` activa `.venv` si existe, si no usa python global; limpia `build/` + `dist/`. `main.spec` incluye `datas=[('assets','assets')]`, `console=False`, `icon='icon.ico'`, `version='version_info.txt'`.
 - Cierre app: `MainApp.on_closing` hace `askokcancel` + `close()` + `quit()` + `destroy()` — respetar ese orden (fix v1.2.0).
 - Sin tests: verificar manualmente — flujo admin (login → CRUD candidato/votante/cargo → activar votación) y flujo voto (CI válida/duplicada/inválida → multiselección → resultados → export PDF).
