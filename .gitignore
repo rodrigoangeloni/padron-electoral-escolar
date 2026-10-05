@@ -32,6 +32,9 @@ venv.bak/
 *.db
 *.db-journal
 
+# Padrón de votantes (datos personales)
+padron_votantes_2026/
+
 # Archivos de configuración personales
 assets/config/
 
