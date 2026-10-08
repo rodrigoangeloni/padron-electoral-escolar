@@ -227,3 +227,49 @@ def test_papeleta_solo_muestra_turno_del_votante(db_manager):
                 for role in db_manager.get_cargos() if role == "DIRECTORA"}
 
     assert [c[1] for c in papeleta["DIRECTORA"]] == ["Eva"]
+
+
+def _eleccion_dos_turnos(db_manager):
+    """DIRECTORA con ganadores distintos por turno + votos emitidos."""
+    db_manager.add_candidato("Ana", "Lopez", "DIRECTORA", "5to Grado", turno="MAÑANA")
+    db_manager.add_candidato("Eva", "Diaz", "DIRECTORA", "5to Grado", turno="TARDE")
+    manana_id = db_manager.get_candidatos(turno="MAÑANA")[0][0]
+    tarde_id = db_manager.get_candidatos(turno="TARDE")[0][0]
+    db_manager.add_votante("1111111", "Vot", "Uno", "5to Grado", "MAÑANA")
+    db_manager.add_votante("2222222", "Vot", "Dos", "5to Grado", "MAÑANA")
+    db_manager.add_votante("3333333", "Vot", "Tres", "5to Grado", "TARDE")
+    db_manager.add_multiple_votes([manana_id], "1111111")
+    db_manager.add_multiple_votes([manana_id], "2222222")
+    db_manager.add_multiple_votes([tarde_id], "3333333")
+
+
+def test_get_resultados_filtra_por_turno(db_manager):
+    _eleccion_dos_turnos(db_manager)
+
+    res_manana, _ = db_manager.get_resultados("MAÑANA")
+    assert len(res_manana) == 1
+    assert res_manana[0][1] == "Ana"
+    assert res_manana[0][5] == 2  # votos conservan su índice
+    assert res_manana[0][7] == "MAÑANA"
+
+    res_tarde, _ = db_manager.get_resultados("TARDE")
+    assert len(res_tarde) == 1
+    assert res_tarde[0][1] == "Eva"
+
+    res_todos, _ = db_manager.get_resultados()
+    assert len(res_todos) == 2
+
+
+def test_get_ganadores_por_turno(db_manager):
+    _eleccion_dos_turnos(db_manager)
+
+    assert db_manager.get_ganadores("MAÑANA")["DIRECTORA"][0]["nombre"] == "Ana"
+    assert db_manager.get_ganadores("TARDE")["DIRECTORA"][0]["nombre"] == "Eva"
+
+
+def test_get_participacion_por_turno(db_manager):
+    _eleccion_dos_turnos(db_manager)
+
+    assert db_manager.get_participacion("MAÑANA") == (2, 2)
+    assert db_manager.get_participacion("TARDE") == (1, 1)
+    assert db_manager.get_participacion() == (3, 3)

@@ -294,46 +294,57 @@ class DatabaseManager:
                 vacios.append(cargo)
         return vacios
 
-    def get_resultados(self):
+    def get_resultados(self, turno=None):
         """Obtiene resultados con id y foto para distinguir homónimos sin N+1.
+
+        Args:
+            turno: si se indica ('MAÑANA'/'TARDE'), solo la elección de
+                ese turno.
 
         Returns:
             tuple: (resultados, resultados_por_grado) donde cada fila de
                 resultados es
-                (id, nombre, apellido, cargo, grado, votos, foto).
+                (id, nombre, apellido, cargo, grado, votos, foto, turno).
         """
-        self.cursor.execute('''
-            SELECT c.id, c.nombre, c.apellido, c.cargo, c.grado, COUNT(v.id) as votos, c.foto
+        filtro = 'WHERE c.turno = ?' if turno else ''
+        params = (turno,) if turno else ()
+        self.cursor.execute(f'''
+            SELECT c.id, c.nombre, c.apellido, c.cargo, c.grado, COUNT(v.id) as votos, c.foto, c.turno
             FROM candidatos c
             LEFT JOIN votos v ON c.id = v.candidato_id
+            {filtro}
             GROUP BY c.id, c.nombre, c.apellido, c.cargo, c.grado
             ORDER BY c.cargo, c.grado, votos DESC
-        ''')
+        ''', params)
         resultados = self.cursor.fetchall()
-        
-        self.cursor.execute('''
+
+        self.cursor.execute(f'''
             SELECT v.grado_curso, c.nombre, c.apellido, c.cargo, COUNT(vot.id) as votos
             FROM votantes v
             JOIN votos vot ON v.ci = vot.ci_votante
             JOIN candidatos c ON vot.candidato_id = c.id
+            {filtro}
             GROUP BY v.grado_curso, c.id
             ORDER BY v.grado_curso, c.cargo, votos DESC
-        ''')
+        ''', params)
         resultados_por_grado = self.cursor.fetchall()
-        
+
         return resultados, resultados_por_grado
 
-    def get_ganadores(self):
+    def get_ganadores(self, turno=None):
         """Calcula ganadores por cargo incluyendo empates.
+
+        Args:
+            turno: si se indica, solo la elección de ese turno.
 
         Returns:
             dict: {cargo: [{id, nombre, apellido, votos, foto}, ...]} con
                 todos los candidatos que comparten el máximo de votos.
         """
-        resultados, _ = self.get_resultados()
+        resultados, _ = self.get_resultados(turno)
         por_cargo = {}
         for row in resultados:
-            candidato_id, nombre, apellido, cargo, _, votos, foto = row
+            candidato_id, nombre, apellido, cargo, _, votos, foto, _turno = row
             por_cargo.setdefault(cargo, []).append(
                 {"id": candidato_id, "nombre": nombre,
                  "apellido": apellido, "votos": votos, "foto": foto}
@@ -343,6 +354,17 @@ class DatabaseManager:
             max_votos = max(c["votos"] for c in candidatos)
             ganadores[cargo] = [c for c in candidatos if c["votos"] == max_votos]
         return ganadores
+
+    def get_participacion(self, turno=None):
+        """Devuelve (habilitados, votaron) del padrón, opcionalmente por turno."""
+        if turno:
+            self.cursor.execute(
+                'SELECT COUNT(*), COALESCE(SUM(ya_voto), 0) FROM votantes WHERE turno = ?',
+                (turno,))
+        else:
+            self.cursor.execute('SELECT COUNT(*), COALESCE(SUM(ya_voto), 0) FROM votantes')
+        habilitados, votaron = self.cursor.fetchone()
+        return habilitados, votaron
     
     def get_estado_votacion(self):
         self.cursor.execute('SELECT estado_votacion FROM configuracion WHERE id = 1')
