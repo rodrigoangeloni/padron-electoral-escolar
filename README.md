@@ -67,9 +67,11 @@ Archivo UTF-8 con encabezado (ver `ejemplo_votantes.csv`):
 
 ```csv
 CI,Nombre,Apellido,Grado/Curso
-1234567,María,González,Pre Escolar
-2345678,Juan,Pérez,1er Grado
+1234567,María,González,Pre Escolar TM
+2345678,Juan,Pérez,1er Grado TT
 ```
+
+El grado debe terminar en `TM` (mañana) o `TT` (tarde); las filas sin turno se rechazan con reporte de línea.
 
 Votantes sin CI: escribir la fecha de nacimiento DDMMYYYY en la columna CI (ej. `01092000`). Dos votantes no pueden compartir el mismo valor.
 

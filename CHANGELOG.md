@@ -17,6 +17,15 @@
 
 ---
 
+## 🚀 [Sin publicar] - Turno en votantes (Fase 1)
+
+### ✨ Añadido
+- **🕐 Turno en Votantes**: nueva columna `turno` (`MAÑANA`/`TARDE`). Migración automática: DBs viejas la crean y la rellenan deduciendo el turno del grado (`"1er Grado TM"` → grado normalizado + turno).
+- **📥 Importación CSV con turno**: el grado debe terminar en `TM`/`TT`; las filas sin turno o CI inválida se rechazan con reporte de línea (primeras 10) y resumen por turno. Resumen muestra conteo Mañana/Tarde.
+- **📝 Alta manual y lista con turno**: selector Mañana/Tarde en el formulario y columna Turno en la lista.
+
+---
+
 ## 🚀 [v1.4.3] - 2026-10-08 - Edición de CI y cambios sin publicar
 
 ### ✨ Añadido
