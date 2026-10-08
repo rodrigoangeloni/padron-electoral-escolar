@@ -43,6 +43,7 @@ pyinstaller main.spec
 - `utils/pdf_exporter.py` — `export_acta(secciones, file_path)` con fpdf2 (API moderna: `helvetica`, `new_x/new_y`). Cada sección = un turno (`turno`, `participacion`, `winners`, `resultados` crudos de `get_resultados()`): participación con %, ganadores con % por cargo, tabla con % y firmas al final. `turno=None` = sección general con columna Turno.
 - `models/` — `candidate.py`, `vote.py` sin uso (ningún import en el repo; lógica en `database.py`). No agregar lógica ahí sin migrar callers.
 - `assets/` — `db/`, `config/`, `images/` creados en runtime. Solo `default_candidate.jpg` e `icon.ico` versionados (ver `.gitignore`).
+- `tools/rue_a_csv.py` — conversor PDF RUE → CSV (`padron_votantes_2026/PDF_LISTA_RUE/` → `padron_votantes_2026/`). Parser puro en `utils/rue_parser.py` (sin pypdf: testeable). Requiere `pip install pypdf` aparte — **no va en `requirements.txt`** (para no engordar el exe). Sin CI → fecha DDMMYYYY; doc extranjero/pasaporte con número válido se usa tal cual; filas irreconocibles se reportan y sale con código 1.
 
 ## Convenciones
 - Idioma: todo UI, mensajes, docstrings y CSV en español.
