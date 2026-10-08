@@ -21,6 +21,8 @@ class CandidateUI:
         self.apellido_entry = None
         self.cargo_var = None
         self.grado_var = None
+        self.turno_var = None
+        self.filtro_turno_var = None
         self.candidates_tree = None
         self.photo_preview = None
         self.update_photo_button = None
@@ -59,22 +61,36 @@ class CandidateUI:
         self.grado_var = tk.StringVar(value=config.GRADOS_CANDIDATOS[0])
         grado_combo = ttk.Combobox(add_frame, textvariable=self.grado_var, values=config.GRADOS_CANDIDATOS, state="readonly")
         grado_combo.grid(row=2, column=3, padx=5, pady=5)
-        
+
+        tk.Label(add_frame, text="Turno:").grid(row=3, column=0, sticky="w", padx=5, pady=5)
+        self.turno_var = tk.StringVar(value="Mañana")
+        turno_combo = ttk.Combobox(add_frame, textvariable=self.turno_var, values=["Mañana", "Tarde"], state="readonly")
+        turno_combo.grid(row=3, column=1, padx=5, pady=5)
+
         add_button = tk.Button(add_frame, text="Agregar Candidato", command=self.add_candidate, bg=config.COLOR_SUCCESS, fg=config.COLOR_WHITE)
-        add_button.grid(row=3, column=0, columnspan=4, pady=10)
+        add_button.grid(row=4, column=0, columnspan=4, pady=10)
         
         list_container = tk.Frame(self.parent_frame)
         list_container.pack(fill="both", expand=True, padx=10, pady=10)
 
         list_frame = tk.LabelFrame(list_container, text="Candidatos Registrados", padx=10, pady=10)
         list_frame.pack(side="left", fill="both", expand=True)
-        
-        columns = ("ID", "Nombre", "Apellido", "Cargo", "Grado", "Foto")
+
+        filtro_frame = tk.Frame(list_frame)
+        filtro_frame.pack(fill="x", pady=(0, 5))
+        tk.Label(filtro_frame, text="Mostrar:").pack(side="left", padx=5)
+        self.filtro_turno_var = tk.StringVar(value="Todos")
+        filtro_combo = ttk.Combobox(filtro_frame, textvariable=self.filtro_turno_var,
+                                    values=["Todos", "Mañana", "Tarde"], state="readonly", width=10)
+        filtro_combo.pack(side="left")
+        filtro_combo.bind('<<ComboboxSelected>>', lambda event: self.refresh_candidates_list())
+
+        columns = ("ID", "Nombre", "Apellido", "Cargo", "Grado", "Turno", "Foto")
         self.candidates_tree = ttk.Treeview(list_frame, columns=columns, show="headings", height=15)
-        
+
         for col in columns:
             self.candidates_tree.heading(col, text=col)
-            self.candidates_tree.column(col, width=120)
+            self.candidates_tree.column(col, width=100)
         self.candidates_tree.column("Foto", width=50, anchor="center")
         
         self.candidates_tree.bind('<<TreeviewSelect>>', self.on_candidate_select)
@@ -195,6 +211,8 @@ class CandidateUI:
         self.apellido_entry.insert(0, apellido)
         if grado_curso in config.GRADOS_CANDIDATOS:
             self.grado_var.set(grado_curso)
+        if len(votante) > 6 and votante[6] in ("MAÑANA", "TARDE"):
+            self.turno_var.set(votante[6].capitalize())
 
     def add_candidate(self):
         """Agrega un nuevo candidato"""
@@ -202,6 +220,7 @@ class CandidateUI:
         apellido = self.apellido_entry.get().strip()
         cargo = self.cargo_var.get()
         grado = self.grado_var.get()
+        turno = self.turno_var.get().upper()
         if not nombre or not apellido:
             messagebox.showerror("Error", "Por favor, ingrese el nombre y apellido del candidato")
             return
@@ -209,7 +228,7 @@ class CandidateUI:
             messagebox.showerror("Error", "Por favor, seleccione un cargo.")
             return
 
-        self.db_manager.add_candidato(nombre, apellido, cargo, grado)
+        self.db_manager.add_candidato(nombre, apellido, cargo, grado, turno=turno)
         self.ci_entry.delete(0, tk.END)
         self.nombre_entry.delete(0, tk.END)
         self.apellido_entry.delete(0, tk.END)
@@ -230,11 +249,14 @@ class CandidateUI:
             messagebox.showinfo("Éxito", "Candidato eliminado correctamente")
 
     def refresh_candidates_list(self):
-        """Actualiza la lista de candidatos"""
+        """Actualiza la lista de candidatos según el filtro de turno"""
         for item in self.candidates_tree.get_children():
             self.candidates_tree.delete(item)
-        candidatos = self.db_manager.get_candidatos()
+        filtro = self.filtro_turno_var.get() if self.filtro_turno_var else "Todos"
+        turno = None if filtro == "Todos" else filtro.upper()
+        candidatos = self.db_manager.get_candidatos(turno=turno)
         for candidato in candidatos:
             has_photo = "Sí" if candidato[5] and candidato[5] != config.DEFAULT_CANDIDATE_IMAGE else "No"
-            values = (candidato[0], candidato[1], candidato[2], candidato[3], candidato[4], has_photo)
+            turno_text = candidato[6].capitalize() if len(candidato) > 6 and candidato[6] else ""
+            values = (candidato[0], candidato[1], candidato[2], candidato[3], candidato[4], turno_text, has_photo)
             self.candidates_tree.insert('', 'end', values=values)
