@@ -17,6 +17,13 @@
 
 ---
 
+## 🚀 [v1.5.1] - 2026-10-08 - Fix Jardín en listas de grado
+
+### 🐛 Corregido
+- **🌱 Falta Jardín para alta manual**: `GRADOS_VOTANTES` y `GRADOS_CANDIDATOS` empiezan en Pre Escolar, pero el padrón trae Jardín (importado por CSV sin problema, pero no seleccionable a mano). Agregado `"Jardín"` al inicio de ambas listas + test.
+
+---
+
 ## 🚀 [v1.5.0] - 2026-10-08 - Votación por turnos (Mañana/Tarde)
 
 ### ✨ Añadido

@@ -3,9 +3,9 @@
 Aplicación de escritorio para gestionar elecciones estudiantiles: cargos dinámicos, candidatos, padrón de votantes, votación por CI y resultados con gráficos y PDF.
 
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
-[![Version](https://img.shields.io/badge/Version-v1.5.0-blue.svg?style=flat-square)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![Version](https://img.shields.io/badge/Version-v1.5.1-blue.svg?style=flat-square)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![Platform](https://img.shields.io/badge/Windows-exe-0078D6?style=flat-square&logo=windows&logoColor=white)](https://github.com/rodrigoangeloni/padron-electoral-escolar/releases)
-[![Tests](https://img.shields.io/badge/tests-65_passed-brightgreen?style=flat-square)](tests/)
+[![Tests](https://img.shields.io/badge/tests-66_passed-brightgreen?style=flat-square)](tests/)
 
 ## Características
 
@@ -81,7 +81,7 @@ Votantes sin CI: escribir la fecha de nacimiento DDMMYYYY en la columna CI (ej. 
 .\.venv\Scripts\python -m pytest tests/ -q
 ```
 
-Suite en `tests/` (65 tests, DB aislada por test con `tmp_path`): integridad de la base de datos, reglas de voto, seguridad de auth, validación de fotos y rendimiento de resultados.
+Suite en `tests/` (66 tests, DB aislada por test con `tmp_path`): integridad de la base de datos, reglas de voto, seguridad de auth, validación de fotos y rendimiento de resultados.
 
 ## Seguridad
 
@@ -126,4 +126,4 @@ utils/path_handler.py Rutas dev vs compilado (persistencia junto al exe)
 Copyright (c) 2025 Rodrigo Angeloni. Uso, copia y modificación libres incluyendo el aviso de copyright; **prohibida la venta** sin permiso escrito. Ver [`LICENSE`](LICENSE). Detalle de cambios en [`CHANGELOG.md`](CHANGELOG.md).
 
 ---
-*Última revisión: 2026-10-08 (v1.5.0). ¿Algo que agregar o corregir? Abre un [issue](https://github.com/rodrigoangeloni/padron-electoral-escolar/issues).*
+*Última revisión: 2026-10-08 (v1.5.1). ¿Algo que agregar o corregir? Abre un [issue](https://github.com/rodrigoangeloni/padron-electoral-escolar/issues).*
