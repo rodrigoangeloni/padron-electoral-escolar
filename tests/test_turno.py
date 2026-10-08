@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import pytest
 from database import DatabaseManager
-from utils.turno_utils import parse_grado_turno
+from utils.turno_utils import parse_grado_turno, parse_fila_votante
 
 
 @pytest.fixture
@@ -120,3 +120,35 @@ def test_import_lista_con_turno_y_duplicadas(db_manager):
     assert (ok_count, err_count) == (2, 2)
     assert db_manager.get_votante("1111111")[6] == "MAÑANA"
     assert db_manager.get_votante("2222222")[6] == "TARDE"
+
+
+def test_parse_fila_formato_nuevo_5_columnas():
+    fila = ["8734643", "Melody Arami", "Benitez Coronel", "1er Grado", "TM"]
+
+    assert parse_fila_votante(fila, 2) == ("8734643", "Melody Arami", "Benitez Coronel", "1er Grado", "MAÑANA")
+
+
+def test_parse_fila_turno_minusculas():
+    fila = ["1234567", "A", "B", "Jardín", "tt"]
+
+    assert parse_fila_votante(fila, 2)[4] == "TARDE"
+
+
+def test_parse_fila_formato_anterior_4_columnas():
+    fila = ["1234567", "A", "B", "1er Grado TM"]
+
+    assert parse_fila_votante(fila, 2) == ("1234567", "A", "B", "1er Grado", "MAÑANA")
+
+
+@pytest.mark.parametrize("fila", [
+    ["1234567", "A", "B", "1er Grado", "XX"],
+    ["1234567", "A", "B", "1er Grado", ""],
+    ["1234567", "A", "B", "1er Grado"],
+    ["ABC", "A", "B", "1er Grado", "TM"],
+    ["123", "A", "B", "1er Grado", "TM"],
+    ["1234567", "", "B", "1er Grado", "TM"],
+    ["1234567", "A", "B"],
+])
+def test_parse_fila_invalida_falla_con_linea(fila):
+    with pytest.raises(ValueError, match="línea 5"):
+        parse_fila_votante(fila, 5)

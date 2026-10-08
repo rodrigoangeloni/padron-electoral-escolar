@@ -7,7 +7,7 @@ import csv
 from tkinter import filedialog
 from collections import Counter
 import config
-from utils.turno_utils import parse_grado_turno
+from utils.turno_utils import parse_fila_votante
 
 
 class VoterUI:
@@ -55,7 +55,7 @@ class VoterUI:
         import_frame = tk.LabelFrame(self.parent_frame, text="Importar Votantes desde Archivo", padx=10, pady=10)
         import_frame.pack(fill="x", padx=10, pady=10)
         
-        import_desc = tk.Label(import_frame, text="Importar votantes desde archivo CSV (CI,Nombre,Apellido,Grado/Curso).\nEl grado debe terminar en TM o TT (ej. \"1er Grado TM\"); las filas sin turno se rechazan.")
+        import_desc = tk.Label(import_frame, text="Importar votantes desde archivo CSV (CI,Nombre,Apellido,Grado,Turno).\nTurno TM o TT; también se acepta el formato anterior con el turno pegado al grado.")
         import_desc.pack(pady=5)
         
         self.import_button = tk.Button(import_frame, text="Seleccionar Archivo CSV", command=self.import_voters_from_file, bg=config.COLOR_WARNING, fg=config.COLOR_WHITE)
@@ -183,17 +183,12 @@ class VoterUI:
                 reader = csv.reader(file)
                 next(reader)  # Omitir el encabezado
                 for numero_linea, row in enumerate(reader, start=2):
-                    if len(row) >= 4:
-                        ci, nombre, apellido, grado_txt = row[0].strip(), row[1].strip(), row[2].strip(), row[3].strip()
-                        if ci.isdigit() and 7 <= len(ci) <= 8:
-                            try:
-                                grado_curso, turno = parse_grado_turno(grado_txt)
-                            except ValueError as e:
-                                filas_rechazadas.append(f"línea {numero_linea}: {e}")
-                                continue
-                            votantes_list.append((ci, nombre, apellido, grado_curso, turno))
-                        else:
-                            filas_rechazadas.append(f"línea {numero_linea}: CI inválida '{ci}'")
+                    if not row or all(not c.strip() for c in row):
+                        continue  # líneas vacías
+                    try:
+                        votantes_list.append(parse_fila_votante(row, numero_linea))
+                    except ValueError as e:
+                        filas_rechazadas.append(str(e))
             if votantes_list:
                 success_count, error_count = self.db_manager.import_votantes_from_list(votantes_list)
                 self.refresh_voters_list()
