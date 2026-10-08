@@ -66,12 +66,12 @@ En Windows también podés doble clic en `1_iniciar.bat`: crea el `.venv` si fal
 Archivo UTF-8 con encabezado (ver `ejemplo_votantes.csv`):
 
 ```csv
-CI,Nombre,Apellido,Grado/Curso
-1234567,María,González,Pre Escolar TM
-2345678,Juan,Pérez,1er Grado TT
+CI,Nombre,Apellido,Grado,Turno
+1234567,María,González,Pre Escolar,TM
+2345678,Juan,Pérez,1er Grado,TT
 ```
 
-El grado debe terminar en `TM` (mañana) o `TT` (tarde); las filas sin turno se rechazan con reporte de línea.
+Turno `TM` (mañana) o `TT` (tarde) en columna propia; también se acepta el formato anterior con el turno pegado al grado (`1er Grado TM`). Las filas sin turno válido se rechazan con reporte de línea.
 
 Votantes sin CI: escribir la fecha de nacimiento DDMMYYYY en la columna CI (ej. `01092000`). Dos votantes no pueden compartir el mismo valor.
 

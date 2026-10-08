@@ -23,6 +23,7 @@
 - **🕐 Turno en Votantes**: nueva columna `turno` (`MAÑANA`/`TARDE`). Migración automática: DBs viejas la crean y la rellenan deduciendo el turno del grado (`"1er Grado TM"` → grado normalizado + turno).
 - **📥 Importación CSV con turno**: el grado debe terminar en `TM`/`TT`; las filas sin turno o CI inválida se rechazan con reporte de línea (primeras 10) y resumen por turno. Resumen muestra conteo Mañana/Tarde.
 - **📝 Alta manual y lista con turno**: selector Mañana/Tarde en el formulario y columna Turno en la lista.
+- **📝 CSV con columna Turno**: formato canónico `CI,Nombre,Apellido,Grado,Turno` (Turno `TM`/`TT` separado por coma); el formato anterior con sufijo pegado sigue aceptado. Parsing centralizado en `parse_fila_votante()` (testeable sin GUI). Padrón 2026 convertido (359 filas: 183 TM + 176 TT).
 
 ---
 

@@ -1,14 +1,14 @@
-CI,Nombre,Apellido,Grado/Curso
-1234567,María,González,Pre Escolar TM
-2345678,Juan,Pérez,1er Grado TM
-3456789,Ana,López,2do Grado TT
-4567890,Carlos,Rodríguez,3er Grado TM
-5678901,Laura,Martínez,4to Grado TT
-6789012,Pedro,Sánchez,5to Grado TM
-7890123,Sofía,Ramírez,6to Grado TT
-8901234,Diego,Torres,7mo Grado TM
-9012345,Valentina,Flores,8vo Grado TT
-10123456,Andrea,Núñez,9no Grado TM
-11123456,Luis,Chávez,1er Curso TT
-12123456,Camila,Ríos,2do Curso TM
-13123456,Fernando,Mendoza,3er Curso TT
+CI,Nombre,Apellido,Grado,Turno
+1234567,María,González,Pre Escolar,TM
+2345678,Juan,Pérez,1er Grado,TM
+3456789,Ana,López,2do Grado,TT
+4567890,Carlos,Rodríguez,3er Grado,TM
+5678901,Laura,Martínez,4to Grado,TT
+6789012,Pedro,Sánchez,5to Grado,TM
+7890123,Sofía,Ramírez,6to Grado,TT
+8901234,Diego,Torres,7mo Grado,TM
+9012345,Valentina,Flores,8vo Grado,TT
+10123456,Andrea,Núñez,9no Grado,TM
+11123456,Luis,Chávez,1er Curso,TT
+12123456,Camila,Ríos,2do Curso,TM
+13123456,Fernando,Mendoza,3er Curso,TT
