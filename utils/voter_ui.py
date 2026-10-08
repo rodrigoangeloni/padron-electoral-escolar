@@ -75,6 +75,9 @@ class VoterUI:
         
         delete_voter_button = tk.Button(buttons_frame, text="Eliminar Votante Seleccionado", command=self.delete_voter, bg=config.COLOR_DANGER, fg=config.COLOR_WHITE)
         delete_voter_button.pack(side="left", padx=5)
+
+        edit_ci_button = tk.Button(buttons_frame, text="Editar CI Seleccionada", command=self.edit_voter_ci, bg=config.COLOR_WARNING, fg=config.COLOR_WHITE)
+        edit_ci_button.pack(side="left", padx=5)
         
         refresh_voters_button = tk.Button(buttons_frame, text="Actualizar Lista", command=self.refresh_voters_list, bg=config.COLOR_PRIMARY, fg=config.COLOR_WHITE)
         refresh_voters_button.pack(side="left", padx=5)
@@ -114,6 +117,44 @@ class VoterUI:
             self.db_manager.delete_votante(ci)
             self.refresh_voters_list()
             messagebox.showinfo("Éxito", "Votante eliminado correctamente")
+
+    def edit_voter_ci(self):
+        """Abre un diálogo para editar la CI del votante seleccionado"""
+        selected_item = self.voters_tree.selection()
+        if not selected_item:
+            messagebox.showwarning("Advertencia", "Por favor, seleccione un votante para editar su CI")
+            return
+        values = self.voters_tree.item(selected_item)['values']
+        ci_actual, nombre, apellido = str(values[1]), values[2], values[3]
+
+        dialog = tk.Toplevel(self.parent_frame)
+        dialog.title("Editar CI")
+        dialog.geometry("350x180")
+        dialog.resizable(False, False)
+        dialog.transient(self.parent_frame)
+        dialog.grab_set()
+
+        tk.Label(dialog, text=f"Votante: {nombre} {apellido}", font=("Arial", 10, "bold")).pack(pady=10)
+        tk.Label(dialog, text=f"CI actual: {ci_actual}").pack()
+        tk.Label(dialog, text="CI nueva:").pack(pady=(10, 0))
+        nueva_entry = tk.Entry(dialog, width=20)
+        nueva_entry.insert(0, ci_actual)
+        nueva_entry.pack(pady=5)
+        nueva_entry.focus()
+        nueva_entry.select_range(0, tk.END)
+
+        def guardar():
+            ci_nueva = nueva_entry.get().strip()
+            ok, mensaje = self.db_manager.update_votante_ci(ci_actual, ci_nueva)
+            if ok:
+                dialog.destroy()
+                self.refresh_voters_list()
+                messagebox.showinfo("Éxito", mensaje)
+            else:
+                messagebox.showerror("Error", mensaje)
+
+        tk.Button(dialog, text="Guardar", command=guardar, bg=config.COLOR_SUCCESS, fg=config.COLOR_WHITE).pack(pady=10)
+        nueva_entry.bind("<Return>", lambda event: guardar())
 
     def import_voters_from_file(self):
         """Importa votantes desde un archivo CSV"""

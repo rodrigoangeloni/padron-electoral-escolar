@@ -314,6 +314,42 @@ class DatabaseManager:
     def delete_votante(self, ci):
         self.cursor.execute('DELETE FROM votantes WHERE ci = ?', (ci,))
         self.conn.commit()
+
+    def update_votante_ci(self, ci_actual, ci_nueva):
+        """Actualiza la CI de un votante y reasigna sus votos a la nueva CI.
+
+        La FK votos.ci_votante no tiene ON UPDATE CASCADE, así que no se puede
+        hacer UPDATE directo: se inserta la fila con la CI nueva (copiando
+        nombre, apellido, grado y ya_voto), se mueven los votos y se borra la
+        fila vieja. Todo en una transacción: si algo falla, no cambia nada.
+
+        Returns:
+            tuple: (ok, mensaje).
+        """
+        if not ci_nueva or not ci_nueva.isdigit() or not (7 <= len(ci_nueva) <= 8):
+            return False, "La CI debe tener entre 7 y 8 dígitos numéricos."
+        if ci_actual == ci_nueva:
+            return True, "Sin cambios."
+        self.cursor.execute(
+            'SELECT nombre, apellido, grado_curso, ya_voto FROM votantes WHERE ci = ?',
+            (ci_actual,))
+        fila = self.cursor.fetchone()
+        if fila is None:
+            return False, "Votante no encontrado."
+        self.cursor.execute('SELECT id FROM votantes WHERE ci = ?', (ci_nueva,))
+        if self.cursor.fetchone() is not None:
+            return False, "La CI nueva ya está registrada en otro votante."
+        try:
+            self.cursor.execute(
+                'INSERT INTO votantes (ci, nombre, apellido, grado_curso, ya_voto) VALUES (?, ?, ?, ?, ?)',
+                (ci_nueva, fila[0], fila[1], fila[2], fila[3]))
+            self.cursor.execute('UPDATE votos SET ci_votante = ? WHERE ci_votante = ?', (ci_nueva, ci_actual))
+            self.cursor.execute('DELETE FROM votantes WHERE ci = ?', (ci_actual,))
+            self.conn.commit()
+            return True, "CI actualizada correctamente."
+        except Exception as e:
+            self.conn.rollback()
+            return False, f"Error al actualizar la CI: {str(e)}"
     
     def import_votantes_from_list(self, votantes_list):
         success_count = 0
