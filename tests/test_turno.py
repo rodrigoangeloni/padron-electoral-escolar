@@ -203,3 +203,27 @@ def test_get_candidatos_filtra_por_turno(db_manager):
     assert len(db_manager.get_candidatos(turno="TARDE")) == 2
     assert len(db_manager.get_candidatos(cargo="DIRECTORA", turno="TARDE")) == 1
     assert db_manager.get_candidatos(cargo="DIRECTORA", turno="TARDE")[0][1] == "Eva"
+
+
+def test_cargos_sin_candidatos_por_turno(db_manager):
+    db_manager.add_candidato("Ana", "Lopez", "DIRECTORA", "5to Grado", turno="MAÑANA")
+
+    assert "DIRECTORA" not in db_manager.cargos_sin_candidatos(turno="MAÑANA")
+    assert "DIRECTORA" in db_manager.cargos_sin_candidatos(turno="TARDE")
+    # Sin turno mantiene el comportamiento global (compatibilidad).
+    assert "DIRECTORA" not in db_manager.cargos_sin_candidatos()
+    assert "VICEDIRECTORA" in db_manager.cargos_sin_candidatos()
+
+
+def test_papeleta_solo_muestra_turno_del_votante(db_manager):
+    """Simula start_voting_flow: por cargo, solo candidatos del turno."""
+    db_manager.add_candidato("Ana", "Lopez", "DIRECTORA", "5to Grado", turno="MAÑANA")
+    db_manager.add_candidato("Eva", "Diaz", "DIRECTORA", "5to Grado", turno="TARDE")
+    db_manager.add_votante("1111111", "Juan", "Perez", "5to Grado", "TARDE")
+
+    votante = db_manager.get_votante("1111111")
+    turno = votante[6]
+    papeleta = {role: db_manager.get_candidatos(role, turno=turno)
+                for role in db_manager.get_cargos() if role == "DIRECTORA"}
+
+    assert [c[1] for c in papeleta["DIRECTORA"]] == ["Eva"]

@@ -109,17 +109,19 @@ class VotingApp(tk.Frame):
             self.show_ci_input()
             return
 
-        vacios = self.db_manager.cargos_sin_candidatos()
+        # Cada turno es una elección: solo candidatos del turno del votante.
+        turno = self.current_votante[6] if len(self.current_votante) > 6 else None
+
+        vacios = self.db_manager.cargos_sin_candidatos(turno)
         if vacios:
-            messagebox.showerror(
-                "Error de Configuración",
-                "Hay cargos sin candidatos: " + ", ".join(vacios)
-                + ". Contacte al administrador."
-            )
+            mensaje = "Hay cargos sin candidatos: " + ", ".join(vacios)
+            if turno:
+                mensaje += f" (turno {turno.capitalize()})"
+            messagebox.showerror("Error de Configuración", mensaje + ". Contacte al administrador.")
             self.show_ci_input()
             return
-        
-        self.all_candidates = {role: self.db_manager.get_candidatos(role) for role in self.roles}
+
+        self.all_candidates = {role: self.db_manager.get_candidatos(role, turno=turno) for role in self.roles}
         
         self.current_step = 0
         self.selected_candidates = {}

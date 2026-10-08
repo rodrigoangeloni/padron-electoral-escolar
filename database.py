@@ -268,8 +268,12 @@ class DatabaseManager:
             self.conn.rollback()
             return False, f"Error al registrar votos: {str(e)}"
     
-    def cargos_sin_candidatos(self):
+    def cargos_sin_candidatos(self, turno=None):
         """Devuelve los cargos configurados que no tienen candidatos.
+
+        Args:
+            turno: si se indica ('MAÑANA'/'TARDE'), solo cuenta los
+                candidatos de ese turno (cada turno es una elección).
 
         Returns:
             list: Nombres de cargos sin candidatos (vacía si la elección
@@ -277,9 +281,15 @@ class DatabaseManager:
         """
         vacios = []
         for cargo in self.get_cargos():
-            self.cursor.execute(
-                'SELECT COUNT(*) FROM candidatos WHERE cargo = ?', (cargo,)
-            )
+            if turno:
+                self.cursor.execute(
+                    'SELECT COUNT(*) FROM candidatos WHERE cargo = ? AND turno = ?',
+                    (cargo, turno)
+                )
+            else:
+                self.cursor.execute(
+                    'SELECT COUNT(*) FROM candidatos WHERE cargo = ?', (cargo,)
+                )
             if self.cursor.fetchone()[0] == 0:
                 vacios.append(cargo)
         return vacios
