@@ -40,7 +40,7 @@ pyinstaller main.spec
 - `utils/auth.py` — `AuthManager`: PBKDF2-HMAC-SHA256 (200.000 iteraciones, salt aleatorio, formato `salt_hex$hash_hex` en `assets/config/.admin_password` + flag `.initial_password_used`, comparación con `hmac.compare_digest`). Bloqueo 5 intentos/30s **en memoria** (se pierde al reiniciar). Sin archivo de password el login falla (sin fallback). Hash legacy SHA-256 plano solo se acepta para migrar al cambiar la clave.
 - `utils/path_handler.py` — CLAVE para persistencia: `get_data_dir()` usa `dirname(sys.executable)` si `sys.frozen`, sino `assets/`. De ahí derivan `get_db_path()` (`db/election.db`), `get_config_dir()`, `get_images_dir()`. `get_resource_path()` usa `sys._MEIPASS` en compilado, raíz del repo en dev.
 - `utils/foto_utils.py` — `validar_foto_candidato(ruta)` pura y testeable (sin GUI): solo `.jpg/.jpeg/.png`, ≤5 MB (`TAMANO_MAX_FOTO_BYTES`), contenido real (`verify()` + `load()`).
-- `utils/pdf_exporter.py` — `export_results_to_pdf(winners, results, file_path)` con fpdf2.
+- `utils/pdf_exporter.py` — `export_acta(secciones, file_path)` con fpdf2 (API moderna: `helvetica`, `new_x/new_y`). Cada sección = un turno (`turno`, `participacion`, `winners`, `resultados` crudos de `get_resultados()`): participación con %, ganadores con % por cargo, tabla con % y firmas al final. `turno=None` = sección general con columna Turno.
 - `models/` — `candidate.py`, `vote.py` sin uso (ningún import en el repo; lógica en `database.py`). No agregar lógica ahí sin migrar callers.
 - `assets/` — `db/`, `config/`, `images/` creados en runtime. Solo `default_candidate.jpg` e `icon.ico` versionados (ver `.gitignore`).
 
@@ -56,6 +56,7 @@ pyinstaller main.spec
 - Turno: columna `turno` (`MAÑANA`/`TARDE`, NOT NULL DEFAULT `'MAÑANA'`) en `votantes`. Migración `_migrar_turno_votantes()` (ALTER + backfill desde sufijo, normaliza grado; idempotente). `turno` va al FINAL de los SELECTs (`get_votante`/`get_votantes` índice 6) para no romper índices existentes (`ya_voto` sigue en 5). `add_votante(..., turno='MAÑANA')` rechaza turnos inválidos.
 - Colores/geometrías solo vía `config.py` (`COLOR_PRIMARY/SUCCESS/WARNING/DANGER/WHITE`).
 - Gráficos: `matplotlib` embebido con `FigureCanvasTkAgg`, un subplot horizontal por cargo.
+- Reportes: selector Mañana/Tarde/Ambos en la pestaña (`results_ui.turno_actual`, `None` = ambos → dos secciones). Participación vía `get_participacion(turno)` → `(habilitados, votaron)`. `get_resultados/get_ganadores(turno=None)` filtran; `turno` al final de las filas (índice 7, foto sigue en 6).
 
 ## Gotchas operativos
 - `.gitignore` ignora `*.db`, `assets/config/`, `assets/images/*` (excepto default + icon), `.venv/`, `padron_votantes_2026/` (CSVs con datos personales). DB y password nunca se commitean.

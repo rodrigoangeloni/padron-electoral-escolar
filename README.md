@@ -3,9 +3,9 @@
 Aplicación de escritorio para gestionar elecciones estudiantiles: cargos dinámicos, candidatos, padrón de votantes, votación por CI y resultados con gráficos y PDF.
 
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
-[![Version](https://img.shields.io/badge/Version-v1.4.3-blue.svg?style=flat-square)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![Version](https://img.shields.io/badge/Version-v1.5.0-blue.svg?style=flat-square)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![Platform](https://img.shields.io/badge/Windows-exe-0078D6?style=flat-square&logo=windows&logoColor=white)](https://github.com/rodrigoangeloni/padron-electoral-escolar/releases)
-[![Tests](https://img.shields.io/badge/tests-27_passed-brightgreen?style=flat-square)](tests/)
+[![Tests](https://img.shields.io/badge/tests-65_passed-brightgreen?style=flat-square)](tests/)
 
 ## Características
 
@@ -13,7 +13,7 @@ Aplicación de escritorio para gestionar elecciones estudiantiles: cargos dinám
 - **Candidatos**: alta, baja y fotos (JPG/PNG hasta 5 MB, validadas).
 - **Votantes**: registro individual o importación masiva desde CSV, validación de CI (7-8 dígitos) y prevención de voto duplicado. Sin CI: usar fecha de nacimiento DDMMYYYY (ej. `01092000` = 01/09/2000).
 - **Votación guiada**: un paso por cargo, confirmación final y comprobante en pantalla.
-- **Resultados**: tabla, ganadores por cargo (con empates), gráficos y exportación a PDF.
+- **Resultados**: tabla, ganadores por cargo (con empates), gráficos y acta en PDF con participación, porcentajes y firmas — por turno (Mañana/Tarde/Ambos).
 - **Seguridad**: contraseña admin con PBKDF2 + salt, bloqueo tras intentos fallidos y control de estado (activa/cerrada).
 
 ## Descarga rápida (usuarios finales)
@@ -81,7 +81,7 @@ Votantes sin CI: escribir la fecha de nacimiento DDMMYYYY en la columna CI (ej. 
 .\.venv\Scripts\python -m pytest tests/ -q
 ```
 
-Suite en `tests/` (27 tests, DB aislada por test con `tmp_path`): integridad de la base de datos, reglas de voto, seguridad de auth, validación de fotos y rendimiento de resultados.
+Suite en `tests/` (65 tests, DB aislada por test con `tmp_path`): integridad de la base de datos, reglas de voto, seguridad de auth, validación de fotos y rendimiento de resultados.
 
 ## Seguridad
 
@@ -102,7 +102,7 @@ voting_app.py      Flujo CI → selección por cargo → confirmación
 utils/auth.py      AuthManager (PBKDF2, rate-limit)
 utils/candidate_ui.py · voter_ui.py · results_ui.py   Pestañas del panel
 utils/foto_utils.py   Validación de fotos (testeable sin GUI)
-utils/pdf_exporter.py Exportación de resultados a PDF (fpdf2)
+utils/pdf_exporter.py Exportación del acta por turno (fpdf2)
 utils/path_handler.py Rutas dev vs compilado (persistencia junto al exe)
 ```
 
@@ -126,4 +126,4 @@ utils/path_handler.py Rutas dev vs compilado (persistencia junto al exe)
 Copyright (c) 2025 Rodrigo Angeloni. Uso, copia y modificación libres incluyendo el aviso de copyright; **prohibida la venta** sin permiso escrito. Ver [`LICENSE`](LICENSE). Detalle de cambios en [`CHANGELOG.md`](CHANGELOG.md).
 
 ---
-*Última revisión: 2026-10-08 (v1.4.3). ¿Algo que agregar o corregir? Abre un [issue](https://github.com/rodrigoangeloni/padron-electoral-escolar/issues).*
+*Última revisión: 2026-10-08 (v1.5.0). ¿Algo que agregar o corregir? Abre un [issue](https://github.com/rodrigoangeloni/padron-electoral-escolar/issues).*

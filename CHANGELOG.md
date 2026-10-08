@@ -17,11 +17,12 @@
 
 ---
 
-## 🚀 [Sin publicar] - Turno en votantes (Fase 1)
+## 🚀 [v1.5.0] - 2026-10-08 - Votación por turnos (Mañana/Tarde)
 
 ### ✨ Añadido
 - **🕐 Turno en Candidatos (Fase 2)**: columna `turno` con migración (existentes quedan en `MAÑANA`). Campo Turno en el alta, filtro Todos/Mañana/Tarde en la lista + columna Turno, y la importación por CI hereda el turno del votante. `get_candidatos()` acepta `turno` y combina filtros.
 - **🗳️ Votación por turno (Fase 3)**: la papeleta muestra solo candidatos del turno del votante; `cargos_sin_candidatos(turno)` bloquea por turno con mensaje que indica cuál.
+- **📄 Acta por turno (Fase 4)**: selector Mañana/Tarde/Ambos en resultados y PDF. El acta trae participación (habilitados/votaron/%), ganadores con % por cargo, tabla con % y líneas de firma (presidente + 2 fiscales). Nuevo `get_participacion()` y `export_acta()` (API fpdf2 moderna, sin warnings deprecados).
 
 ### ✨ Añadido
 - **🕐 Turno en Votantes**: nueva columna `turno` (`MAÑANA`/`TARDE`). Migración automática: DBs viejas la crean y la rellenan deduciendo el turno del grado (`"1er Grado TM"` → grado normalizado + turno).
