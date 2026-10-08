@@ -5,7 +5,9 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 import csv
 from tkinter import filedialog
+from collections import Counter
 import config
+from utils.turno_utils import parse_grado_turno
 
 
 class VoterUI:
@@ -16,6 +18,7 @@ class VoterUI:
         self.nombre_voter_entry = None
         self.apellido_voter_entry = None
         self.grado_curso_var = None
+        self.turno_var = None
         self.voters_tree = None
         self.import_button = None
 
@@ -40,14 +43,19 @@ class VoterUI:
         self.grado_curso_var = tk.StringVar(value=config.GRADOS_VOTANTES[0])
         grado_curso_combo = ttk.Combobox(add_frame, textvariable=self.grado_curso_var, values=config.GRADOS_VOTANTES, state="readonly", width=17)
         grado_curso_combo.grid(row=1, column=3, padx=5, pady=5)
-        
+
+        tk.Label(add_frame, text="Turno:").grid(row=2, column=0, sticky="w", padx=5, pady=5)
+        self.turno_var = tk.StringVar(value="Mañana")
+        turno_combo = ttk.Combobox(add_frame, textvariable=self.turno_var, values=["Mañana", "Tarde"], state="readonly", width=17)
+        turno_combo.grid(row=2, column=1, padx=5, pady=5)
+
         add_voter_button = tk.Button(add_frame, text="Agregar Votante", command=self.add_voter, bg=config.COLOR_SUCCESS, fg=config.COLOR_WHITE)
-        add_voter_button.grid(row=2, column=0, columnspan=4, pady=10)
+        add_voter_button.grid(row=2, column=2, columnspan=2, pady=10)
         
         import_frame = tk.LabelFrame(self.parent_frame, text="Importar Votantes desde Archivo", padx=10, pady=10)
         import_frame.pack(fill="x", padx=10, pady=10)
         
-        import_desc = tk.Label(import_frame, text="Importar votantes desde archivo CSV (CI,Nombre,Apellido,Grado/Curso)")
+        import_desc = tk.Label(import_frame, text="Importar votantes desde archivo CSV (CI,Nombre,Apellido,Grado/Curso).\nEl grado debe terminar en TM o TT (ej. \"1er Grado TM\"); las filas sin turno se rechazan.")
         import_desc.pack(pady=5)
         
         self.import_button = tk.Button(import_frame, text="Seleccionar Archivo CSV", command=self.import_voters_from_file, bg=config.COLOR_WARNING, fg=config.COLOR_WHITE)
@@ -56,7 +64,7 @@ class VoterUI:
         list_frame = tk.LabelFrame(self.parent_frame, text="Votantes Registrados", padx=10, pady=10)
         list_frame.pack(fill="both", expand=True, padx=10, pady=10)
         
-        columns = ("ID", "CI", "Nombre", "Apellido", "Grado/Curso", "Ya Votó")
+        columns = ("ID", "CI", "Nombre", "Apellido", "Grado/Curso", "Turno", "Ya Votó")
         self.voters_tree = ttk.Treeview(list_frame, columns=columns, show="headings", height=15)
         
         for col in columns:
@@ -90,13 +98,14 @@ class VoterUI:
         nombre = self.nombre_voter_entry.get().strip()
         apellido = self.apellido_voter_entry.get().strip()
         grado_curso = self.grado_curso_var.get()
+        turno = self.turno_var.get().upper()
         if not ci or not nombre or not apellido:
             messagebox.showerror("Error", "Por favor, complete todos los campos obligatorios (CI, Nombre, Apellido)")
             return
         if not ci.isdigit() or len(ci) < 7 or len(ci) > 8:
             messagebox.showerror("Error", "La CI debe tener entre 7 y 8 dígitos numéricos")
             return
-        success = self.db_manager.add_votante(ci, nombre, apellido, grado_curso)
+        success = self.db_manager.add_votante(ci, nombre, apellido, grado_curso, turno)
         if success:
             self.ci_voter_entry.delete(0, tk.END)
             self.nombre_voter_entry.delete(0, tk.END)
@@ -169,20 +178,37 @@ class VoterUI:
 
         try:
             votantes_list = []
+            filas_rechazadas = []
             with open(file_path, 'r', encoding='utf-8') as file:
                 reader = csv.reader(file)
                 next(reader)  # Omitir el encabezado
-                for row in reader:
+                for numero_linea, row in enumerate(reader, start=2):
                     if len(row) >= 4:
-                        ci, nombre, apellido, grado_curso = row[0].strip(), row[1].strip(), row[2].strip(), row[3].strip()
+                        ci, nombre, apellido, grado_txt = row[0].strip(), row[1].strip(), row[2].strip(), row[3].strip()
                         if ci.isdigit() and 7 <= len(ci) <= 8:
-                            votantes_list.append((ci, nombre, apellido, grado_curso))
+                            try:
+                                grado_curso, turno = parse_grado_turno(grado_txt)
+                            except ValueError as e:
+                                filas_rechazadas.append(f"línea {numero_linea}: {e}")
+                                continue
+                            votantes_list.append((ci, nombre, apellido, grado_curso, turno))
                         else:
-                            print(f"CI inválido omitido: {ci}")
+                            filas_rechazadas.append(f"línea {numero_linea}: CI inválida '{ci}'")
             if votantes_list:
                 success_count, error_count = self.db_manager.import_votantes_from_list(votantes_list)
                 self.refresh_voters_list()
-                messagebox.showinfo("Importación completada", f"Importación completada: {success_count} votantes agregados, {error_count} errores (CI duplicadas)")
+                por_turno = Counter(turno for _, _, _, _, turno in votantes_list)
+                detalle = ", ".join(f"{t.capitalize()}: {por_turno.get(t, 0)}" for t in ("MAÑANA", "TARDE"))
+                mensaje = (f"Importación completada: {success_count} votantes agregados "
+                           f"({detalle}), {error_count} errores (CI duplicadas)")
+                if filas_rechazadas:
+                    muestra = "\n".join(filas_rechazadas[:10])
+                    extra = f" (+{len(filas_rechazadas) - 10} más)" if len(filas_rechazadas) > 10 else ""
+                    mensaje += f"\n\nFilas rechazadas (no importadas):\n{muestra}{extra}"
+                messagebox.showinfo("Importación completada", mensaje)
+            elif filas_rechazadas:
+                muestra = "\n".join(filas_rechazadas[:10])
+                messagebox.showwarning("Advertencia", f"No se importó ningún votante. Filas rechazadas:\n{muestra}")
             else:
                 messagebox.showwarning("Advertencia", "No se encontraron votantes válidos en el archivo")
         except Exception as e:
@@ -198,5 +224,6 @@ class VoterUI:
         votantes = self.db_manager.get_votantes()
         for votante in votantes:
             ya_voto_text = "Sí" if votante[5] == 1 else "No"
-            values = (votante[0], votante[1], votante[2], votante[3], votante[4], ya_voto_text)
+            turno_text = votante[6].capitalize() if len(votante) > 6 and votante[6] else ""
+            values = (votante[0], votante[1], votante[2], votante[3], votante[4], turno_text, ya_voto_text)
             self.voters_tree.insert('', 'end', values=values)

@@ -105,3 +105,18 @@ def test_add_votante_turno_explicito(db_manager):
 def test_add_votante_turno_invalido_falla(db_manager):
     assert db_manager.add_votante("3333333", "Luz", "Diaz", "5to Grado", "NOCHE") is False
     assert db_manager.get_votante("3333333") is None
+
+
+def test_import_lista_con_turno_y_duplicadas(db_manager):
+    lista = [
+        ("1111111", "Juan", "Perez", "1er Grado", "MAÑANA"),
+        ("2222222", "Ana", "Gomez", "1er Grado", "TARDE"),
+        ("1111111", "Otro", "Duplicado", "2do Grado", "MAÑANA"),
+        ("3333333", "Luz", "Diaz", "2do Grado", "NOCHE"),
+    ]
+
+    ok_count, err_count = db_manager.import_votantes_from_list(lista)
+
+    assert (ok_count, err_count) == (2, 2)
+    assert db_manager.get_votante("1111111")[6] == "MAÑANA"
+    assert db_manager.get_votante("2222222")[6] == "TARDE"
