@@ -4,11 +4,12 @@ Módulo para la funcionalidad de UI de resultados
 import tkinter as tk
 from tkinter import messagebox, ttk, filedialog
 from PIL import Image, ImageTk
+from datetime import datetime
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import config
 from utils.path_handler import get_images_dir
-from utils.pdf_exporter import export_results_to_pdf
+from utils.pdf_exporter import export_acta
 
 
 class ResultsUI:
@@ -19,6 +20,8 @@ class ResultsUI:
         self.winners_widgets = {}
         self.graphs_frame = None
         self._figura_actual = None
+        self.filtro_turno_var = None
+        self.turno_actual = None  # None = ambos turnos
 
     def setup_results_tab(self, refresh_callback=None, reset_callback=None):
         """Configura la pestaña de resultados"""
@@ -32,6 +35,13 @@ class ResultsUI:
         
         export_button = tk.Button(controls_frame, text="Exportar a PDF", command=self._export_results_to_pdf, bg=config.COLOR_SUCCESS, fg=config.COLOR_WHITE)
         export_button.pack(side="left", padx=5)
+
+        tk.Label(controls_frame, text="Turno:").pack(side="left", padx=(15, 5))
+        self.filtro_turno_var = tk.StringVar(value="Todos")
+        filtro_combo = ttk.Combobox(controls_frame, textvariable=self.filtro_turno_var,
+                                    values=["Todos", "Mañana", "Tarde"], state="readonly", width=10)
+        filtro_combo.pack(side="left")
+        filtro_combo.bind('<<ComboboxSelected>>', self._on_filtro_turno)
 
         results_notebook = ttk.Notebook(self.parent_frame)
         results_notebook.pack(fill="both", expand=True, padx=10, pady=10)
@@ -51,7 +61,7 @@ class ResultsUI:
         self.results_general_frame = tk.LabelFrame(parent_frame, text="Resultados Detallados", padx=10, pady=10)
         self.results_general_frame.pack(fill="both", expand=True, padx=10, pady=5)
         
-        columns = ("Nombre", "Apellido", "Cargo", "Grado", "Votos")
+        columns = ("Nombre", "Apellido", "Cargo", "Grado", "Turno", "Votos")
         self.results_tree = ttk.Treeview(self.results_general_frame, columns=columns, show="headings", height=10)
         
         for col in columns:
@@ -85,6 +95,12 @@ class ResultsUI:
             votes_label.pack()
             self.winners_widgets[cargo] = {'img': img_label, 'name': name_label, 'votes': votes_label}
 
+    def _on_filtro_turno(self, event=None):
+        """Cambia el turno visible y refresca."""
+        filtro = self.filtro_turno_var.get()
+        self.turno_actual = None if filtro == "Todos" else filtro.upper()
+        self.refresh_results()
+
     def refresh_results(self):
         """Actualiza los resultados mostrados"""
         cargos = self.db_manager.get_cargos()
@@ -95,14 +111,18 @@ class ResultsUI:
         for widget in self.graphs_frame.winfo_children():
             widget.destroy()
 
-        resultados, _ = self.db_manager.get_resultados()
+        resultados, _ = self.db_manager.get_resultados(self.turno_actual)
 
-        # Columnas visibles: (Nombre, Apellido, Cargo, Grado, Votos); el id
-        # va primero y la foto al final: no se muestran.
+        # Columnas visibles: (Nombre, Apellido, Cargo, Grado, Turno, Votos);
+        # el id va primero y la foto queda sin mostrar.
         for resultado in resultados:
-            self.results_tree.insert('', 'end', values=resultado[1:6])
+            turno_text = resultado[7].capitalize() if resultado[7] else ""
+            self.results_tree.insert(
+                '', 'end',
+                values=(resultado[1], resultado[2], resultado[3],
+                        resultado[4], turno_text, resultado[5]))
 
-        winners = self.db_manager.get_ganadores()
+        winners = self.db_manager.get_ganadores(self.turno_actual)
 
         for cargo, widgets in self.winners_widgets.items():
             top = winners.get(cargo, [])
@@ -150,40 +170,48 @@ class ResultsUI:
         canvas.get_tk_widget().pack(fill='both', expand=True)
 
     def _export_results_to_pdf(self):
-        """Exporta los resultados actuales a un archivo PDF."""
-        resultados, _ = self.db_manager.get_resultados()
-
-        if not resultados:
+        """Exporta el acta del turno visible (o ambos) a un archivo PDF."""
+        turnos = [self.turno_actual] if self.turno_actual else ["MAÑANA", "TARDE"]
+        secciones = [self._construir_seccion(t) for t in turnos]
+        if not any(s["resultados"] for s in secciones):
             messagebox.showinfo("Exportar a PDF", "No hay resultados para exportar.")
             return
 
-        winners_pdf = {}
-        for cargo, top in self.db_manager.get_ganadores().items():
-            if len(top) == 1:
-                winners_pdf[cargo] = {'nombre': top[0]['nombre'],
-                                      'apellido': top[0]['apellido'],
-                                      'votos': top[0]['votos']}
-            else:
-                empatados = ", ".join(f"{c['nombre']} {c['apellido']}" for c in top)
-                winners_pdf[cargo] = {'nombre': f"Empate: {empatados}",
-                                      'apellido': "",
-                                      'votos': top[0]['votos']}
-
+        etiqueta = self.turno_actual.capitalize() if self.turno_actual else "Ambos"
         file_path = filedialog.asksaveasfilename(
             defaultextension=".pdf",
+            initialfile=f"acta_{etiqueta}_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf",
             filetypes=[("PDF Files", "*.pdf"), ("All files", "*.*")],
-            title="Guardar resultados como PDF"
+            title="Guardar acta como PDF"
         )
 
         if not file_path:
             return
 
         try:
-            filas_pdf = [r[1:6] for r in resultados]
-            export_results_to_pdf(winners_pdf, filas_pdf, file_path)
-            messagebox.showinfo("Exportar a PDF", f"Resultados exportados exitosamente a:\n{file_path}")
+            export_acta(secciones, file_path)
+            messagebox.showinfo("Exportar a PDF", f"Acta exportada exitosamente a:\n{file_path}")
         except Exception as e:
             messagebox.showerror("Error de Exportación", f"No se pudo exportar el archivo PDF.\nError: {e}")
+
+    def _construir_seccion(self, turno):
+        """Arma una sección del acta para el turno dado."""
+        resultados, _ = self.db_manager.get_resultados(turno)
+        winners = {}
+        for cargo, top in self.db_manager.get_ganadores(turno).items():
+            if len(top) == 1:
+                winners[cargo] = {'nombre': top[0]['nombre'],
+                                  'apellido': top[0]['apellido'],
+                                  'votos': top[0]['votos']}
+            else:
+                empatados = ", ".join(f"{c['nombre']} {c['apellido']}" for c in top)
+                winners[cargo] = {'nombre': f"Empate: {empatados}",
+                                  'apellido': "",
+                                  'votos': top[0]['votos']}
+        return {"turno": turno,
+                "participacion": self.db_manager.get_participacion(turno),
+                "winners": winners,
+                "resultados": resultados}
 
 
 def crear_figura_resultados(resultados, cargos):
