@@ -17,6 +17,18 @@
 
 ---
 
+## 🚀 [v1.4.3] - 2026-10-08 - Edición de CI y cambios sin publicar
+
+### ✨ Añadido
+- **🪪 Editar CI de Votante**: botón "Editar CI Seleccionada" en la pestaña Votantes; cambia la CI y reasigna los votos en transacción conservando `ya_voto` (nuevo método `update_votante_ci()` + 4 tests, suite 27/27).
+- **📥 Importar Candidato desde el Padrón por CI**: campo CI en el alta de candidatos que autocompleta nombre, apellido y grado desde el padrón, con confirmación si el candidato ya existe.
+- **🔢 Votantes sin CI**: convención documentada — usar fecha de nacimiento DDMMYYYY como CI (ej. `01092000` = 01/09/2000); vale para alta manual, CSV e importación.
+
+### 🔧 Cambiado
+- **🖱️ Lanzador sin consola**: `1_iniciar.bat` abre la app con `pythonw` (crea `.venv` si falta); script de compilación renombrado a `2_build.bat`.
+
+---
+
 ## 🚀 [v1.4.2] - 2026-09-03 - Hotfix crash panel de administración
 
 ### 🐛 Corregido
