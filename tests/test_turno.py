@@ -34,8 +34,15 @@ def test_parse_turno_tarde_minusculas_y_espacios():
 
 
 def test_parse_acepta_grado_fuera_de_lista():
-    """Jardin no está en config.GRADOS_VOTANTES pero es válido igual."""
+    """El grado base no se valida contra config: cualquier texto vale."""
     assert parse_grado_turno("Jardin TM") == ("Jardin", "MAÑANA")
+
+
+def test_config_incluye_jardin():
+    """Jardín debe estar seleccionable en alta manual (viene en el padrón)."""
+    import config
+    assert config.GRADOS_VOTANTES[0] == "Jardín"
+    assert config.GRADOS_CANDIDATOS[0] == "Jardín"
 
 
 @pytest.mark.parametrize("texto", ["1er Grado", "TM", "", "   ", "3er Grado XM", "1er Grado TMT"])

@@ -17,8 +17,8 @@ def parse_grado_turno(texto):
     """Separa "1er Grado TM" en ("1er Grado", "MAÑANA").
 
     Acepta minúsculas y espacios extra ("  6to grado  tt ").
-    El grado base no se valida contra lista (ej. "Jardin" no está
-    en config.GRADOS_VOTANTES pero es un grado real del padrón).
+    El grado base no se valida contra lista: cualquier texto con
+    sufijo válido pasa (la lista de config solo alimenta los combos).
 
     Raises:
         ValueError: si no termina en sufijo TM/TT o falta el grado.

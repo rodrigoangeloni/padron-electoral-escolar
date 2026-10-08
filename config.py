@@ -23,14 +23,14 @@ ADMIN_PASSWORD_FILE = os.path.join(CONFIG_DIR, '.admin_password')
 DEFAULT_CANDIDATE_IMAGE = os.path.join(IMG_DIR, 'default_candidate.jpg')
 
 GRADOS_CANDIDATOS = [
-    "Pre Escolar", "1er Grado", "2do Grado", "3er Grado", "4to Grado",
+    "Jardín", "Pre Escolar", "1er Grado", "2do Grado", "3er Grado", "4to Grado",
     "5to Grado", "6to Grado", "7mo Grado", "8vo Grado", "9no Grado",
     "1er Curso", "2do Curso", "3er Curso"
 ]
 
 # --- Votantes ---
 GRADOS_VOTANTES = [
-    "Pre Escolar", "1er Grado", "2do Grado", "3er Grado", "4to Grado",
+    "Jardín", "Pre Escolar", "1er Grado", "2do Grado", "3er Grado", "4to Grado",
     "5to Grado", "6to Grado", "7mo Grado", "8vo Grado", "9no Grado",
     "1er Curso", "2do Curso", "3er Curso"
 ]
