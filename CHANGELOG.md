@@ -21,6 +21,7 @@
 
 ### ✨ Añadido
 - **🕐 Turno en Candidatos (Fase 2)**: columna `turno` con migración (existentes quedan en `MAÑANA`). Campo Turno en el alta, filtro Todos/Mañana/Tarde en la lista + columna Turno, y la importación por CI hereda el turno del votante. `get_candidatos()` acepta `turno` y combina filtros.
+- **🗳️ Votación por turno (Fase 3)**: la papeleta muestra solo candidatos del turno del votante; `cargos_sin_candidatos(turno)` bloquea por turno con mensaje que indica cuál.
 
 ### ✨ Añadido
 - **🕐 Turno en Votantes**: nueva columna `turno` (`MAÑANA`/`TARDE`). Migración automática: DBs viejas la crean y la rellenan deduciendo el turno del grado (`"1er Grado TM"` → grado normalizado + turno).
