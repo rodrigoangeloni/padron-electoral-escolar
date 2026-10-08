@@ -2,6 +2,7 @@ import sqlite3
 import os
 from config import DB_PATH, DEFAULT_CANDIDATE_IMAGE, VOTACION_CERRADA, GRADOS_CANDIDATOS
 from utils.path_handler import get_images_dir
+from utils.turno_utils import parse_grado_turno, TURNOS_VALIDOS
 import random
 
 
@@ -36,7 +37,8 @@ class DatabaseManager:
                 nombre TEXT NOT NULL,
                 apellido TEXT NOT NULL,
                 grado_curso TEXT NOT NULL,
-                ya_voto BOOLEAN DEFAULT 0
+                ya_voto BOOLEAN DEFAULT 0,
+                turno TEXT NOT NULL DEFAULT 'MAÑANA'
             )
         ''')
         
@@ -70,9 +72,29 @@ class DatabaseManager:
         self.cursor.execute('SELECT COUNT(*) FROM configuracion')
         if self.cursor.fetchone()[0] == 0:
             self.cursor.execute('INSERT INTO configuracion (id, estado_votacion) VALUES (1, ?)', (VOTACION_CERRADA,))
-        
+
+        self._migrar_turno_votantes()
         self._seed_data()
         self.conn.commit()
+
+    def _migrar_turno_votantes(self):
+        """Agrega la columna turno a DBs viejas y la rellena desde grado_curso.
+
+        "1er Grado TM" -> turno MAÑANA + grado normalizado "1er Grado".
+        Filas sin sufijo válido conservan el grado y quedan en MAÑANA
+        (valor por defecto, sin destruir datos).
+        """
+        columnas = [fila[1] for fila in self.cursor.execute('PRAGMA table_info(votantes)')]
+        if 'turno' in columnas:
+            return
+        self.cursor.execute("ALTER TABLE votantes ADD COLUMN turno TEXT NOT NULL DEFAULT 'MAÑANA'")
+        filas = self.cursor.execute('SELECT id, grado_curso FROM votantes').fetchall()
+        for vid, grado_curso in filas:
+            try:
+                grado, turno = parse_grado_turno(grado_curso)
+            except ValueError:
+                continue
+            self.cursor.execute('UPDATE votantes SET grado_curso = ?, turno = ? WHERE id = ?', (grado, turno, vid))
 
     def _seed_data(self):
         """Puebla la tabla de cargos con valores iniciales si está vacía."""
@@ -160,16 +182,18 @@ class DatabaseManager:
         self.cursor.execute('UPDATE candidatos SET foto = ? WHERE id = ?', (photo_path, candidato_id))
         self.conn.commit()
     
-    def add_votante(self, ci, nombre, apellido, grado_curso):
+    def add_votante(self, ci, nombre, apellido, grado_curso, turno='MAÑANA'):
+        if turno not in TURNOS_VALIDOS:
+            return False
         try:
-            self.cursor.execute('INSERT INTO votantes (ci, nombre, apellido, grado_curso, ya_voto) VALUES (?, ?, ?, ?, 0)', (ci, nombre, apellido, grado_curso))
+            self.cursor.execute('INSERT INTO votantes (ci, nombre, apellido, grado_curso, ya_voto, turno) VALUES (?, ?, ?, ?, 0, ?)', (ci, nombre, apellido, grado_curso, turno))
             self.conn.commit()
             return True
         except sqlite3.IntegrityError:
             return False
     
     def get_votante(self, ci):
-        self.cursor.execute('SELECT id, ci, nombre, apellido, grado_curso, ya_voto FROM votantes WHERE ci = ?', (ci,))
+        self.cursor.execute('SELECT id, ci, nombre, apellido, grado_curso, ya_voto, turno FROM votantes WHERE ci = ?', (ci,))
         return self.cursor.fetchone()
     
     def add_voto(self, candidato_id, ci_votante):
@@ -306,9 +330,9 @@ class DatabaseManager:
         Obtiene todos los votantes registrados
         
         Returns:
-            list: Lista de tuplas (id, ci, nombre, apellido, grado_curso, ya_voto)
+            list: Lista de tuplas (id, ci, nombre, apellido, grado_curso, ya_voto, turno)
         """
-        self.cursor.execute('SELECT id, ci, nombre, apellido, grado_curso, ya_voto FROM votantes')
+        self.cursor.execute('SELECT id, ci, nombre, apellido, grado_curso, ya_voto, turno FROM votantes')
         return self.cursor.fetchall()
     
     def delete_votante(self, ci):
@@ -331,7 +355,7 @@ class DatabaseManager:
         if ci_actual == ci_nueva:
             return True, "Sin cambios."
         self.cursor.execute(
-            'SELECT nombre, apellido, grado_curso, ya_voto FROM votantes WHERE ci = ?',
+            'SELECT nombre, apellido, grado_curso, ya_voto, turno FROM votantes WHERE ci = ?',
             (ci_actual,))
         fila = self.cursor.fetchone()
         if fila is None:
@@ -341,8 +365,8 @@ class DatabaseManager:
             return False, "La CI nueva ya está registrada en otro votante."
         try:
             self.cursor.execute(
-                'INSERT INTO votantes (ci, nombre, apellido, grado_curso, ya_voto) VALUES (?, ?, ?, ?, ?)',
-                (ci_nueva, fila[0], fila[1], fila[2], fila[3]))
+                'INSERT INTO votantes (ci, nombre, apellido, grado_curso, ya_voto, turno) VALUES (?, ?, ?, ?, ?, ?)',
+                (ci_nueva, fila[0], fila[1], fila[2], fila[3], fila[4]))
             self.cursor.execute('UPDATE votos SET ci_votante = ? WHERE ci_votante = ?', (ci_nueva, ci_actual))
             self.cursor.execute('DELETE FROM votantes WHERE ci = ?', (ci_actual,))
             self.conn.commit()
@@ -354,9 +378,12 @@ class DatabaseManager:
     def import_votantes_from_list(self, votantes_list):
         success_count = 0
         error_count = 0
-        for ci, nombre, apellido, grado_curso in votantes_list:
+        for ci, nombre, apellido, grado_curso, turno in votantes_list:
+            if turno not in TURNOS_VALIDOS:
+                error_count += 1
+                continue
             try:
-                self.cursor.execute('INSERT INTO votantes (ci, nombre, apellido, grado_curso, ya_voto) VALUES (?, ?, ?, ?, 0)', (ci, nombre, apellido, grado_curso))
+                self.cursor.execute('INSERT INTO votantes (ci, nombre, apellido, grado_curso, ya_voto, turno) VALUES (?, ?, ?, ?, 0, ?)', (ci, nombre, apellido, grado_curso, turno))
                 success_count += 1
             except sqlite3.IntegrityError:
                 error_count += 1
