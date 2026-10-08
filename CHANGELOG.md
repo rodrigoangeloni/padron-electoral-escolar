@@ -20,6 +20,9 @@
 ## 🚀 [Sin publicar] - Turno en votantes (Fase 1)
 
 ### ✨ Añadido
+- **🕐 Turno en Candidatos (Fase 2)**: columna `turno` con migración (existentes quedan en `MAÑANA`). Campo Turno en el alta, filtro Todos/Mañana/Tarde en la lista + columna Turno, y la importación por CI hereda el turno del votante. `get_candidatos()` acepta `turno` y combina filtros.
+
+### ✨ Añadido
 - **🕐 Turno en Votantes**: nueva columna `turno` (`MAÑANA`/`TARDE`). Migración automática: DBs viejas la crean y la rellenan deduciendo el turno del grado (`"1er Grado TM"` → grado normalizado + turno).
 - **📥 Importación CSV con turno**: el grado debe terminar en `TM`/`TT`; las filas sin turno o CI inválida se rechazan con reporte de línea (primeras 10) y resumen por turno. Resumen muestra conteo Mañana/Tarde.
 - **📝 Alta manual y lista con turno**: selector Mañana/Tarde en el formulario y columna Turno en la lista.
