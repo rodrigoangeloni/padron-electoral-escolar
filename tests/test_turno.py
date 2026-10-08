@@ -152,3 +152,54 @@ def test_parse_fila_formato_anterior_4_columnas():
 def test_parse_fila_invalida_falla_con_linea(fila):
     with pytest.raises(ValueError, match="línea 5"):
         parse_fila_votante(fila, 5)
+
+
+def _crear_db_vieja_sin_turno_candidatos(db_path):
+    conn = sqlite3.connect(db_path)
+    conn.execute('''CREATE TABLE candidatos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL,
+        apellido TEXT NOT NULL,
+        cargo TEXT NOT NULL,
+        grado TEXT NOT NULL,
+        foto TEXT)''')
+    conn.execute("INSERT INTO candidatos (nombre, apellido, cargo, grado, foto)"
+                 " VALUES ('Ana','Lopez','DIRECTORA','5to Grado','x.jpg')")
+    conn.commit()
+    conn.close()
+
+
+def test_migracion_candidatos_turno_por_defecto(tmp_path):
+    db_path = str(tmp_path / "vieja_cand.db")
+    _crear_db_vieja_sin_turno_candidatos(db_path)
+    manager = DatabaseManager(db_path=db_path)
+
+    candidato = manager.get_candidatos()[0]
+    assert candidato[5] == "x.jpg"  # foto conserva su índice
+    assert candidato[6] == "MAÑANA"
+    manager.close()
+
+
+def test_add_candidato_con_turno(db_manager):
+    db_manager.add_candidato("Ana", "Lopez", "DIRECTORA", "5to Grado", turno="TARDE")
+    db_manager.add_candidato("Eva", "Diaz", "DIRECTORA", "5to Grado")
+
+    assert db_manager.get_candidatos()[0][6] == "TARDE"
+    assert db_manager.get_candidatos()[1][6] == "MAÑANA"  # defecto
+
+
+def test_add_candidato_turno_invalido_falla(db_manager):
+    with pytest.raises(ValueError):
+        db_manager.add_candidato("Ana", "Lopez", "DIRECTORA", "5to Grado", turno="NOCHE")
+
+
+def test_get_candidatos_filtra_por_turno(db_manager):
+    db_manager.add_candidato("Ana", "Lopez", "DIRECTORA", "5to Grado", turno="MAÑANA")
+    db_manager.add_candidato("Eva", "Diaz", "DIRECTORA", "5to Grado", turno="TARDE")
+    db_manager.add_candidato("Luis", "Perez", "VICEDIRECTORA", "6to Grado", turno="TARDE")
+
+    assert len(db_manager.get_candidatos()) == 3
+    assert len(db_manager.get_candidatos(turno="MAÑANA")) == 1
+    assert len(db_manager.get_candidatos(turno="TARDE")) == 2
+    assert len(db_manager.get_candidatos(cargo="DIRECTORA", turno="TARDE")) == 1
+    assert db_manager.get_candidatos(cargo="DIRECTORA", turno="TARDE")[0][1] == "Eva"

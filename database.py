@@ -26,7 +26,8 @@ class DatabaseManager:
                 apellido TEXT NOT NULL,
                 cargo TEXT NOT NULL,
                 grado TEXT NOT NULL,
-                foto TEXT DEFAULT '{DEFAULT_CANDIDATE_IMAGE}'
+                foto TEXT DEFAULT '{DEFAULT_CANDIDATE_IMAGE}',
+                turno TEXT NOT NULL DEFAULT 'MAÑANA'
             )
         ''')
         
@@ -74,6 +75,7 @@ class DatabaseManager:
             self.cursor.execute('INSERT INTO configuracion (id, estado_votacion) VALUES (1, ?)', (VOTACION_CERRADA,))
 
         self._migrar_turno_votantes()
+        self._migrar_turno_candidatos()
         self._seed_data()
         self.conn.commit()
 
@@ -95,6 +97,16 @@ class DatabaseManager:
             except ValueError:
                 continue
             self.cursor.execute('UPDATE votantes SET grado_curso = ?, turno = ? WHERE id = ?', (grado, turno, vid))
+
+    def _migrar_turno_candidatos(self):
+        """Agrega la columna turno a DBs viejas.
+
+        Los candidatos existentes no tienen turno registrado: quedan en
+        MAÑANA (valor por defecto). Corregirlos manualmente si corresponde.
+        """
+        columnas = [fila[1] for fila in self.cursor.execute('PRAGMA table_info(candidatos)')]
+        if 'turno' not in columnas:
+            self.cursor.execute("ALTER TABLE candidatos ADD COLUMN turno TEXT NOT NULL DEFAULT 'MAÑANA'")
 
     def _seed_data(self):
         """Puebla la tabla de cargos con valores iniciales si está vacía."""
@@ -132,25 +144,33 @@ class DatabaseManager:
         self.conn.commit()
         return True, "Cargo eliminado exitosamente."
         
-    def get_candidatos(self, cargo=None, grado=None):
+    def get_candidatos(self, cargo=None, grado=None, turno=None):
         """
         Obtiene candidatos con filtros opcionales
         
         Args:
             cargo: Filtro por cargo (opcional)
             grado: Filtro por grado (opcional)
+            turno: Filtro por turno 'MAÑANA'/'TARDE' (opcional)
             
         Returns:
-            list: Lista de tuplas (id, nombre, apellido, cargo, grado, foto)
+            list: Lista de tuplas (id, nombre, apellido, cargo, grado, foto, turno)
         """
-        if cargo and grado:
-            self.cursor.execute('SELECT id, nombre, apellido, cargo, grado, foto FROM candidatos WHERE cargo = ? AND grado = ?', (cargo, grado))
-        elif cargo:
-            self.cursor.execute('SELECT id, nombre, apellido, cargo, grado, foto FROM candidatos WHERE cargo = ?', (cargo,))
-        elif grado:
-            self.cursor.execute('SELECT id, nombre, apellido, cargo, grado, foto FROM candidatos WHERE grado = ?', (grado,))
-        else:
-            self.cursor.execute('SELECT id, nombre, apellido, cargo, grado, foto FROM candidatos')
+        condiciones = []
+        parametros = []
+        if cargo:
+            condiciones.append('cargo = ?')
+            parametros.append(cargo)
+        if grado:
+            condiciones.append('grado = ?')
+            parametros.append(grado)
+        if turno:
+            condiciones.append('turno = ?')
+            parametros.append(turno)
+        sql = 'SELECT id, nombre, apellido, cargo, grado, foto, turno FROM candidatos'
+        if condiciones:
+            sql += ' WHERE ' + ' AND '.join(condiciones)
+        self.cursor.execute(sql, parametros)
         return self.cursor.fetchall()
 
     def get_candidato_by_name(self, nombre, apellido):
@@ -165,13 +185,15 @@ class DatabaseManager:
             candidato_id: ID del candidato a buscar
             
         Returns:
-            tuple: (id, nombre, apellido, cargo, grado, foto) o None si no se encuentra
+            tuple: (id, nombre, apellido, cargo, grado, foto, turno) o None si no se encuentra
         """
-        self.cursor.execute('SELECT id, nombre, apellido, cargo, grado, foto FROM candidatos WHERE id = ?', (candidato_id,))
+        self.cursor.execute('SELECT id, nombre, apellido, cargo, grado, foto, turno FROM candidatos WHERE id = ?', (candidato_id,))
         return self.cursor.fetchone()
     
-    def add_candidato(self, nombre, apellido, cargo, grado, foto=DEFAULT_CANDIDATE_IMAGE):
-        self.cursor.execute('INSERT INTO candidatos (nombre, apellido, cargo, grado, foto) VALUES (?, ?, ?, ?, ?)', (nombre, apellido, cargo, grado, foto))
+    def add_candidato(self, nombre, apellido, cargo, grado, foto=DEFAULT_CANDIDATE_IMAGE, turno='MAÑANA'):
+        if turno not in TURNOS_VALIDOS:
+            raise ValueError(f"Turno inválido: '{turno}' (use MAÑANA o TARDE).")
+        self.cursor.execute('INSERT INTO candidatos (nombre, apellido, cargo, grado, foto, turno) VALUES (?, ?, ?, ?, ?, ?)', (nombre, apellido, cargo, grado, foto, turno))
         self.conn.commit()
     
     def delete_candidato(self, candidato_id):
