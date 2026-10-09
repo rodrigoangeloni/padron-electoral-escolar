@@ -289,6 +289,14 @@ class AdminApp(tk.Frame):
         
         delete_cargo_button = tk.Button(cargos_frame, text="Eliminar Cargo Seleccionado", command=self.delete_cargo, bg=config.COLOR_DANGER, fg=config.COLOR_WHITE)
         delete_cargo_button.pack(pady=5)
+
+        orden_frame = tk.Frame(cargos_frame)
+        orden_frame.pack(pady=5)
+        tk.Label(orden_frame, text="Orden en la papeleta:").pack(side="left", padx=(0, 5))
+        up_button = tk.Button(orden_frame, text="▲ Subir", command=lambda: self.move_cargo(-1), bg=config.COLOR_PRIMARY, fg=config.COLOR_WHITE)
+        up_button.pack(side="left", padx=5)
+        down_button = tk.Button(orden_frame, text="▼ Bajar", command=lambda: self.move_cargo(+1), bg=config.COLOR_PRIMARY, fg=config.COLOR_WHITE)
+        down_button.pack(side="left", padx=5)
         
         self.update_status_display()
         self.refresh_cargos_list()
@@ -317,9 +325,9 @@ class AdminApp(tk.Frame):
         if not selected_item:
             messagebox.showwarning("Advertencia", "Por favor, seleccione un cargo para eliminar.")
             return
-            
+
         cargo_name = self.cargos_tree.item(selected_item, 'values')[0]
-        
+
         if messagebox.askyesno("Confirmar Eliminación", f"¿Está seguro de que desea eliminar el cargo '{cargo_name}'?"):
             success, message = self.db_manager.delete_cargo(cargo_name)
             if success:
@@ -330,6 +338,27 @@ class AdminApp(tk.Frame):
                     self.candidate_ui.update_cargos_combobox()
             else:
                 messagebox.showerror("Error", message)
+
+    def move_cargo(self, direccion):
+        """Sube o baja el cargo seleccionado en el orden de la papeleta."""
+        selected_item = self.cargos_tree.selection()
+        if not selected_item:
+            messagebox.showwarning("Advertencia", "Por favor, seleccione un cargo para reordenar.")
+            return
+        cargo_name = self.cargos_tree.item(selected_item, 'values')[0]
+        success, message = self.db_manager.mover_cargo(cargo_name, direccion)
+        if success:
+            self.refresh_cargos_list()
+            if hasattr(self, 'candidate_ui'):
+                self.candidate_ui.update_cargos_combobox()
+            # Mantener la selección en el cargo movido
+            for item in self.cargos_tree.get_children():
+                if self.cargos_tree.item(item, 'values')[0] == cargo_name:
+                    self.cargos_tree.selection_set(item)
+                    self.cargos_tree.see(item)
+                    break
+        else:
+            messagebox.showinfo("Orden de cargos", message)
 
     def refresh_cargos_list(self):
         """Actualiza la lista de cargos en la interfaz."""

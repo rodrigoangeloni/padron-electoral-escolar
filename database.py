@@ -66,7 +66,8 @@ class DatabaseManager:
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS cargos (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nombre TEXT NOT NULL UNIQUE
+                nombre TEXT NOT NULL UNIQUE,
+                orden INTEGER NOT NULL DEFAULT 0
             )
         ''')
 
@@ -76,6 +77,7 @@ class DatabaseManager:
 
         self._migrar_turno_votantes()
         self._migrar_turno_candidatos()
+        self._migrar_orden_cargos()
         self._seed_data()
         self.conn.commit()
 
@@ -108,31 +110,77 @@ class DatabaseManager:
         if 'turno' not in columnas:
             self.cursor.execute("ALTER TABLE candidatos ADD COLUMN turno TEXT NOT NULL DEFAULT 'MAÑANA'")
 
+    def _migrar_orden_cargos(self):
+        """Agrega la columna orden a DBs viejas.
+
+        Los cargos existentes conservan su orden visual actual
+        (alfabético): se numeran 0, 1, 2... por nombre.
+        """
+        columnas = [fila[1] for fila in self.cursor.execute('PRAGMA table_info(cargos)')]
+        if 'orden' in columnas:
+            return
+        self.cursor.execute('ALTER TABLE cargos ADD COLUMN orden INTEGER NOT NULL DEFAULT 0')
+        ids = [fila[0] for fila in
+               self.cursor.execute('SELECT id FROM cargos ORDER BY nombre').fetchall()]
+        for posicion, cid in enumerate(ids):
+            self.cursor.execute('UPDATE cargos SET orden = ? WHERE id = ?', (posicion, cid))
+
     def _seed_data(self):
         """Puebla la tabla de cargos con valores iniciales si está vacía."""
         self.cursor.execute('SELECT COUNT(*) FROM cargos')
         if self.cursor.fetchone()[0] == 0:
             default_cargos = ["DIRECTORA", "VICEDIRECTORA", "COORDINADORA"]
-            for cargo in default_cargos:
+            for posicion, cargo in enumerate(default_cargos):
                 try:
-                    self.cursor.execute('INSERT INTO cargos (nombre) VALUES (?)', (cargo,))
+                    self.cursor.execute('INSERT INTO cargos (nombre, orden) VALUES (?, ?)', (cargo, posicion))
                 except sqlite3.IntegrityError:
                     pass
-    
+
     # --- Gestión de Cargos ---
     def get_cargos(self):
-        """Obtiene todos los cargos de la base de datos."""
-        self.cursor.execute('SELECT nombre FROM cargos ORDER BY nombre')
+        """Obtiene todos los cargos en el orden configurado por el admin."""
+        self.cursor.execute('SELECT nombre FROM cargos ORDER BY orden, nombre')
         return [row[0] for row in self.cursor.fetchall()]
 
     def add_cargo(self, nombre_cargo):
-        """Agrega un nuevo cargo a la base de datos."""
+        """Agrega un nuevo cargo a la base de datos (al final del orden)."""
         try:
-            self.cursor.execute('INSERT INTO cargos (nombre) VALUES (?)', (nombre_cargo,))
+            self.cursor.execute('SELECT COALESCE(MAX(orden), -1) + 1 FROM cargos')
+            siguiente = self.cursor.fetchone()[0]
+            self.cursor.execute('INSERT INTO cargos (nombre, orden) VALUES (?, ?)', (nombre_cargo, siguiente))
             self.conn.commit()
             return True, "Cargo agregado exitosamente."
         except sqlite3.IntegrityError:
             return False, f"El cargo '{nombre_cargo}' ya existe."
+
+    def mover_cargo(self, nombre_cargo, direccion):
+        """Sube (direccion=-1) o baja (direccion=+1) un cargo en el orden.
+
+        Intercambia el valor de orden con el vecino. En los extremos
+        no hace nada.
+
+        Returns:
+            tuple: (ok, mensaje).
+        """
+        cargos = self.get_cargos()
+        if nombre_cargo not in cargos:
+            return False, "Cargo no encontrado."
+        i = cargos.index(nombre_cargo)
+        j = i + direccion
+        if j < 0 or j >= len(cargos):
+            return False, f"'{nombre_cargo}' ya está al {'principio' if direccion < 0 else 'final'}."
+        try:
+            self.cursor.execute('SELECT id, orden FROM cargos WHERE nombre = ?', (nombre_cargo,))
+            id_a, orden_a = self.cursor.fetchone()
+            self.cursor.execute('SELECT id, orden FROM cargos WHERE nombre = ?', (cargos[j],))
+            id_b, orden_b = self.cursor.fetchone()
+            self.cursor.execute('UPDATE cargos SET orden = ? WHERE id = ?', (orden_b, id_a))
+            self.cursor.execute('UPDATE cargos SET orden = ? WHERE id = ?', (orden_a, id_b))
+            self.conn.commit()
+            return True, "Orden actualizado."
+        except Exception as e:
+            self.conn.rollback()
+            return False, f"Error al reordenar: {str(e)}"
 
     def delete_cargo(self, nombre_cargo):
         """Elimina un cargo de la base de datos."""
