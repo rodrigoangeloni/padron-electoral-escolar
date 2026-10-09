@@ -10,6 +10,28 @@ from database import DatabaseManager
 import config
 from utils.path_handler import get_images_dir
 
+
+def calcular_layout_papeleta(n):
+    """Devuelve (columnas, tamaño_imagen, fuente) según la cantidad de candidatos.
+
+    La grilla adapta columnas y tamaño para que entren todos en el espacio
+    visible (ventana 1200x680 menos los títulos). Con más de 12, el scroll
+    vertical (ya existente) cubre el resto. Pura y testeable sin display.
+    """
+    if n <= 1:
+        return (1, 220, 16)
+    if n == 2:
+        return (2, 200, 16)
+    if n <= 4:
+        return (n, 170, 14)
+    if n <= 6:
+        return (3, 140, 14)
+    if n <= 8:
+        return (4, 130, 13)
+    if n <= 12:
+        return (6, 110, 12)
+    return (6, 90, 11)
+
 class VotingApp(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
@@ -169,20 +191,20 @@ class VotingApp(tk.Frame):
         self.bind_all("<Button-4>", self._on_ballot_mousewheel)
         self.bind_all("<Button-5>", self._on_ballot_mousewheel)
 
-        # Configuración de la grilla
-        max_cols = 4  # Máximo de candidatos por fila
-        for col in range(max_cols):
+        # Configuración de la grilla: se adapta a la cantidad de candidatos
+        num_cols, img_size, font_size = calcular_layout_papeleta(len(candidates_for_role))
+        for col in range(num_cols):
             candidates_frame.grid_columnconfigure(col, weight=1)
-        
+
         for i, candidato in enumerate(candidates_for_role):
-            row = i // max_cols
-            col = i % max_cols
-            
+            row = i // num_cols
+            col = i % num_cols
+
             candidato_frame = tk.Frame(candidates_frame, bg=config.COLOR_WHITE)
             candidato_frame.grid(row=row, column=col, padx=25, pady=25)
 
-            img = self._load_candidate_image(candidato[5], (200, 200)) # Tamaño de imagen ajustado
-            
+            img = self._load_candidate_image(candidato[5], (img_size, img_size)) # Tamaño adaptado
+
             btn_img = tk.Button(
                 candidato_frame,
                 image=img,
@@ -193,9 +215,9 @@ class VotingApp(tk.Frame):
             )
             btn_img.image = img
             btn_img.pack(pady=5)
-            
+
             info_text = f"{candidato[1]} {candidato[2]}\n({candidato[4]})"
-            name_label = tk.Label(candidato_frame, text=info_text, font=("Arial", 14), bg=config.COLOR_WHITE, fg='#34495e', justify="center")
+            name_label = tk.Label(candidato_frame, text=info_text, font=("Arial", font_size), bg=config.COLOR_WHITE, fg='#34495e', justify="center", wraplength=img_size + 60)
             name_label.pack()
 
     def _on_ballot_mousewheel(self, event):
