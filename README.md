@@ -5,7 +5,7 @@ Aplicación de escritorio para gestionar elecciones estudiantiles: cargos dinám
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![Version](https://img.shields.io/badge/Version-v1.5.1-blue.svg?style=flat-square)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![Platform](https://img.shields.io/badge/Windows-exe-0078D6?style=flat-square&logo=windows&logoColor=white)](https://github.com/rodrigoangeloni/padron-electoral-escolar/releases)
-[![Tests](https://img.shields.io/badge/tests-66_passed-brightgreen?style=flat-square)](tests/)
+[![Tests](https://img.shields.io/badge/tests-77_passed-brightgreen?style=flat-square)](tests/)
 
 ## Características
 
@@ -13,6 +13,7 @@ Aplicación de escritorio para gestionar elecciones estudiantiles: cargos dinám
 - **Candidatos**: alta, baja y fotos (JPG/PNG hasta 5 MB, validadas).
 - **Votantes**: registro individual o importación masiva desde CSV, validación de CI (7-8 dígitos) y prevención de voto duplicado. Sin CI: usar fecha de nacimiento DDMMYYYY (ej. `01092000` = 01/09/2000).
 - **Votación guiada**: un paso por cargo, confirmación final y comprobante en pantalla.
+- **Turnos**: cada turno (Mañana/Tarde) es una elección separada: padrón, candidatos, votación y acta propios, con filtros por turno en todo el panel.
 - **Resultados**: tabla, ganadores por cargo (con empates), gráficos y acta en PDF con participación, porcentajes y firmas — por turno (Mañana/Tarde/Ambos).
 - **Seguridad**: contraseña admin con PBKDF2 + salt, bloqueo tras intentos fallidos y control de estado (activa/cerrada).
 
@@ -75,13 +76,22 @@ Turno `TM` (mañana) o `TT` (tarde) en columna propia; también se acepta el for
 
 Votantes sin CI: escribir la fecha de nacimiento DDMMYYYY en la columna CI (ej. `01092000`). Dos votantes no pueden compartir el mismo valor.
 
+### Generar el CSV desde listas RUE (PDF)
+
+```bash
+.venv\Scripts\python.exe -m pip install pypdf   # solo para esta utilidad
+.venv\Scripts\python.exe tools/rue_a_csv.py
+```
+
+Lee los PDF oficiales de `padron_votantes_2026/PDF_LISTA_RUE/` y genera los 16 CSV en `padron_votantes_2026/`. Sin CI usa la fecha de nacimiento; reporta filas problemáticas y sale con código 1 si hay rechazos.
+
 ## Tests
 
 ```bash
 .\.venv\Scripts\python -m pytest tests/ -q
 ```
 
-Suite en `tests/` (66 tests, DB aislada por test con `tmp_path`): integridad de la base de datos, reglas de voto, seguridad de auth, validación de fotos y rendimiento de resultados.
+Suite en `tests/` (77 tests, DB aislada por test con `tmp_path`): integridad de la base de datos, reglas de voto, seguridad de auth, validación de fotos, rendimiento de resultados, turno, acta PDF y parser RUE.
 
 ## Seguridad
 
@@ -102,8 +112,11 @@ voting_app.py      Flujo CI → selección por cargo → confirmación
 utils/auth.py      AuthManager (PBKDF2, rate-limit)
 utils/candidate_ui.py · voter_ui.py · results_ui.py   Pestañas del panel
 utils/foto_utils.py   Validación de fotos (testeable sin GUI)
+utils/turno_utils.py  Parsing grado+turno del CSV (testeable sin GUI)
+utils/rue_parser.py   Parsing de listas RUE (testeable sin GUI)
 utils/pdf_exporter.py Exportación del acta por turno (fpdf2)
 utils/path_handler.py Rutas dev vs compilado (persistencia junto al exe)
+tools/rue_a_csv.py    Genera los CSV desde los PDF RUE (requiere pypdf)
 ```
 
 ## Compilar el ejecutable
