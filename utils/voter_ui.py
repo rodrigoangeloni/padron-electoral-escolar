@@ -4,6 +4,7 @@ Módulo para la funcionalidad de UI de votantes
 import tkinter as tk
 from tkinter import messagebox, ttk
 import csv
+import os
 from tkinter import filedialog
 from collections import Counter
 import config
@@ -57,9 +58,12 @@ class VoterUI:
         
         import_desc = tk.Label(import_frame, text="Importar votantes desde archivo CSV (CI,Nombre,Apellido,Grado,Turno).\nTurno TM o TT; también se acepta el formato anterior con el turno pegado al grado.")
         import_desc.pack(pady=5)
-        
+
         self.import_button = tk.Button(import_frame, text="Seleccionar Archivo CSV", command=self.import_voters_from_file, bg=config.COLOR_WARNING, fg=config.COLOR_WHITE)
         self.import_button.pack(pady=5)
+
+        self.import_rue_button = tk.Button(import_frame, text="Importar desde PDF RUE", command=self.import_voters_from_rue, bg=config.COLOR_PRIMARY, fg=config.COLOR_WHITE)
+        self.import_rue_button.pack(pady=5)
         
         list_frame = tk.LabelFrame(self.parent_frame, text="Votantes Registrados", padx=10, pady=10)
         list_frame.pack(fill="both", expand=True, padx=10, pady=10)
@@ -211,6 +215,58 @@ class VoterUI:
         finally:
             # self.controller.config(cursor="")
             self.import_button.config(state="normal", text="Seleccionar Archivo CSV")
+
+    def import_voters_from_rue(self):
+        """Importa votantes directo desde PDF RUE, sin pasar por CSV."""
+        try:
+            from tools.rue_a_csv import convertir_pdf
+        except ImportError:
+            messagebox.showerror("Error", "No se pudo cargar el conversor RUE.")
+            return
+        pdf_paths = filedialog.askopenfilenames(
+            title="Seleccionar PDF RUE (se pueden elegir varios)",
+            filetypes=[("Archivos PDF", "*.pdf"), ("Todos los archivos", "*.*")])
+        if not pdf_paths:
+            return
+
+        self.import_rue_button.config(state="disabled", text="Importando...")
+        try:
+            votantes_list = []
+            avisos = []
+            por_archivo = []
+            for ruta in pdf_paths:
+                nombre = os.path.basename(ruta)
+                try:
+                    grado, turno, votantes, advertencias = convertir_pdf(ruta)
+                except ImportError:
+                    messagebox.showerror(
+                        "Error",
+                        "Falta la librería pypdf. Instalala con:\n"
+                        ".venv\\Scripts\\python.exe -m pip install pypdf")
+                    return
+                except ValueError as e:
+                    avisos.append(f"{nombre}: {e}")
+                    continue
+                votantes_list.extend(votantes)
+                por_archivo.append(f"{nombre}: {len(votantes)}")
+                avisos.extend(f"{nombre}: {a}" for a in advertencias)
+            if votantes_list:
+                success_count, error_count = self.db_manager.import_votantes_from_list(votantes_list)
+                self.refresh_voters_list()
+                mensaje = (f"Importación RUE completada: {success_count} votantes agregados, "
+                           f"{error_count} errores (CI duplicadas)\n\n" + "\n".join(por_archivo))
+                if avisos:
+                    muestra = "\n".join(avisos[:10])
+                    extra = f" (+{len(avisos) - 10} más)" if len(avisos) > 10 else ""
+                    mensaje += f"\n\nAvisos:\n{muestra}{extra}"
+                messagebox.showinfo("Importación RUE completada", mensaje)
+            elif avisos:
+                muestra = "\n".join(avisos[:10])
+                messagebox.showwarning("Advertencia", f"No se importó ningún votante.\n{muestra}")
+            else:
+                messagebox.showwarning("Advertencia", "No se encontraron votantes en los PDF")
+        finally:
+            self.import_rue_button.config(state="normal", text="Importar desde PDF RUE")
 
     def refresh_voters_list(self):
         """Actualiza la lista de votantes"""

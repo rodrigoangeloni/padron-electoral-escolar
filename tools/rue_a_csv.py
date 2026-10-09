@@ -24,8 +24,10 @@ sys.path.insert(0, RAIZ)
 
 try:
     from pypdf import PdfReader
-except ImportError:
-    sys.exit("Falta pypdf: instalalo con  .venv\\Scripts\\python.exe -m pip install pypdf")
+    _FALTA_PYPDF = None
+except ImportError as e:
+    PdfReader = None
+    _FALTA_PYPDF = e
 
 from utils.rue_parser import (
     normalizar_grado_rue,
@@ -44,7 +46,14 @@ def convertir_pdf(ruta_pdf):
 
     Returns:
         tuple: (grado, turno_tm_tt, [(ci, nombres, apellidos, aviso)], advertencias).
+
+    Raises:
+        ImportError: si pypdf no está instalado.
     """
+    if PdfReader is None:
+        raise ImportError(
+            "Falta pypdf: instalalo con  .venv\\Scripts\\python.exe -m pip install pypdf"
+        ) from _FALTA_PYPDF
     texto = "\n".join((p.extract_text() or "") for p in PdfReader(ruta_pdf).pages)
     advertencias = []
 
@@ -105,6 +114,8 @@ def main():
     for pdf in pdfs:
         try:
             grado, turno, votantes, advertencias = convertir_pdf(os.path.join(args.entrada, pdf))
+        except ImportError as e:
+            sys.exit(str(e))
         except ValueError as e:
             fallos.append(f"{pdf}: {e}")
             continue

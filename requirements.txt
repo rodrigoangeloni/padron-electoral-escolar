@@ -2,3 +2,4 @@ Pillow==11.3.0
 matplotlib==3.10.7
 pyinstaller==6.16.0
 fpdf2==2.7.9
+pypdf==6.19.0
