@@ -76,14 +76,17 @@ Turno `TM` (mañana) o `TT` (tarde) en columna propia; también se acepta el for
 
 Votantes sin CI: escribir la fecha de nacimiento DDMMYYYY en la columna CI (ej. `01092000`). Dos votantes no pueden compartir el mismo valor.
 
-### Generar el CSV desde listas RUE (PDF)
+### Generar el padrón desde listas RUE (PDF)
+
+En la pestaña **Votantes**, botón **Importar desde PDF RUE**: elegí uno o varios PDF oficiales y se importan directo, con reporte por archivo y avisos (sin CI usa la fecha de nacimiento).
+
+Alternativa por consola (requiere `pip install pypdf`):
 
 ```bash
-.venv\Scripts\python.exe -m pip install pypdf   # solo para esta utilidad
 .venv\Scripts\python.exe tools/rue_a_csv.py
 ```
 
-Lee los PDF oficiales de `padron_votantes_2026/PDF_LISTA_RUE/` y genera los 16 CSV en `padron_votantes_2026/`. Sin CI usa la fecha de nacimiento; reporta filas problemáticas y sale con código 1 si hay rechazos.
+Lee los PDF de `padron_votantes_2026/PDF_LISTA_RUE/` y genera los 16 CSV en `padron_votantes_2026/`. Reporta filas problemáticas y sale con código 1 si hay rechazos.
 
 ## Tests
 

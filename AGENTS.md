@@ -3,7 +3,7 @@
 Sistema de votación escolar desktop (Tkinter + SQLite). Cargos dinámicos, candidatos, votantes (CI), votación por pasos y resultados con gráficos + PDF.
 
 ## Stack
-- README pide Python 3.11. Deps pinneadas en `requirements.txt`: `Pillow==11.3.0`, `matplotlib==3.10.7`, `fpdf2==2.7.9`, `pyinstaller==6.16.0`. Tkinter/SQLite son stdlib. Dev: `requirements-dev.txt` (`pytest==9.1.1`).
+- README pide Python 3.11. Deps pinneadas en `requirements.txt`: `Pillow==11.3.0`, `matplotlib==3.10.7`, `fpdf2==2.7.9`, `pyinstaller==6.16.0`, `pypdf==6.19.0` (solo la usa el importador RUE). Tkinter/SQLite son stdlib. Dev: `requirements-dev.txt` (`pytest==9.1.1`).
 - Suite pytest en `tests/` (77 tests verificados, fixtures `tmp_path` con DB aislada). Sin linter/formatter. PEP 8 + docstrings en español.
 - Commits: Conventional Commits (tipo en inglés, descripción en español, ej. `feat: importar candidato desde el padron por CI`).
 
@@ -43,7 +43,7 @@ pyinstaller main.spec
 - `utils/pdf_exporter.py` — `export_acta(secciones, file_path)` con fpdf2 (API moderna: `helvetica`, `new_x/new_y`). Cada sección = un turno (`turno`, `participacion`, `winners`, `resultados` crudos de `get_resultados()`): participación con %, ganadores con % por cargo, tabla con % y firmas al final. `turno=None` = sección general con columna Turno.
 - `models/` — `candidate.py`, `vote.py` sin uso (ningún import en el repo; lógica en `database.py`). No agregar lógica ahí sin migrar callers.
 - `assets/` — `db/`, `config/`, `images/` creados en runtime. Solo `default_candidate.jpg` e `icon.ico` versionados (ver `.gitignore`).
-- `tools/rue_a_csv.py` — conversor PDF RUE → CSV (`padron_votantes_2026/PDF_LISTA_RUE/` → `padron_votantes_2026/`). Parser puro en `utils/rue_parser.py` (sin pypdf: testeable). Requiere `pip install pypdf` aparte — **no va en `requirements.txt`** (para no engordar el exe). Sin CI → fecha DDMMYYYY; doc extranjero/pasaporte con número válido se usa tal cual; filas irreconocibles se reportan y sale con código 1.
+- `tools/rue_a_csv.py` — conversor PDF RUE → CSV (`padron_votantes_2026/PDF_LISTA_RUE/` → `padron_votantes_2026/`) y función `convertir_pdf()` reutilizada por el botón "Importar desde PDF RUE" de `voter_ui` (import directo a DB, multiselección de PDFs). Parser puro en `utils/rue_parser.py` (sin pypdf: testeable). `pypdf` va en `requirements.txt` (se empaqueta en el exe); el import de `tools` es lazy con mensaje si falta. Sin CI → fecha DDMMYYYY; doc extranjero/pasaporte con número válido se usa tal cual; filas irreconocibles se reportan y el CLI sale con código 1.
 
 ## Convenciones
 - Idioma: todo UI, mensajes, docstrings y CSV en español.

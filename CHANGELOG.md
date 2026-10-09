@@ -20,7 +20,7 @@
 ## 🚀 [Sin publicar] - Conversor RUE a CSV
 
 ### ✨ Añadido
-- **🧾 Utilidad `tools/rue_a_csv.py`**: genera los 16 CSV del padrón desde los PDF oficiales (`PDF_LISTA_RUE`). Parser puro y testeado en `utils/rue_parser.py` (11 tests). Sin CI → fecha de nacimiento DDMMYYYY; documento extranjero/pasaporte con número válido se usa tal cual; filas irreconocibles se reportan (sale código 1). Requiere `pypdf` (fuera de `requirements.txt` para no engordar el exe). Padrón regenerado: 370 votantes (+11 vs CSV anterior, 0 bajas).
+- **🧾 Utilidad `tools/rue_a_csv.py`**: genera los 16 CSV del padrón desde los PDF oficiales (`PDF_LISTA_RUE`). Parser puro y testeado en `utils/rue_parser.py` (11 tests). Botón "Importar desde PDF RUE" en la pestaña Votantes (multiselección, import directo a DB con reporte). Sin CI → fecha de nacimiento DDMMYYYY; documento extranjero/pasaporte con número válido se usa tal cual; filas irreconocibles se reportan (sale código 1). `pypdf` en `requirements.txt` (se empaqueta en el exe). Padrón regenerado: 370 votantes (+11 vs CSV anterior, 0 bajas).
 
 ---
 
