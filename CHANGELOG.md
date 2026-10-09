@@ -22,6 +22,7 @@
 ### ✨ Añadido
 - **🔢 Orden de cargos configurable**: columna `orden` en `cargos` (migración conserva el orden alfabético actual). Botones ▲ Subir / ▼ Bajar en Configuración; la papeleta, ganadores y gráficos siguen ese orden.
 - **📜 Papeleta con scroll**: la grilla de candidatos desplaza verticalmente (rueda del ratón) — entran N candidatos por cargo sin cortarse.
+- **🔍 Papeleta adaptativa**: `calcular_layout_papeleta(n)` ajusta columnas, tamaño de foto y fuente a la cantidad (11 → 6 columnas con foto 110); más de 12 usa scroll. Testeada sin display.
 
 ---
 
