@@ -5,7 +5,7 @@ Aplicación de escritorio para gestionar elecciones estudiantiles: cargos dinám
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![Version](https://img.shields.io/badge/Version-v1.5.1-blue.svg?style=flat-square)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![Platform](https://img.shields.io/badge/Windows-exe-0078D6?style=flat-square&logo=windows&logoColor=white)](https://github.com/rodrigoangeloni/padron-electoral-escolar/releases)
-[![Tests](https://img.shields.io/badge/tests-77_passed-brightgreen?style=flat-square)](tests/)
+[![Tests](https://img.shields.io/badge/tests-93_passed-brightgreen?style=flat-square)](tests/)
 
 ## Características
 
@@ -13,7 +13,7 @@ Aplicación de escritorio para gestionar elecciones estudiantiles: cargos dinám
 - **Candidatos**: alta, baja y fotos (JPG/PNG hasta 5 MB, validadas).
 - **Votantes**: registro individual o importación masiva desde CSV, validación de CI (7-8 dígitos) y prevención de voto duplicado. Sin CI: usar fecha de nacimiento DDMMYYYY (ej. `01092000` = 01/09/2000).
 - **Votación guiada**: un paso por cargo, confirmación final y comprobante en pantalla.
-- **Turnos**: cada turno (Mañana/Tarde) es una elección separada: padrón, candidatos, votación y acta propios, con filtros por turno en todo el panel.
+- **Turnos**: el admin elige el **turno a votar** (Mañana/Tarde) al activar la votación: se vota Mañana, se cierra, se cambia a Tarde y se activa de nuevo. La papeleta muestra los candidatos del turno activo y rechaza votantes de otro turno; padrón, resultados y acta con filtros por turno.
 - **Resultados**: tabla, ganadores por cargo (con empates), gráficos y acta en PDF con participación, porcentajes y firmas — por turno (Mañana/Tarde/Ambos).
 - **Seguridad**: contraseña admin con PBKDF2 + salt, bloqueo tras intentos fallidos y control de estado (activa/cerrada).
 
@@ -54,7 +54,7 @@ En Windows también podés doble clic en `1_iniciar.bat`: crea el `.venv` si fal
 
 1. Entra a **Modo Administración**. La primera vez se genera una contraseña inicial aleatoria: cópiala y guárdala.
 2. Cambia la contraseña en la pestaña **Configuración**.
-3. Carga **cargos**, **candidatos** y **votantes**, y pulsa **Activar Votación**.
+3. Carga **cargos**, **candidatos** y **votantes**, elegí el **Turno a votar** y pulsa **Activar Votación**.
 
 ### Votación
 
@@ -94,7 +94,7 @@ Lee los PDF de `padron_votantes_2026/PDF_LISTA_RUE/` y genera los 16 CSV en `pad
 .\.venv\Scripts\python -m pytest tests/ -q
 ```
 
-Suite en `tests/` (77 tests, DB aislada por test con `tmp_path`): integridad de la base de datos, reglas de voto, seguridad de auth, validación de fotos, rendimiento de resultados, turno, acta PDF y parser RUE.
+Suite en `tests/` (93 tests, DB aislada por test con `tmp_path`): integridad de la base de datos, reglas de voto, seguridad de auth, validación de fotos, rendimiento de resultados, turno, turno activo, acta PDF y parser RUE.
 
 ## Seguridad
 

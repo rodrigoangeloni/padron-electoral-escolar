@@ -58,6 +58,7 @@ class DatabaseManager:
             CREATE TABLE IF NOT EXISTS configuracion (
                 id INTEGER PRIMARY KEY,
                 estado_votacion TEXT DEFAULT '{VOTACION_CERRADA}',
+                turno_activo TEXT DEFAULT 'MAÑANA',
                 fecha_inicio TIMESTAMP,
                 fecha_fin TIMESTAMP
             )
@@ -78,6 +79,7 @@ class DatabaseManager:
         self._migrar_turno_votantes()
         self._migrar_turno_candidatos()
         self._migrar_orden_cargos()
+        self._migrar_turno_activo()
         self._seed_data()
         self.conn.commit()
 
@@ -124,6 +126,12 @@ class DatabaseManager:
                self.cursor.execute('SELECT id FROM cargos ORDER BY nombre').fetchall()]
         for posicion, cid in enumerate(ids):
             self.cursor.execute('UPDATE cargos SET orden = ? WHERE id = ?', (posicion, cid))
+
+    def _migrar_turno_activo(self):
+        """Agrega la columna turno_activo a DBs viejas (default MAÑANA)."""
+        columnas = [fila[1] for fila in self.cursor.execute('PRAGMA table_info(configuracion)')]
+        if 'turno_activo' not in columnas:
+            self.cursor.execute("ALTER TABLE configuracion ADD COLUMN turno_activo TEXT DEFAULT 'MAÑANA'")
 
     def _seed_data(self):
         """Puebla la tabla de cargos con valores iniciales si está vacía."""
@@ -420,6 +428,19 @@ class DatabaseManager:
     
     def set_estado_votacion(self, estado):
         self.cursor.execute('UPDATE configuracion SET estado_votacion = ? WHERE id = 1', (estado,))
+        self.conn.commit()
+
+    def get_turno_activo(self):
+        """Devuelve el turno activo ('MAÑANA'/'TARDE') para la votación."""
+        self.cursor.execute('SELECT turno_activo FROM configuracion WHERE id = 1')
+        fila = self.cursor.fetchone()
+        return (fila[0] if fila and fila[0] else 'MAÑANA')
+
+    def set_turno_activo(self, turno):
+        """Guarda el turno activo. Lanza ValueError si el turno es inválido."""
+        if turno not in TURNOS_VALIDOS:
+            raise ValueError(f"Turno inválido: '{turno}' (use MAÑANA o TARDE).")
+        self.cursor.execute('UPDATE configuracion SET turno_activo = ? WHERE id = 1', (turno,))
         self.conn.commit()
     
     def reset_votos(self):

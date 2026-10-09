@@ -1,5 +1,10 @@
 # 📝 Changelog
 
+## 📌 Próximas mejoras (pendientes, sin implementar)
+- **🖼️ Papeleta más legible con 8 candidatos**: subir foto de 130px → ~150px (niños pequeños reconocen mejor la cara del compañero); reducir `padx/pady` de 25 → ~12 (hoy quedan ~110px de vacío entre fotos y las tarjetas flotan desconectadas); verificar que las 2 filas entren sin scroll. Toca `calcular_layout_papeleta()` en `voting_app.py`, los paddings de la grilla y `tests/test_papeleta.py`.
+
+---
+
 <div align="center">
 
 [![Version](https://img.shields.io/badge/Version-v1.4.2-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
@@ -14,6 +19,19 @@
 ### 🔄 Registro de Cambios y Actualizaciones del Sistema de Votación Escolar
 
 </div>
+
+---
+
+## 🚀 [Sin publicar] - Turno activo controlado desde el panel de admin
+
+### ✨ Añadido
+- **🕐 Turno a votar en Configuración**: combobox "Turno a votar" (Mañana/Tarde) junto al estado de la votación. Al pulsar **Activar Votación** se guarda el turno seleccionado; mientras la votación está activa el combo queda bloqueado y el estado muestra "ACTIVA — Turno Mañana/Tarde".
+
+### 🔄 Cambiado
+- **🗳️ Papeleta por turno activo**: la papeleta filtra los candidatos por el **turno activo** (configurado por el admin), y no por el turno del votante. Flujo: se activa Mañana → se vota → se cierra → se cambia a Tarde → se activa de nuevo. Un votante de otro turno es rechazado con mensaje claro (no puede quemar su voto en la sesión equivocada). Nueva columna `turno_activo` en `configuracion` con migración para DBs viejas (default `MAÑANA`).
+
+### ✨ Añadido
+- **🧪 Tests**: `tests/test_turno_activo.py` (6 tests): default, set/get, validación, migración de DB vieja y verificación estructural (ast) de que `voting_app` usa el turno activo.
 
 ---
 

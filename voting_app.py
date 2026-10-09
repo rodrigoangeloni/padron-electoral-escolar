@@ -122,7 +122,16 @@ class VotingApp(tk.Frame):
         if votante[5] == 1:
             messagebox.showerror("Error", "Este votante ya ha emitido su voto.")
             return
-        
+
+        turno_activo = self.db_manager.get_turno_activo()
+        if len(votante) > 6 and votante[6] != turno_activo:
+            messagebox.showerror(
+                "Turno incorrecto",
+                f"Este votante pertenece al turno {votante[6].capitalize()}. "
+                f"La votación activa es el turno {turno_activo.capitalize()}."
+            )
+            return
+
         self.current_votante = votante
         self.start_voting_flow()
 
@@ -134,8 +143,8 @@ class VotingApp(tk.Frame):
             self.show_ci_input()
             return
 
-        # Cada turno es una elección: solo candidatos del turno del votante.
-        turno = self.current_votante[6] if len(self.current_votante) > 6 else None
+        # El admin define el turno activo: la papeleta muestra ese turno.
+        turno = self.db_manager.get_turno_activo()
 
         vacios = self.db_manager.cargos_sin_candidatos(turno)
         if vacios:

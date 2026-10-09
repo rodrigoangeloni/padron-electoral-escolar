@@ -230,7 +230,14 @@ class AdminApp(tk.Frame):
         
         self.status_label = tk.Label(status_frame, text="", font=("Arial", 12, "bold"))
         self.status_label.pack(pady=10)
-        
+
+        turno_frame = tk.Frame(status_frame)
+        turno_frame.pack(pady=(0, 5))
+        tk.Label(turno_frame, text="Turno a votar:").pack(side="left", padx=(0, 8))
+        self.turno_activo_combo = ttk.Combobox(turno_frame, values=["Mañana", "Tarde"], state="readonly", width=12)
+        self.turno_activo_combo.pack(side="left")
+        self.turno_activo_combo.set("Mañana")
+
         button_frame = tk.Frame(status_frame)
         button_frame.pack(pady=10)
         
@@ -380,15 +387,30 @@ class AdminApp(tk.Frame):
             messagebox.showinfo("Éxito", "Votos reiniciados correctamente")
     
     def set_votation_status(self, status):
+        if status == config.VOTACION_ACTIVA:
+            turno = (self.turno_activo_combo.get() or "").strip().upper()
+            try:
+                self.db_manager.set_turno_activo(turno)
+            except ValueError as error:
+                messagebox.showerror("Error", str(error))
+                return
         self.db_manager.set_estado_votacion(status)
         self.update_status_display()
-        status_text = "activa" if status == config.VOTACION_ACTIVA else "cerrada"
-        messagebox.showinfo("Éxito", f"La votación ha sido {status_text}")
-    
+        if status == config.VOTACION_ACTIVA:
+            messagebox.showinfo("Éxito", f"Votación activada — Turno {self.db_manager.get_turno_activo().capitalize()}")
+        else:
+            messagebox.showinfo("Éxito", "La votación ha sido cerrada")
+
     def update_status_display(self):
         status = self.db_manager.get_estado_votacion()
-        status_text = f"Estado actual: Votación {'ACTIVA' if status == config.VOTACION_ACTIVA else 'CERRADA'}"
-        self.status_label.config(text=status_text, fg="green" if status == config.VOTACION_ACTIVA else "red")
+        turno = self.db_manager.get_turno_activo()
+        activa = status == config.VOTACION_ACTIVA
+        self.turno_activo_combo.set(turno.capitalize())
+        self.turno_activo_combo.configure(state="disabled" if activa else "readonly")
+        status_text = f"Estado actual: Votación {'ACTIVA' if activa else 'CERRADA'}"
+        if activa:
+            status_text += f" — Turno {turno.capitalize()}"
+        self.status_label.config(text=status_text, fg="green" if activa else "red")
     
     def change_password(self):
         current_password = self.current_password_entry.get()
