@@ -17,6 +17,14 @@
 
 ---
 
+## 🚀 [Sin publicar] - Orden de cargos y papeleta con scroll
+
+### ✨ Añadido
+- **🔢 Orden de cargos configurable**: columna `orden` en `cargos` (migración conserva el orden alfabético actual). Botones ▲ Subir / ▼ Bajar en Configuración; la papeleta, ganadores y gráficos siguen ese orden.
+- **📜 Papeleta con scroll**: la grilla de candidatos desplaza verticalmente (rueda del ratón) — entran N candidatos por cargo sin cortarse.
+
+---
+
 ## 🚀 [Sin publicar] - Conversor RUE a CSV
 
 ### ✨ Añadido
