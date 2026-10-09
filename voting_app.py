@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 from PIL import Image, ImageTk
 import os
 import sys
@@ -34,6 +34,9 @@ class VotingApp(tk.Frame):
 
     def _clear_screen(self):
         """Limpia todos los widgets de este frame."""
+        self.unbind_all('<MouseWheel>')
+        self.unbind_all('<Button-4>')
+        self.unbind_all('<Button-5>')
         for widget in self.winfo_children():
             widget.destroy()
 
@@ -144,12 +147,32 @@ class VotingApp(tk.Frame):
         role_label = tk.Label(main_container, text=f"Elige a tu {current_role}", font=("Arial", 32, "bold"), bg=config.COLOR_WHITE, fg='#2c3e50')
         role_label.pack(pady=(0, 20))
 
-        # Frame para la grilla de candidatos
-        candidates_frame = tk.Frame(main_container, bg=config.COLOR_WHITE)
-        candidates_frame.pack(expand=True)
+        # Frame para la grilla de candidatos (con scroll: entran N candidatos)
+        scroll_container = tk.Frame(main_container, bg=config.COLOR_WHITE)
+        scroll_container.pack(fill="both", expand=True)
+
+        self._ballot_canvas = tk.Canvas(scroll_container, bg=config.COLOR_WHITE, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(scroll_container, orient="vertical", command=self._ballot_canvas.yview)
+        self._ballot_canvas.configure(yscrollcommand=scrollbar.set)
+        scrollbar.pack(side="right", fill="y")
+        self._ballot_canvas.pack(side="left", fill="both", expand=True)
+
+        candidates_frame = tk.Frame(self._ballot_canvas, bg=config.COLOR_WHITE)
+        ballot_window = self._ballot_canvas.create_window((0, 0), window=candidates_frame, anchor="nw")
+        candidates_frame.bind(
+            "<Configure>",
+            lambda event: self._ballot_canvas.configure(scrollregion=self._ballot_canvas.bbox("all")))
+        self._ballot_canvas.bind(
+            "<Configure>",
+            lambda event: self._ballot_canvas.itemconfig(ballot_window, width=event.width))
+        self.bind_all("<MouseWheel>", self._on_ballot_mousewheel)
+        self.bind_all("<Button-4>", self._on_ballot_mousewheel)
+        self.bind_all("<Button-5>", self._on_ballot_mousewheel)
 
         # Configuración de la grilla
         max_cols = 4  # Máximo de candidatos por fila
+        for col in range(max_cols):
+            candidates_frame.grid_columnconfigure(col, weight=1)
         
         for i, candidato in enumerate(candidates_for_role):
             row = i // max_cols
@@ -174,6 +197,16 @@ class VotingApp(tk.Frame):
             info_text = f"{candidato[1]} {candidato[2]}\n({candidato[4]})"
             name_label = tk.Label(candidato_frame, text=info_text, font=("Arial", 14), bg=config.COLOR_WHITE, fg='#34495e', justify="center")
             name_label.pack()
+
+    def _on_ballot_mousewheel(self, event):
+        """Desplaza la grilla de candidatos con la rueda del ratón."""
+        canvas = getattr(self, "_ballot_canvas", None)
+        if canvas is None or not canvas.winfo_exists():
+            return
+        if getattr(event, "num", None) == 5 or getattr(event, "delta", 0) < 0:
+            canvas.yview_scroll(1, "units")
+        else:
+            canvas.yview_scroll(-1, "units")
 
     def _load_candidate_image(self, path, size):
         """Carga una imagen de candidato o una por defecto."""
