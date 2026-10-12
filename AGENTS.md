@@ -6,6 +6,7 @@ Sistema de votación escolar desktop (Tkinter + SQLite). Cargos dinámicos, cand
 - README pide Python 3.11. Deps pinneadas en `requirements.txt`: `Pillow==11.3.0`, `matplotlib==3.10.7`, `fpdf2==2.7.9`, `pyinstaller==6.16.0`, `pypdf==6.19.0` (solo la usa el importador RUE). Tkinter/SQLite son stdlib. Dev: `requirements-dev.txt` (`pytest==9.1.1`).
 - Suite pytest en `tests/` (100 tests verificados, fixtures `tmp_path` con DB aislada). Sin linter/formatter. PEP 8 + docstrings en español.
 - Commits: Conventional Commits (tipo en inglés, descripción en español, ej. `feat: importar candidato desde el padron por CI`).
+- Releases: cada nueva versión lleva commit `release: vX.Y.Z ...` + **tag anotado** `vX.Y.Z` sobre ese commit + `git push origin vX.Y.Z`. Versión sincronizada en `version_info.txt`, badges README/CHANGELOG y `config.APP_VERSION`.
 
 ## Comandos
 ```bash
