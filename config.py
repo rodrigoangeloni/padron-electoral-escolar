@@ -39,6 +39,10 @@ GRADOS_VOTANTES = [
 VOTACION_ACTIVA = 'activa'
 VOTACION_CERRADA = 'cerrada'
 
+# --- Aplicación ---
+APP_VERSION = "1.5.1"
+DESARROLLADOR = "Rodrigo Angeloni"
+
 # --- Interfaz Gráfica ---
 # Dimensiones de la ventana principal
 MAIN_WINDOW_GEOMETRY = "400x300"

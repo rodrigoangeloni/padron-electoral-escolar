@@ -5,7 +5,7 @@ Aplicación de escritorio para gestionar elecciones estudiantiles: cargos dinám
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![Version](https://img.shields.io/badge/Version-v1.5.1-blue.svg?style=flat-square)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![Platform](https://img.shields.io/badge/Windows-exe-0078D6?style=flat-square&logo=windows&logoColor=white)](https://github.com/rodrigoangeloni/padron-electoral-escolar/releases)
-[![Tests](https://img.shields.io/badge/tests-99_passed-brightgreen?style=flat-square)](tests/)
+[![Tests](https://img.shields.io/badge/tests-100_passed-brightgreen?style=flat-square)](tests/)
 
 ## Características
 
@@ -94,7 +94,7 @@ Lee los PDF de `padron_votantes_2026/PDF_LISTA_RUE/` y genera los 16 CSV en `pad
 .\.venv\Scripts\python -m pytest tests/ -q
 ```
 
-Suite en `tests/` (99 tests, DB aislada por test con `tmp_path`): integridad de la base de datos, reglas de voto, seguridad de auth, validación de fotos, rendimiento de resultados, turno, turno activo, layout y edición de papeleta, acta PDF y parser RUE.
+Suite en `tests/` (100 tests, DB aislada por test con `tmp_path`): integridad de la base de datos, reglas de voto, seguridad de auth, validación de fotos, rendimiento de resultados, turno, turno activo, layout y edición de papeleta, contenido del acta PDF y parser RUE.
 
 ## Seguridad
 

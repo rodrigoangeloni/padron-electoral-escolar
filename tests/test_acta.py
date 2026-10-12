@@ -100,3 +100,20 @@ def test_export_acta_muchos_datos_no_falla(db_manager, tmp_path):
                  _seccion(db_manager, "TARDE")], ruta)
 
     assert os.path.getsize(ruta) > 0
+
+
+def test_acta_firma_unica_y_pie_con_desarrollador(db_manager, tmp_path):
+    """El acta trae solo la firma del presidente/encargado y el pie con autor y versión."""
+    from pypdf import PdfReader
+    import config
+
+    _eleccion(db_manager)
+    ruta = str(tmp_path / "acta_firma.pdf")
+
+    export_acta([_seccion(db_manager, "MAÑANA")], ruta)
+
+    texto = "\n".join((pagina.extract_text() or "") for pagina in PdfReader(ruta).pages)
+    assert "Presidente de Mesa o Encargado" in texto
+    assert "Fiscal" not in texto
+    assert config.DESARROLLADOR in texto
+    assert f"v{config.APP_VERSION}" in texto

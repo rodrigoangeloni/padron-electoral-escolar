@@ -3,11 +3,13 @@ Exportación del acta de resultados a PDF.
 
 Cada sección corresponde a un turno (o al general) e incluye:
 participación del padrón, ganadores con porcentaje y tabla detallada.
-Al final van las líneas de firma, como en un acta de escrutinio.
+Al final va la línea de firma del presidente de mesa o encargado.
+El pie de página acredita al desarrollador y la versión del programa.
 """
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
 from datetime import datetime
+import config
 
 FONT = "helvetica"
 
@@ -24,9 +26,11 @@ class PDFExporter(FPDF):
     def footer(self):
         self.set_y(-15)
         self.set_font(FONT, 'I', 8)
-        self.cell(0, 10, f'Página {self.page_no()}/{{nb}}', new_x=XPos.RIGHT, new_y=YPos.TOP, align='C')
-        self.set_x(-80)
-        self.cell(0, 10, 'Sistema de Votación Escolar', new_x=XPos.RIGHT, new_y=YPos.TOP, align='R')
+        self.cell(0, 10, f'Desarrollado por {config.DESARROLLADOR} - v{config.APP_VERSION}',
+                  new_x=XPos.RIGHT, new_y=YPos.TOP, align='L')
+        self.set_x(-60)
+        self.cell(0, 10, f'Página {self.page_no()}/{{nb}}',
+                  new_x=XPos.RIGHT, new_y=YPos.TOP, align='R')
 
     def chapter_title(self, title):
         self.set_font(FONT, 'B', 14)
@@ -84,13 +88,12 @@ class PDFExporter(FPDF):
 
     def add_firmas(self):
         self.ln(12)
-        self.chapter_title("Firmas")
+        self.chapter_title("Firma")
         y = self.get_y() + 14
-        for i, rol in enumerate(["Presidente de mesa", "Fiscal 1", "Fiscal 2"]):
-            x = 12 + i * 62
-            self.line(x, y, x + 54, y)
-            self.set_xy(x, y + 2)
-            self.cell(54, 8, rol, align='C')
+        x = 75
+        self.line(x, y, x + 60, y)
+        self.set_xy(x, y + 2)
+        self.cell(60, 8, "Presidente de Mesa o Encargado", align='C')
         self.set_y(y + 12)
 
 

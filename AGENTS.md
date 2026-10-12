@@ -4,7 +4,7 @@ Sistema de votación escolar desktop (Tkinter + SQLite). Cargos dinámicos, cand
 
 ## Stack
 - README pide Python 3.11. Deps pinneadas en `requirements.txt`: `Pillow==11.3.0`, `matplotlib==3.10.7`, `fpdf2==2.7.9`, `pyinstaller==6.16.0`, `pypdf==6.19.0` (solo la usa el importador RUE). Tkinter/SQLite son stdlib. Dev: `requirements-dev.txt` (`pytest==9.1.1`).
-- Suite pytest en `tests/` (99 tests verificados, fixtures `tmp_path` con DB aislada). Sin linter/formatter. PEP 8 + docstrings en español.
+- Suite pytest en `tests/` (100 tests verificados, fixtures `tmp_path` con DB aislada). Sin linter/formatter. PEP 8 + docstrings en español.
 - Commits: Conventional Commits (tipo en inglés, descripción en español, ej. `feat: importar candidato desde el padron por CI`).
 
 ## Comandos
@@ -40,7 +40,7 @@ pyinstaller main.spec
 - `utils/auth.py` — `AuthManager`: PBKDF2-HMAC-SHA256 (200.000 iteraciones, salt aleatorio, formato `salt_hex$hash_hex` en `assets/config/.admin_password` + flag `.initial_password_used`, comparación con `hmac.compare_digest`). Bloqueo 5 intentos/30s **en memoria** (se pierde al reiniciar). Sin archivo de password el login falla (sin fallback). Hash legacy SHA-256 plano solo se acepta para migrar al cambiar la clave.
 - `utils/path_handler.py` — CLAVE para persistencia: `get_data_dir()` usa `dirname(sys.executable)` si `sys.frozen`, sino `assets/`. De ahí derivan `get_db_path()` (`db/election.db`), `get_config_dir()`, `get_images_dir()`. `get_resource_path()` usa `sys._MEIPASS` en compilado, raíz del repo en dev.
 - `utils/foto_utils.py` — `validar_foto_candidato(ruta)` pura y testeable (sin GUI): solo `.jpg/.jpeg/.png`, ≤5 MB (`TAMANO_MAX_FOTO_BYTES`), contenido real (`verify()` + `load()`).
-- `utils/pdf_exporter.py` — `export_acta(secciones, file_path)` con fpdf2 (API moderna: `helvetica`, `new_x/new_y`). Cada sección = un turno (`turno`, `participacion`, `winners`, `resultados` crudos de `get_resultados()`): participación con %, ganadores con % por cargo, tabla con % y firmas al final. `turno=None` = sección general con columna Turno.
+- `utils/pdf_exporter.py` — `export_acta(secciones, file_path)` con fpdf2 (API moderna: `helvetica`, `new_x/new_y`). Cada sección = un turno (`turno`, `participacion`, `winners`, `resultados` crudos de `get_resultados()`): participación con %, ganadores con % por cargo, tabla con % y firma única al final ("Presidente de Mesa o Encargado"). Pie con `Desarrollado por <DESARROLLADOR> - v<APP_VERSION>` (constantes en `config.py`) + página. `turno=None` = sección general con columna Turno.
 - `models/` — `candidate.py`, `vote.py` sin uso (ningún import en el repo; lógica en `database.py`). No agregar lógica ahí sin migrar callers.
 - `assets/` — `db/`, `config/`, `images/` creados en runtime. Solo `default_candidate.jpg` e `icon.ico` versionados (ver `.gitignore`).
 - `tools/rue_a_csv.py` — conversor PDF RUE → CSV (`padron_votantes_2026/PDF_LISTA_RUE/` → `padron_votantes_2026/`) y función `convertir_pdf()` reutilizada por el botón "Importar desde PDF RUE" de `voter_ui` (import directo a DB, multiselección de PDFs). Parser puro en `utils/rue_parser.py` (sin pypdf: testeable). `pypdf` va en `requirements.txt` (se empaqueta en el exe); el import de `tools` es lazy con mensaje si falta. Sin CI → fecha DDMMYYYY; doc extranjero/pasaporte con número válido se usa tal cual; filas irreconocibles se reportan y el CLI sale con código 1.

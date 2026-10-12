@@ -17,6 +17,14 @@
 
 ---
 
+## 🚀 [Sin publicar] - Acta PDF: firma única y pie con autor
+
+### 🔄 Cambiado
+- **✍️ Firma única en el acta**: solo la línea de "Presidente de Mesa o Encargado" (antes presidente + 2 fiscales).
+- **👤 Pie con autor y versión**: "Desarrollado por Rodrigo Angeloni - v1.5.1" + número de página (antes "Sistema de Votación Escolar"). Nuevas constantes `APP_VERSION`/`DESARROLLADOR` en `config.py` + test de contenido del PDF (extracción con pypdf).
+
+---
+
 ## 🚀 [Sin publicar] - Editar cargo de candidato
 
 ### ✨ Añadido
