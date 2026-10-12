@@ -27,7 +27,7 @@ def calcular_layout_papeleta(n):
     if n <= 6:
         return (3, 140, 14)
     if n <= 8:
-        return (4, 130, 13)
+        return (4, 150, 13)
     if n <= 12:
         return (6, 110, 12)
     return (6, 90, 11)
@@ -210,7 +210,7 @@ class VotingApp(tk.Frame):
             col = i % num_cols
 
             candidato_frame = tk.Frame(candidates_frame, bg=config.COLOR_WHITE)
-            candidato_frame.grid(row=row, column=col, padx=25, pady=25)
+            candidato_frame.grid(row=row, column=col, padx=12, pady=12)
 
             img = self._load_candidate_image(candidato[5], (img_size, img_size)) # Tamaño adaptado
 

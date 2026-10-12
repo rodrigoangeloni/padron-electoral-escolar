@@ -259,6 +259,18 @@ class DatabaseManager:
     def update_candidate_photo(self, candidato_id, photo_path):
         self.cursor.execute('UPDATE candidatos SET foto = ? WHERE id = ?', (photo_path, candidato_id))
         self.conn.commit()
+
+    def update_candidate_cargo(self, candidato_id, nuevo_cargo):
+        """Cambia el cargo de un candidato. Lanza ValueError si el cargo no existe."""
+        if nuevo_cargo not in self.get_cargos():
+            raise ValueError(f"Cargo inexistente: '{nuevo_cargo}'.")
+        self.cursor.execute('UPDATE candidatos SET cargo = ? WHERE id = ?', (nuevo_cargo, candidato_id))
+        self.conn.commit()
+
+    def get_votos_candidato(self, candidato_id):
+        """Devuelve la cantidad de votos que tiene un candidato."""
+        self.cursor.execute('SELECT COUNT(*) FROM votos WHERE candidato_id = ?', (candidato_id,))
+        return self.cursor.fetchone()[0]
     
     def add_votante(self, ci, nombre, apellido, grado_curso, turno='MAÑANA'):
         if turno not in TURNOS_VALIDOS:

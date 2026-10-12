@@ -111,6 +111,9 @@ class CandidateUI:
         self.update_photo_button = tk.Button(buttons_frame_candidates, text="Actualizar Foto", command=self.update_candidate_photo, state="disabled")
         self.update_photo_button.pack(side="left", padx=5)
 
+        edit_cargo_button = tk.Button(buttons_frame_candidates, text="Editar Cargo", command=self.edit_candidate_cargo, bg=config.COLOR_WARNING, fg=config.COLOR_WHITE)
+        edit_cargo_button.pack(side="left", padx=5)
+
         delete_button = tk.Button(buttons_frame_candidates, text="Eliminar Candidato", command=self.delete_candidate, bg=config.COLOR_DANGER, fg=config.COLOR_WHITE)
         delete_button.pack(side="left", padx=5)
         
@@ -186,6 +189,63 @@ class CandidateUI:
 
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo actualizar la foto: {e}")
+
+    def edit_candidate_cargo(self):
+        """Cambia el cargo del candidato seleccionado mediante un diálogo."""
+        selected_item = self.candidates_tree.selection()
+        if not selected_item:
+            messagebox.showwarning("Advertencia", "Por favor, seleccione un candidato para editar su cargo.")
+            return
+        candidato_id = self.candidates_tree.item(selected_item)['values'][0]
+        candidato = self.db_manager.get_candidato_by_id(candidato_id)
+        if not candidato:
+            messagebox.showerror("Error", "No se encontró el candidato seleccionado.")
+            return
+        cargo_actual = candidato[3]
+        cargos = self.db_manager.get_cargos()
+        if not cargos:
+            messagebox.showerror("Error", "No hay cargos configurados.")
+            return
+
+        dialogo = tk.Toplevel(self.parent_frame)
+        dialogo.title("Editar Cargo")
+        dialogo.resizable(False, False)
+        dialogo.grab_set()
+
+        texto = f"{candidato[1]} {candidato[2]}  (cargo actual: {cargo_actual})"
+        tk.Label(dialogo, text=texto, font=("Arial", 11, "bold")).pack(padx=20, pady=(15, 5))
+        tk.Label(dialogo, text="Nuevo cargo:").pack(padx=20, pady=(5, 0))
+        nuevo_cargo_var = tk.StringVar(value=cargo_actual)
+        cargo_combo = ttk.Combobox(dialogo, textvariable=nuevo_cargo_var,
+                                   values=cargos, state="readonly", width=25)
+        cargo_combo.pack(padx=20, pady=5)
+
+        def guardar():
+            nuevo_cargo = nuevo_cargo_var.get()
+            if nuevo_cargo == cargo_actual:
+                messagebox.showinfo("Sin cambios", "El candidato ya está en ese cargo.")
+                dialogo.destroy()
+                return
+            votos = self.db_manager.get_votos_candidato(candidato_id)
+            if votos > 0 and not messagebox.askyesno(
+                    "Confirmar",
+                    f"Este candidato ya tiene {votos} voto(s): se contarán en el nuevo cargo ({nuevo_cargo}). ¿Continuar?"):
+                return
+            try:
+                self.db_manager.update_candidate_cargo(candidato_id, nuevo_cargo)
+            except ValueError as error:
+                messagebox.showerror("Error", str(error))
+                return
+            self.refresh_candidates_list()
+            dialogo.destroy()
+            messagebox.showinfo("Éxito", f"Cargo actualizado a {nuevo_cargo} correctamente.")
+
+        botones = tk.Frame(dialogo)
+        botones.pack(pady=15)
+        tk.Button(botones, text="Guardar", command=guardar,
+                  bg=config.COLOR_SUCCESS, fg=config.COLOR_WHITE, width=12).pack(side="left", padx=5)
+        tk.Button(botones, text="Cancelar", command=dialogo.destroy,
+                  width=12).pack(side="left", padx=5)
 
     def import_voter_by_ci(self):
         """Completa nombre, apellido y grado del candidato desde el padrón usando la CI."""

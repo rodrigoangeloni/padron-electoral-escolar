@@ -1,10 +1,5 @@
 # 📝 Changelog
 
-## 📌 Próximas mejoras (pendientes, sin implementar)
-- **🖼️ Papeleta más legible con 8 candidatos**: subir foto de 130px → ~150px (niños pequeños reconocen mejor la cara del compañero); reducir `padx/pady` de 25 → ~12 (hoy quedan ~110px de vacío entre fotos y las tarjetas flotan desconectadas); verificar que las 2 filas entren sin scroll. Toca `calcular_layout_papeleta()` en `voting_app.py`, los paddings de la grilla y `tests/test_papeleta.py`.
-
----
-
 <div align="center">
 
 [![Version](https://img.shields.io/badge/Version-v1.4.2-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
@@ -19,6 +14,20 @@
 ### 🔄 Registro de Cambios y Actualizaciones del Sistema de Votación Escolar
 
 </div>
+
+---
+
+## 🚀 [Sin publicar] - Editar cargo de candidato
+
+### ✨ Añadido
+- **✏️ Botón Editar Cargo en Candidatos Registrados**: selecciona un candidato → diálogo con el cargo actual y combo para elegir el nuevo → Guardar. Si ya tiene votos, pide confirmación (esos votos se contarán en el nuevo cargo). Nuevos `update_candidate_cargo()` (valida que el cargo exista) y `get_votos_candidato()` en `database.py` + `tests/test_editar_cargo.py` (4 tests). Verificado en la app.
+
+---
+
+## 🚀 [Sin publicar] - Papeleta más legible
+
+### 🎨 Mejorado
+- **🖼️ Fotos más grandes con 8 candidatos**: 130px → 150px (mejor reconocimiento de caras); padding de tarjetas 25 → 12 (la grilla queda compacta, sin huecos). Las 2 filas entran sin scroll. Toca `calcular_layout_papeleta()`, paddings de la grilla y `tests/test_papeleta.py` (2 tests nuevos, verificado visualmente en la app).
 
 ---
 
