@@ -3,7 +3,7 @@
 Aplicación de escritorio para gestionar elecciones estudiantiles: cargos dinámicos, candidatos, padrón de votantes, votación por CI y resultados con gráficos y PDF.
 
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
-[![Version](https://img.shields.io/badge/Version-v1.5.1-blue.svg?style=flat-square)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![Version](https://img.shields.io/badge/Version-v1.6.0-blue.svg?style=flat-square)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![Platform](https://img.shields.io/badge/Windows-exe-0078D6?style=flat-square&logo=windows&logoColor=white)](https://github.com/rodrigoangeloni/padron-electoral-escolar/releases)
 [![Tests](https://img.shields.io/badge/tests-100_passed-brightgreen?style=flat-square)](tests/)
 
@@ -142,4 +142,4 @@ tools/rue_a_csv.py    Genera los CSV desde los PDF RUE (requiere pypdf)
 Copyright (c) 2025 Rodrigo Angeloni. Uso, copia y modificación libres incluyendo el aviso de copyright; **prohibida la venta** sin permiso escrito. Ver [`LICENSE`](LICENSE). Detalle de cambios en [`CHANGELOG.md`](CHANGELOG.md).
 
 ---
-*Última revisión: 2026-10-08 (v1.5.1). ¿Algo que agregar o corregir? Abre un [issue](https://github.com/rodrigoangeloni/padron-electoral-escolar/issues).*
+*Última revisión: 2026-10-12 (v1.6.0). ¿Algo que agregar o corregir? Abre un [issue](https://github.com/rodrigoangeloni/padron-electoral-escolar/issues).*

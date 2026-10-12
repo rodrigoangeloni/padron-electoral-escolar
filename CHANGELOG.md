@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/Version-v1.4.2-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![Version](https://img.shields.io/badge/Version-v1.6.0-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![Python](https://img.shields.io/badge/Python-3.7+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
 </div>
@@ -17,29 +17,31 @@
 
 ---
 
-## 🚀 [Sin publicar] - Acta PDF: firma única y pie con autor
+## 🚀 [v1.6.0] - 2026-10-12 - Turno activo, papeleta, editar cargo y acta
+
+### 📄 Acta PDF: firma única y pie con autor
 
 ### 🔄 Cambiado
 - **✍️ Firma única en el acta**: solo la línea de "Presidente de Mesa o Encargado" (antes presidente + 2 fiscales).
-- **👤 Pie con autor y versión**: "Desarrollado por Rodrigo Angeloni - v1.5.1" + número de página (antes "Sistema de Votación Escolar"). Nuevas constantes `APP_VERSION`/`DESARROLLADOR` en `config.py` + test de contenido del PDF (extracción con pypdf).
+- **👤 Pie con autor y versión**: "Desarrollado por Rodrigo Angeloni - v1.6.0" + número de página (antes "Sistema de Votación Escolar"). Nuevas constantes `APP_VERSION`/`DESARROLLADOR` en `config.py` + test de contenido del PDF (extracción con pypdf).
 
 ---
 
-## 🚀 [Sin publicar] - Editar cargo de candidato
+### ✏️ Editar cargo de candidato
 
 ### ✨ Añadido
 - **✏️ Botón Editar Cargo en Candidatos Registrados**: selecciona un candidato → diálogo con el cargo actual y combo para elegir el nuevo → Guardar. Si ya tiene votos, pide confirmación (esos votos se contarán en el nuevo cargo). Nuevos `update_candidate_cargo()` (valida que el cargo exista) y `get_votos_candidato()` en `database.py` + `tests/test_editar_cargo.py` (4 tests). Verificado en la app.
 
 ---
 
-## 🚀 [Sin publicar] - Papeleta más legible
+### 🖼️ Papeleta más legible
 
 ### 🎨 Mejorado
 - **🖼️ Fotos más grandes con 8 candidatos**: 130px → 150px (mejor reconocimiento de caras); padding de tarjetas 25 → 12 (la grilla queda compacta, sin huecos). Las 2 filas entran sin scroll. Toca `calcular_layout_papeleta()`, paddings de la grilla y `tests/test_papeleta.py` (2 tests nuevos, verificado visualmente en la app).
 
 ---
 
-## 🚀 [Sin publicar] - Turno activo controlado desde el panel de admin
+### 🕐 Turno activo controlado desde el panel de admin
 
 ### ✨ Añadido
 - **🕐 Turno a votar en Configuración**: combobox "Turno a votar" (Mañana/Tarde) junto al estado de la votación. Al pulsar **Activar Votación** se guarda el turno seleccionado; mientras la votación está activa el combo queda bloqueado y el estado muestra "ACTIVA — Turno Mañana/Tarde".
@@ -52,7 +54,7 @@
 
 ---
 
-## 🚀 [Sin publicar] - Orden de cargos y papeleta con scroll
+### 🔢 Orden de cargos y papeleta con scroll
 
 ### ✨ Añadido
 - **🔢 Orden de cargos configurable**: columna `orden` en `cargos` (migración conserva el orden alfabético actual). Botones ▲ Subir / ▼ Bajar en Configuración; la papeleta, ganadores y gráficos siguen ese orden.
@@ -61,7 +63,7 @@
 
 ---
 
-## 🚀 [Sin publicar] - Conversor RUE a CSV
+### 🧾 Conversor RUE a CSV
 
 ### ✨ Añadido
 - **🧾 Utilidad `tools/rue_a_csv.py`**: genera los 16 CSV del padrón desde los PDF oficiales (`PDF_LISTA_RUE`). Parser puro y testeado en `utils/rue_parser.py` (11 tests). Botón "Importar desde PDF RUE" en la pestaña Votantes (multiselección, import directo a DB con reporte). Sin CI → fecha de nacimiento DDMMYYYY; documento extranjero/pasaporte con número válido se usa tal cual; filas irreconocibles se reportan (sale código 1). `pypdf` en `requirements.txt` (se empaqueta en el exe). Padrón regenerado: 370 votantes (+11 vs CSV anterior, 0 bajas).
@@ -372,6 +374,7 @@
 
 | Versión | Fecha de Lanzamiento | Características | Correcciones | Tamaño del Código |
 |:---:|:---:|:---:|
+| 1.6.0 | 2026-10-12 | 9 | 2 | 🗳️ Turno activo + acta |
 | 1.4.2 | 2026-09-03 | 0 | 1 | 🚨 Hotfix crash admin |
 | 1.4.1 | 2026-09-03 | 5 | 7 | 🧪 +Suite de tests |
 | 1.3.2 | 2025-10-09 | 1 | 0 | 📈 Aumentado |
