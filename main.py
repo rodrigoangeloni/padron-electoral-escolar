@@ -40,12 +40,19 @@ class MainApp(tk.Tk):
         '''Muestra un frame para la página dada'''
         frame = self.frames[page_name]
         frame.tkraise()
-        
+
+        # Maximizada ignora geometry(): restaurar a normal antes de redimensionar.
+        if self.state() == 'zoomed':
+            self.state('normal')
+
         if page_name == "MainMenu":
             self.geometry(config.MAIN_WINDOW_GEOMETRY)
             self.resizable(False, False)
         elif page_name == "VotingApp":
             self.geometry(config.VOTING_WINDOW_GEOMETRY)
+            self.resizable(True, True)
+        elif page_name == "AdminApp":
+            self.geometry(config.ADMIN_WINDOW_GEOMETRY)
             self.resizable(True, True)
         
         self.center_window()

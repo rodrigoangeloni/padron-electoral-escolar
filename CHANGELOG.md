@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/Version-v1.6.0-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![Version](https://img.shields.io/badge/Version-v1.6.1-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![Python](https://img.shields.io/badge/Python-3.7+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
 </div>
@@ -14,6 +14,14 @@
 ### 🔄 Registro de Cambios y Actualizaciones del Sistema de Votación Escolar
 
 </div>
+
+---
+
+## 🚀 [v1.6.1] - 2026-10-13 - Panel de administración redimensionable
+
+### 🐛 Corregido
+- **🪟 Maximizar y redimensionar en modo administración**: `show_frame()` no tenía caso para `AdminApp` y heredaba `resizable(False, False)` del menú (eso deshabilita también el botón maximizar). Ahora usa `ADMIN_WINDOW_GEOMETRY` (1200x680) + `resizable(True, True)`, igual que la votación.
+- **🪟 Volver al menú restaura la ventana**: en estado maximizado (`zoomed`) Windows ignora `geometry()` y el menú quedaba gigante. `show_frame()` vuelve a `normal` antes de aplicar la geometría de cada pantalla. Tests estructurales en `tests/test_ventanas.py` (4 tests).
 
 ---
 
@@ -374,6 +382,7 @@
 
 | Versión | Fecha de Lanzamiento | Características | Correcciones | Tamaño del Código |
 |:---:|:---:|:---:|
+| 1.6.1 | 2026-10-13 | 0 | 2 | 🪟 Admin redimensionable |
 | 1.6.0 | 2026-10-12 | 9 | 2 | 🗳️ Turno activo + acta |
 | 1.4.2 | 2026-09-03 | 0 | 1 | 🚨 Hotfix crash admin |
 | 1.4.1 | 2026-09-03 | 5 | 7 | 🧪 +Suite de tests |

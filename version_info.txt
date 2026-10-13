@@ -5,8 +5,8 @@
 VSVersionInfo(
   ffi=FixedFileInfo(
     # file version info
-    filevers=(1, 6, 0, 0),
-    prodvers=(1, 6, 0, 0),
+    filevers=(1, 6, 1, 0),
+    prodvers=(1, 6, 1, 0),
     mask=0x3f,
     flags=0x0,
     OS=0x40004,
@@ -21,12 +21,12 @@ VSVersionInfo(
         u'0c0a04b0',
         [StringStruct(u'CompanyName', u'Rodrigo Angeloni'),
         StringStruct(u'FileDescription', u'Sistema de Votación para Elecciones Escolares'),
-        StringStruct(u'FileVersion', u'1.6.0.0'),
+        StringStruct(u'FileVersion', u'1.6.1.0'),
         StringStruct(u'InternalName', u'SistemaVotacionEscolar'),
         StringStruct(u'LegalCopyright', u'Copyright © 2025 Rodrigo Angeloni. Todos los derechos reservados.'),
         StringStruct(u'OriginalFilename', u'SistemaVotacionEscolar.exe'),
         StringStruct(u'ProductName', u'Sistema de Votación Escolar'),
-        StringStruct(u'ProductVersion', u'1.6.0.0')])
+        StringStruct(u'ProductVersion', u'1.6.1.0')])
       ]),
     VarFileInfo([VarStruct(u'Translation', [3082, 1200])])
   ]

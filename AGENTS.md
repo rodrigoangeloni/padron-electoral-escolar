@@ -4,7 +4,7 @@ Sistema de votación escolar desktop (Tkinter + SQLite). Cargos dinámicos, cand
 
 ## Stack
 - README pide Python 3.11. Deps pinneadas en `requirements.txt`: `Pillow==11.3.0`, `matplotlib==3.10.7`, `fpdf2==2.7.9`, `pyinstaller==6.16.0`, `pypdf==6.19.0` (solo la usa el importador RUE). Tkinter/SQLite son stdlib. Dev: `requirements-dev.txt` (`pytest==9.1.1`).
-- Suite pytest en `tests/` (100 tests verificados, fixtures `tmp_path` con DB aislada). Sin linter/formatter. PEP 8 + docstrings en español.
+- Suite pytest en `tests/` (104 tests verificados, fixtures `tmp_path` con DB aislada). Sin linter/formatter. PEP 8 + docstrings en español.
 - Commits: Conventional Commits (tipo en inglés, descripción en español, ej. `feat: importar candidato desde el padron por CI`).
 - Releases: cada nueva versión lleva commit `release: vX.Y.Z ...` + **tag anotado** `vX.Y.Z` sobre ese commit + `git push origin vX.Y.Z`. Versión sincronizada en `version_info.txt`, badges README/CHANGELOG y `config.APP_VERSION`.
 
@@ -33,7 +33,7 @@ pyinstaller main.spec
 ```
 
 ## Estructura
-- `main.py` — `MainApp(tk.Tk)` controlador. Registra frames `MainMenu`, `AdminApp`, `VotingApp` en un container y navega con `show_frame(name)`. Maneja geometría (`config.MAIN/VOTING_WINDOW_GEOMETRY`) y cierre (`db_manager.close()`).
+- `main.py` — `MainApp(tk.Tk)` controlador. Registra frames `MainMenu`, `AdminApp`, `VotingApp` en un container y navega con `show_frame(name)`. Cada frame fija su geometría + `resizable` (`MAIN` no redimensionable; `VOTING`/`ADMIN` 1200x680 sí — `resizable(False, False)` también deshabilita maximizar). Maneja centrado (`center_window()`) y cierre (`db_manager.close()`).
 - `config.py` — constantes centrales. Importa rutas desde `utils/path_handler`. Define `GRADOS_CANDIDATOS/VOTANTES` (listas idénticas), estados `VOTACION_ACTIVA/CERRADA`, colores, geometrías. `DEFAULT_ADMIN_PASSWORD` eliminado (comentado, línea 20).
 - `database.py` — `DatabaseManager`: conexión única sqlite3, `PRAGMA foreign_keys = ON`, `init_db()` + `_seed_data()` + `_migrar_turno_votantes()` + `_migrar_turno_activo()`. Tablas: `candidatos(turno)`, `votantes(ci UNIQUE, ya_voto, turno)`, `votos`, `configuracion(estado_votacion, turno_activo)`, `cargos(nombre UNIQUE, orden)`. Cargos default: DIRECTORA, VICEDIRECTORA, COORDINADORA. `get_turno_activo()/set_turno_activo()` gestionan la sesión por turno (valida `TURNOS_VALIDOS`, default `MAÑANA`).
 - `admin_app.py` — `AdminApp(tk.Frame)`: si no existe `ADMIN_PASSWORD_FILE`, genera inicial de 12 chars y la muestra una vez en popup; login → Notebook (Candidatos/Votantes/Resultados/Configuración). Delega a `utils/candidate_ui.py`, `voter_ui.py`, `results_ui.py`. En Configuración: combo "Turno a votar" (Mañana/Tarde) que se guarda al pulsar **Activar Votación**; queda `disabled` mientras la votación está activa.
