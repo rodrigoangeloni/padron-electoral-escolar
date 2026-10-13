@@ -6,7 +6,7 @@ Sistema de votación escolar desktop (Tkinter + SQLite). Cargos dinámicos, cand
 - README pide Python 3.11. Deps pinneadas en `requirements.txt`: `Pillow==11.3.0`, `matplotlib==3.10.7`, `fpdf2==2.7.9`, `pyinstaller==6.16.0`, `pypdf==6.19.0` (solo la usa el importador RUE). Tkinter/SQLite son stdlib. Dev: `requirements-dev.txt` (`pytest==9.1.1`).
 - Suite pytest en `tests/` (104 tests verificados, fixtures `tmp_path` con DB aislada). Sin linter/formatter. PEP 8 + docstrings en español.
 - Commits: Conventional Commits (tipo en inglés, descripción en español, ej. `feat: importar candidato desde el padron por CI`).
-- Releases: cada nueva versión lleva commit `release: vX.Y.Z ...` + **tag anotado** `vX.Y.Z` sobre ese commit + `git push origin vX.Y.Z`. Versión sincronizada en `version_info.txt`, badges README/CHANGELOG y `config.APP_VERSION`.
+- Releases: secuencia fija — (1) suite verde, (2) sync versión (`version_info.txt` filevers/prodvers + strings, `config.APP_VERSION`, badges README/CHANGELOG, última revisión README), (3) sección `## 🚀 [vX.Y.Z] - YYYY-MM-DD` en CHANGELOG + fila en tabla de versiones, (4) commit `release: vX.Y.Z <resumen>` , (5) **tag anotado** `git tag -a vX.Y.Z -m "vX.Y.Z - <Resumen sin tildes>"` (sin tildes por encoding de consola Windows; el tag apunta al commit release), (6) `git push origin main` + `git push origin vX.Y.Z`, (7) recompilar exe (`cmd /c "echo.| 2_build.bat"`) y verificar estampa con `(Get-Item dist/...).VersionInfo`, (8) texto de release GitHub + adjuntar exe. Versionado: fix menor → parche (`x.x.Z+1`). Excepciones legacy no tocar: `v1.3.4`/`v1.4.2` son livianos (apuntan directo al commit).
 
 ## Comandos
 ```bash
