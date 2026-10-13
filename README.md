@@ -17,6 +17,16 @@ Aplicación de escritorio para gestionar elecciones estudiantiles: cargos dinám
 - **Resultados**: tabla, ganadores por cargo (con empates), gráficos y acta en PDF con participación, porcentajes y firmas — por turno (Mañana/Tarde/Ambos).
 - **Seguridad**: contraseña admin con PBKDF2 + salt, bloqueo tras intentos fallidos y control de estado (activa/cerrada).
 
+## 📸 Capturas de pantalla
+
+| Menú principal | Acceso administrativo |
+|---|---|
+| ![Menú principal](docs/screenshots/Menu1.jpg) | ![Acceso administrativo](docs/screenshots/Menu2.jpg) |
+
+| Panel de administración | Votación: ingreso de CI |
+|---|---|
+| ![Panel de administración](docs/screenshots/Menu3.jpg) | ![Votación: ingreso de CI](docs/screenshots/Menu0.jpg) |
+
 ## Descarga rápida (usuarios finales)
 
 1. Ve a [Releases](https://github.com/rodrigoangeloni/padron-electoral-escolar/releases) y descarga `SistemaVotacionEscolar.exe`.
