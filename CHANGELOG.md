@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/Version-v1.6.1-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![Version](https://img.shields.io/badge/Version-v1.6.2-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![Python](https://img.shields.io/badge/Python-3.7+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
 </div>
@@ -16,6 +16,11 @@
 </div>
 
 ---
+
+## 🚀 [v1.6.2] - 2026-10-14 - Foto del ganador en el acta
+
+### ✨ Novedades
+- **🖼️ Foto del ganador junto a cada cargo en el acta PDF**: la sección de ganadores muestra el thumbnail de la foto (con fallback a la imagen por defecto si falta; en empates sale solo el texto). Tests en `tests/test_acta.py` (3 nuevos: foto incrustada, foto faltante y empate).
 
 ## 🚀 [v1.6.1] - 2026-10-13 - Panel de administración redimensionable
 
@@ -382,6 +387,7 @@
 
 | Versión | Fecha de Lanzamiento | Características | Correcciones | Tamaño del Código |
 |:---:|:---:|:---:|
+| 1.6.2 | 2026-10-14 | 1 | 0 | 🖼️ Foto ganador en acta |
 | 1.6.1 | 2026-10-13 | 0 | 2 | 🪟 Admin redimensionable |
 | 1.6.0 | 2026-10-12 | 9 | 2 | 🗳️ Turno activo + acta |
 | 1.4.2 | 2026-09-03 | 0 | 1 | 🚨 Hotfix crash admin |

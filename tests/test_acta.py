@@ -30,12 +30,14 @@ def _seccion(db_manager, turno):
         if len(top) == 1:
             winners[cargo] = {'nombre': top[0]['nombre'],
                               'apellido': top[0]['apellido'],
-                              'votos': top[0]['votos']}
+                              'votos': top[0]['votos'],
+                              'foto': top[0]['foto']}
         else:
             empatados = ", ".join(f"{c['nombre']} {c['apellido']}" for c in top)
             winners[cargo] = {'nombre': f"Empate: {empatados}",
                               'apellido': "",
-                              'votos': top[0]['votos']}
+                              'votos': top[0]['votos'],
+                              'foto': None}
     return {"turno": turno,
             "participacion": db_manager.get_participacion(turno),
             "winners": winners,
@@ -117,3 +119,65 @@ def test_acta_firma_unica_y_pie_con_desarrollador(db_manager, tmp_path):
     assert "Fiscal" not in texto
     assert config.DESARROLLADOR in texto
     assert f"v{config.APP_VERSION}" in texto
+
+
+def _tiene_imagenes(ruta):
+    """Detecta objetos /Image dentro del PDF (fpdf incrusta la foto del ganador)."""
+    from pypdf import PdfReader
+
+    for pagina in PdfReader(ruta).pages:
+        xobjects = (pagina.get("/Resources") or {}).get("/XObject", {}) or {}
+        for obj in xobjects.values():
+            if obj.get_object().get("/Subtype") == "/Image":
+                return True
+    return False
+
+
+def test_acta_incluye_foto_del_ganador(db_manager, tmp_path):
+    """El ganador con foto disponible la lleva incrustada en el acta."""
+    import config
+
+    db_manager.add_candidato("Ana", "Lopez", "DIRECTORA", "5to Grado",
+                             foto=config.DEFAULT_CANDIDATE_IMAGE, turno="MAÑANA")
+    manana_id = db_manager.get_candidatos(turno="MAÑANA")[0][0]
+    db_manager.add_votante("1111111", "Vot", "Uno", "5to Grado", "MAÑANA")
+    db_manager.add_multiple_votes([manana_id], "1111111")
+    ruta = str(tmp_path / "acta_foto.pdf")
+
+    export_acta([_seccion(db_manager, "MAÑANA")], ruta)
+
+    assert os.path.getsize(ruta) > 0
+    assert _tiene_imagenes(ruta)
+
+
+def test_acta_foto_inexistente_no_falla(db_manager, tmp_path):
+    """Foto del ganador borrada o ruta inválida: el acta sale igual (con la de defecto)."""
+    _eleccion(db_manager)
+    seccion = _seccion(db_manager, "MAÑANA")
+    for datos in seccion["winners"].values():
+        datos["foto"] = "/ruta/que/no/existe.jpg"
+    ruta = str(tmp_path / "acta_sin_foto.pdf")
+
+    export_acta([seccion], ruta)
+
+    assert os.path.getsize(ruta) > 0
+
+
+def test_acta_empate_sin_foto_no_falla(db_manager, tmp_path):
+    """Empate (foto=None): el acta sale sin foto pero con el texto del empate."""
+    from pypdf import PdfReader
+
+    db_manager.add_candidato("Ana", "Lopez", "DIRECTORA", "5to Grado", turno="MAÑANA")
+    db_manager.add_candidato("Eva", "Diaz", "DIRECTORA", "5to Grado", turno="MAÑANA")
+    ids = [c[0] for c in db_manager.get_candidatos(turno="MAÑANA")]
+    db_manager.add_votante("1111111", "Vot", "Uno", "5to Grado", "MAÑANA")
+    db_manager.add_votante("2222222", "Vot", "Dos", "5to Grado", "MAÑANA")
+    db_manager.add_multiple_votes([ids[0]], "1111111")
+    db_manager.add_multiple_votes([ids[1]], "2222222")
+    ruta = str(tmp_path / "acta_empate.pdf")
+
+    export_acta([_seccion(db_manager, "MAÑANA")], ruta)
+
+    texto = "\n".join((pagina.extract_text() or "") for pagina in PdfReader(ruta).pages)
+    assert os.path.getsize(ruta) > 0
+    assert "Empate:" in texto

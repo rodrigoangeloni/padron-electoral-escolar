@@ -9,9 +9,11 @@ El pie de página acredita al desarrollador y la versión del programa.
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
 from datetime import datetime
+import os
 import config
 
 FONT = "helvetica"
+FOTO_GANADOR_MM = 22  # ancho del thumbnail del ganador
 
 
 class PDFExporter(FPDF):
@@ -55,11 +57,35 @@ class PDFExporter(FPDF):
             pct = (datos['votos'] / total * 100) if total else 0.0
             self.set_font(FONT, 'B', 12)
             self.cell(0, 9, f"Cargo: {cargo}", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-            self.set_font(FONT, '', 12)
-            self.cell(0, 9, f"  Ganador: {datos['nombre']} {datos['apellido']}".rstrip()
-                        + f"  ({datos['votos']} votos, {pct:.1f}%)",
-                        new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            texto = (f"Ganador: {datos['nombre']} {datos['apellido']}".rstrip()
+                     + f"  ({datos['votos']} votos, {pct:.1f}%)")
+            self._ganador_con_foto(datos.get('foto'), texto)
         self.ln(5)
+
+    def _ganador_con_foto(self, foto, texto):
+        """Renglón del ganador con su foto a la izquierda (si hay una usable)."""
+        ruta = foto if foto and os.path.exists(foto) else None
+        if ruta is None and os.path.exists(config.DEFAULT_CANDIDATE_IMAGE):
+            ruta = config.DEFAULT_CANDIDATE_IMAGE
+        if ruta is None:
+            self._texto_ganador(texto)
+            return
+        y0 = self.get_y()
+        x0 = self.l_margin
+        try:
+            self.image(ruta, x=x0, y=y0, w=FOTO_GANADOR_MM)
+        except Exception:
+            self._texto_ganador(texto)
+            return
+        self.set_xy(x0 + FOTO_GANADOR_MM + 4, y0 + 4)
+        self.set_font(FONT, '', 12)
+        self.multi_cell(0, 8, texto)
+        self.set_y(max(self.get_y(), y0 + FOTO_GANADOR_MM + 6))
+
+    def _texto_ganador(self, texto):
+        """Renglón del ganador sin foto (fallback)."""
+        self.set_font(FONT, '', 12)
+        self.cell(0, 9, texto, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
 
     def add_results_table(self, headers, data):
         self.set_font(FONT, 'B', 9)
@@ -112,8 +138,9 @@ def export_acta(secciones, file_path):
         secciones: lista de dicts con claves:
             turno: 'MAÑANA'/'TARDE'/None (None = general sin filtro).
             participacion: (habilitados, votaron).
-            winners: {cargo: {'nombre', 'apellido', 'votos'}}
-                (nombre puede ser "Empate: ..." si corresponde).
+            winners: {cargo: {'nombre', 'apellido', 'votos', 'foto'}}
+                (nombre puede ser "Empate: ..." si corresponde; foto=None
+                en empates o si no hay imagen y se usa la de defecto).
             resultados: filas crudas de get_resultados()
                 (id, nombre, apellido, cargo, grado, votos, foto, turno).
         file_path: ruta del PDF a generar.

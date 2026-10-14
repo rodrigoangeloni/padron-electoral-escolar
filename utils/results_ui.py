@@ -202,12 +202,14 @@ class ResultsUI:
             if len(top) == 1:
                 winners[cargo] = {'nombre': top[0]['nombre'],
                                   'apellido': top[0]['apellido'],
-                                  'votos': top[0]['votos']}
+                                  'votos': top[0]['votos'],
+                                  'foto': top[0]['foto']}
             else:
                 empatados = ", ".join(f"{c['nombre']} {c['apellido']}" for c in top)
                 winners[cargo] = {'nombre': f"Empate: {empatados}",
                                   'apellido': "",
-                                  'votos': top[0]['votos']}
+                                  'votos': top[0]['votos'],
+                                  'foto': None}
         return {"turno": turno,
                 "participacion": self.db_manager.get_participacion(turno),
                 "winners": winners,
