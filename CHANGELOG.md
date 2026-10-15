@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/Version-v1.6.2-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![Version](https://img.shields.io/badge/Version-v1.6.3-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![Python](https://img.shields.io/badge/Python-3.7+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
 </div>
@@ -16,6 +16,11 @@
 </div>
 
 ---
+
+## 🚀 [v1.6.3] - 2026-10-14 - Fotos portables al mover la app
+
+### 🐛 Corregido
+- **🖼️ Las fotos ya no se pierden al mover la app de carpeta**: la DB guardaba rutas absolutas (`C:\...\images\...`) que morían al cambiar de ubicación. Ahora guarda solo el nombre del archivo y la ruta se reconstruye contra la carpeta actual; al iniciar, migra sola las rutas viejas. Si una foto no existe, muestra la imagen por defecto. Tests en `tests/test_fotos_portables.py` (7 tests).
 
 ## 🚀 [v1.6.2] - 2026-10-14 - Foto del ganador en el acta
 
@@ -387,6 +392,7 @@
 
 | Versión | Fecha de Lanzamiento | Características | Correcciones | Tamaño del Código |
 |:---:|:---:|:---:|
+| 1.6.3 | 2026-10-14 | 0 | 1 | 🖼️ Fotos portables |
 | 1.6.2 | 2026-10-14 | 1 | 0 | 🖼️ Foto ganador en acta |
 | 1.6.1 | 2026-10-13 | 0 | 2 | 🪟 Admin redimensionable |
 | 1.6.0 | 2026-10-12 | 9 | 2 | 🗳️ Turno activo + acta |

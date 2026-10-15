@@ -80,6 +80,7 @@ class DatabaseManager:
         self._migrar_turno_candidatos()
         self._migrar_orden_cargos()
         self._migrar_turno_activo()
+        self._migrar_fotos_relativas()
         self._seed_data()
         self.conn.commit()
 
@@ -132,6 +133,22 @@ class DatabaseManager:
         columnas = [fila[1] for fila in self.cursor.execute('PRAGMA table_info(configuracion)')]
         if 'turno_activo' not in columnas:
             self.cursor.execute("ALTER TABLE configuracion ADD COLUMN turno_activo TEXT DEFAULT 'MAÑANA'")
+
+    def _migrar_fotos_relativas(self):
+        """Convierte rutas absolutas de fotos a solo-nombre (idempotente).
+
+        Las rutas absolutas viejas se rompen al mover la app de carpeta;
+        con solo el nombre, `resolver_ruta_foto()` reconstruye la ruta
+        contra la carpeta de imágenes actual. Las filas con la imagen
+        por defecto no se tocan.
+        """
+        defecto = os.path.basename(DEFAULT_CANDIDATE_IMAGE)
+        for cid, foto in self.cursor.execute('SELECT id, foto FROM candidatos').fetchall():
+            if not foto or os.path.basename(foto) == defecto:
+                continue
+            base = os.path.basename(foto)
+            if base != foto:
+                self.cursor.execute('UPDATE candidatos SET foto = ? WHERE id = ?', (base, cid))
 
     def _seed_data(self):
         """Puebla la tabla de cargos con valores iniciales si está vacía."""
@@ -257,7 +274,9 @@ class DatabaseManager:
         self.conn.commit()
 
     def update_candidate_photo(self, candidato_id, photo_path):
-        self.cursor.execute('UPDATE candidatos SET foto = ? WHERE id = ?', (photo_path, candidato_id))
+        """Guarda solo el nombre del archivo (portable al mover la app)."""
+        self.cursor.execute('UPDATE candidatos SET foto = ? WHERE id = ?',
+                            (os.path.basename(photo_path), candidato_id))
         self.conn.commit()
 
     def update_candidate_cargo(self, candidato_id, nuevo_cargo):

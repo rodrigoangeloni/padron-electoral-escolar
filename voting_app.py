@@ -240,13 +240,15 @@ class VotingApp(tk.Frame):
             canvas.yview_scroll(-1, "units")
 
     def _load_candidate_image(self, path, size):
-        """Carga una imagen de candidato o una por defecto."""
+        """Carga una imagen de candidato o una por defecto (rutas portables)."""
+        from utils.foto_utils import resolver_ruta_foto
+        ruta = resolver_ruta_foto(path) or config.DEFAULT_CANDIDATE_IMAGE
         try:
-            img = Image.open(path)
-        except (FileNotFoundError, IOError):
+            img = Image.open(ruta)
+        except (FileNotFoundError, IOError, OSError):
             try:
                 img = Image.open(config.DEFAULT_CANDIDATE_IMAGE)
-            except (FileNotFoundError, IOError):
+            except (FileNotFoundError, IOError, OSError):
                 img = Image.new('RGB', size, color='#ecf0f1')
         
         img = img.resize(size, Image.Resampling.LANCZOS)

@@ -2,7 +2,10 @@
 Validación de fotos de candidatos.
 
 Separa la validación (función pura, testeable sin GUI) de la
-interfaz de subida en `candidate_ui.py`.
+interfaz de subida en `candidate_ui.py`. También resuelve rutas
+portables: la DB guarda solo el nombre del archivo y la ruta real
+se reconstruye contra la carpeta de imágenes actual (así la app
+se puede mover de carpeta o de PC sin perder las fotos).
 """
 import os
 
@@ -47,3 +50,30 @@ def validar_foto_candidato(ruta, tamano_max_bytes=TAMANO_MAX_FOTO_BYTES):
         return False, "El archivo no es una imagen válida."
 
     return True, "Foto válida."
+
+
+def resolver_ruta_foto(foto, directorio=None):
+    """Devuelve la ruta usable de una foto guardada en la DB (o None).
+
+    La DB puede contener rutas absolutas viejas (se rompen al mover la
+    app de carpeta) o solo-nombres (formato portable actual). Orden:
+    ruta tal cual si existe -> basename dentro de <directorio> ->
+    imagen por defecto -> None.
+
+    Args:
+        foto: valor de la columna foto (ruta absoluta o nombre).
+        directorio: carpeta de imágenes (por defecto `get_images_dir()`).
+    """
+    from utils.path_handler import get_images_dir
+    import config
+
+    base = directorio or get_images_dir()
+    if foto and os.path.isfile(foto):
+        return foto
+    if foto:
+        candidata = os.path.join(base, os.path.basename(foto))
+        if os.path.isfile(candidata):
+            return candidata
+    if os.path.isfile(config.DEFAULT_CANDIDATE_IMAGE):
+        return config.DEFAULT_CANDIDATE_IMAGE
+    return None

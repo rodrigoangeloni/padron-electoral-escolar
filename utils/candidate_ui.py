@@ -9,7 +9,7 @@ import shutil
 from tkinter import filedialog
 import config
 from utils.path_handler import get_images_dir
-from utils.foto_utils import validar_foto_candidato
+from utils.foto_utils import validar_foto_candidato, resolver_ruta_foto
 
 
 class CandidateUI:
@@ -138,7 +138,7 @@ class CandidateUI:
             candidato = self.db_manager.get_candidato_by_id(candidato_id)
             
             if candidato:
-                photo_path = candidato[5] # foto está en la posición 5
+                photo_path = resolver_ruta_foto(candidato[5]) or config.DEFAULT_CANDIDATE_IMAGE  # foto en pos 5
             else:
                 photo_path = config.DEFAULT_CANDIDATE_IMAGE
             

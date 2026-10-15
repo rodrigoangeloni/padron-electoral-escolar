@@ -129,7 +129,9 @@ class ResultsUI:
             if top:
                 winner_data = top[0]
                 try:
-                    img = Image.open(winner_data['foto']).resize((150, 150), Image.Resampling.LANCZOS)
+                    from utils.foto_utils import resolver_ruta_foto
+                    ruta = resolver_ruta_foto(winner_data['foto'])
+                    img = Image.open(ruta).resize((150, 150), Image.Resampling.LANCZOS)
                     photo = ImageTk.PhotoImage(img)
                 except:
                     photo = None

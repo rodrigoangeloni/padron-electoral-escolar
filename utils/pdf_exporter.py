@@ -9,7 +9,6 @@ El pie de página acredita al desarrollador y la versión del programa.
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
 from datetime import datetime
-import os
 import config
 
 FONT = "helvetica"
@@ -64,9 +63,8 @@ class PDFExporter(FPDF):
 
     def _ganador_con_foto(self, foto, texto):
         """Renglón del ganador con su foto a la izquierda (si hay una usable)."""
-        ruta = foto if foto and os.path.exists(foto) else None
-        if ruta is None and os.path.exists(config.DEFAULT_CANDIDATE_IMAGE):
-            ruta = config.DEFAULT_CANDIDATE_IMAGE
+        from utils.foto_utils import resolver_ruta_foto
+        ruta = resolver_ruta_foto(foto)
         if ruta is None:
             self._texto_ganador(texto)
             return
