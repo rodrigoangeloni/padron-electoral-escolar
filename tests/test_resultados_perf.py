@@ -104,3 +104,42 @@ def test_reemplazo_no_acumula_figuras():
     finally:
         plt.close(fig2)
     assert set(plt.get_fignums()) == antes
+
+
+def test_figura_crece_con_muchas_candidatas():
+    """16 candidatas (vista Todos): la figura es más alta, no colapsan las barras."""
+    plt = pytest.importorskip("matplotlib.pyplot")
+    from utils.results_ui import crear_figura_resultados
+
+    pocas = [(1, "Ana", "Lopez", "DIRECTORA", "5to Grado", 3, "f")]
+    muchas = [(i, f"Nombre Largo {i}", f"Apellido Extenso {i}",
+               "DIRECTORA", "5to Grado", i, "f") for i in range(16)]
+
+    fig_pocas = crear_figura_resultados(pocas, ["DIRECTORA"])
+    fig_muchas = crear_figura_resultados(muchas, ["DIRECTORA"])
+    try:
+        h_pocas = fig_pocas.get_size_inches()[1]
+        h_muchas = fig_muchas.get_size_inches()[1]
+        assert h_muchas > h_pocas
+        # nombres completos, sin recorte: uno por candidata
+        etiquetas = [t.get_text() for t in fig_muchas.axes[0].get_yticklabels()]
+        assert len(etiquetas) == 16
+        assert etiquetas[0] == "Nombre Largo 0 Apellido Extenso 0"
+    finally:
+        plt.close(fig_pocas)
+        plt.close(fig_muchas)
+
+
+def test_figura_eje_x_en_enteros():
+    """El eje X usa ticks enteros (sin decimales superpuestos)."""
+    plt = pytest.importorskip("matplotlib.pyplot")
+    from matplotlib.ticker import MaxNLocator
+    from utils.results_ui import crear_figura_resultados
+
+    resultados = [(i, f"N{i}", f"A{i}", "DIRECTORA", "5to Grado", i * 3, "f")
+                  for i in range(5)]
+    fig = crear_figura_resultados(resultados, ["DIRECTORA"])
+    try:
+        assert isinstance(fig.axes[0].xaxis.get_major_locator(), MaxNLocator)
+    finally:
+        plt.close(fig)

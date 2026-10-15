@@ -18,7 +18,8 @@ FOTO_GANADOR_MM = 22  # ancho del thumbnail del ganador
 class PDFExporter(FPDF):
     def header(self):
         self.set_font(FONT, 'B', 16)
-        self.cell(0, 10, 'Acta de Resultados Electorales', new_x=XPos.LMARGIN, new_y=YPos.NEXT, align='C')
+        titulo = getattr(self, 'titulo_reporte', 'Acta de Resultados Electorales')
+        self.cell(0, 10, titulo, new_x=XPos.LMARGIN, new_y=YPos.NEXT, align='C')
         self.set_font(FONT, '', 8)
         self.cell(0, 10, f"Generada el: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
                   new_x=XPos.LMARGIN, new_y=YPos.NEXT, align='C')
@@ -182,3 +183,83 @@ def export_acta(secciones, file_path):
 
     pdf.add_firmas()
     pdf.output(file_path)
+
+
+def export_nomina(secciones, file_path):
+    """Exporta la nómina de votantes (votaron / no votaron) por turno.
+
+    Lista de trabajo para convocar ausentes (ej. desempate): no lleva
+    firma, solo el pie estándar con desarrollador y versión.
+
+    Args:
+        secciones: lista de dicts con claves:
+            turno: 'MAÑANA'/'TARDE'/None (None = general con columna Turno).
+            votaron: filas (ci, nombre, apellido, grado, turno).
+            no_votaron: filas (ci, nombre, apellido, grado, turno).
+        file_path: ruta del PDF a generar.
+    """
+    pdf = PDFExporter()
+    pdf.alias_nb_pages('{nb}')
+    pdf.set_auto_page_break(True, margin=20)
+    pdf.titulo_reporte = 'Nómina de Votantes'
+    pdf.add_page()
+
+    for seccion in secciones:
+        turno = seccion.get("turno")
+        titulo = f"Turno {turno.capitalize()}" if turno else "Todos los turnos"
+        pdf.chapter_title(titulo)
+
+        votaron = seccion.get("votaron", [])
+        no_votaron = seccion.get("no_votaron", [])
+        total = len(votaron) + len(no_votaron)
+        pdf.set_font(FONT, '', 11)
+        pdf.cell(0, 8, f"Habilitados: {total}   Votaron: {len(votaron)}   "
+                       f"No votaron: {len(no_votaron)}",
+                 new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        pdf.ln(3)
+
+        con_turno = turno is None
+        pdf.chapter_title(f"No votaron ({len(no_votaron)})")
+        _tabla_nomina(pdf, no_votaron, con_turno)
+        pdf.ln(5)
+        pdf.chapter_title(f"Votaron ({len(votaron)})")
+        _tabla_nomina(pdf, votaron, con_turno)
+        pdf.ln(5)
+
+    pdf.output(file_path)
+
+
+def _tabla_nomina(pdf, filas, con_turno):
+    """Tabla de votantes (CI, nombre, apellido, grado[, turno])."""
+    if con_turno:
+        headers = ["CI", "Nombre", "Apellido", "Grado", "Turno"]
+        anchos = [24, 42, 42, 52, 22]
+    else:
+        headers = ["CI", "Nombre", "Apellido", "Grado"]
+        anchos = [26, 48, 48, 60]
+    pdf.set_font(FONT, 'B', 9)
+    pdf.set_fill_color(30, 130, 200)
+    pdf.set_text_color(255, 255, 255)
+    for i, header in enumerate(headers):
+        pdf.cell(anchos[i], 9, header, border=1, new_x=XPos.RIGHT, new_y=YPos.TOP,
+                 align='C', fill=True)
+    pdf.ln()
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font(FONT, '', 9)
+    if not filas:
+        pdf.cell(sum(anchos), 8, "Nadie en esta lista.", border=1,
+                 new_x=XPos.LMARGIN, new_y=YPos.NEXT, align='C')
+        return
+    zebra = False
+    for fila in filas:
+        ci, nombre, apellido, grado = fila[0], fila[1], fila[2], fila[3]
+        celdas = [ci, nombre, apellido, grado]
+        if con_turno:
+            celdas.append(fila[4].capitalize() if fila[4] else "")
+        if zebra:
+            pdf.set_fill_color(235, 245, 255)
+        for i, item in enumerate(celdas):
+            pdf.cell(anchos[i], 8, str(item), border=1, new_x=XPos.RIGHT,
+                     new_y=YPos.TOP, align='C' if i == 0 else 'L', fill=zebra)
+        pdf.ln()
+        zebra = not zebra

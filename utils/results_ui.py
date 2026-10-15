@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import config
 from utils.path_handler import get_images_dir
-from utils.pdf_exporter import export_acta
+from utils.pdf_exporter import export_acta, export_nomina
 
 
 class ResultsUI:
@@ -35,6 +35,9 @@ class ResultsUI:
         
         export_button = tk.Button(controls_frame, text="Exportar a PDF", command=self._export_results_to_pdf, bg=config.COLOR_SUCCESS, fg=config.COLOR_WHITE)
         export_button.pack(side="left", padx=5)
+
+        nomina_button = tk.Button(controls_frame, text="Nómina PDF", command=self._export_nomina_to_pdf, bg="#8e44ad", fg=config.COLOR_WHITE)
+        nomina_button.pack(side="left", padx=5)
 
         tk.Label(controls_frame, text="Turno:").pack(side="left", padx=(15, 5))
         self.filtro_turno_var = tk.StringVar(value="Todos")
@@ -152,7 +155,7 @@ class ResultsUI:
         self._update_graphs(resultados, cargos)
 
     def _update_graphs(self, resultados, cargos):
-        """Actualiza los gráficos de resultados"""
+        """Actualiza los gráficos de resultados (con scroll si hay muchas candidatas)."""
         for widget in self.graphs_frame.winfo_children():
             widget.destroy()
 
@@ -167,9 +170,22 @@ class ResultsUI:
         fig = crear_figura_resultados(resultados, cargos)
         self._figura_actual = fig
 
-        canvas = FigureCanvasTkAgg(fig, master=self.graphs_frame)
+        area = tk.Canvas(self.graphs_frame, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(self.graphs_frame, orient="vertical", command=area.yview)
+        contenedor = tk.Frame(area)
+        contenedor.bind("<Configure>", lambda e: area.configure(scrollregion=area.bbox("all")))
+        area.create_window((0, 0), window=contenedor, anchor="nw")
+        area.configure(yscrollcommand=scrollbar.set)
+        area.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
+        canvas = FigureCanvasTkAgg(fig, master=contenedor)
         canvas.draw()
-        canvas.get_tk_widget().pack(fill='both', expand=True)
+        canvas.get_tk_widget().pack(fill="both", expand=True)
+
+        contenedor.bind("<Enter>", lambda e: area.bind_all(
+            "<MouseWheel>", lambda ev: area.yview_scroll(int(-ev.delta / 120), "units")))
+        contenedor.bind("<Leave>", lambda e: area.unbind_all("<MouseWheel>"))
 
     def _export_results_to_pdf(self):
         """Exporta el acta del turno visible (o ambos) a un archivo PDF."""
@@ -193,6 +209,35 @@ class ResultsUI:
         try:
             export_acta(secciones, file_path)
             messagebox.showinfo("Exportar a PDF", f"Acta exportada exitosamente a:\n{file_path}")
+        except Exception as e:
+            messagebox.showerror("Error de Exportación", f"No se pudo exportar el archivo PDF.\nError: {e}")
+
+    def _export_nomina_to_pdf(self):
+        """Exporta la nómina de votantes (votaron / no votaron) a PDF."""
+        turnos = [self.turno_actual] if self.turno_actual else ["MAÑANA", "TARDE"]
+        secciones = []
+        for turno in turnos:
+            votaron, no_votaron = self.db_manager.get_nomina(turno)
+            secciones.append({"turno": turno, "votaron": votaron,
+                              "no_votaron": no_votaron})
+        if not any(s["votaron"] or s["no_votaron"] for s in secciones):
+            messagebox.showinfo("Nómina de votantes", "No hay votantes en el padrón.")
+            return
+
+        etiqueta = self.turno_actual.capitalize() if self.turno_actual else "Ambos"
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".pdf",
+            initialfile=f"nomina_{etiqueta}_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf",
+            filetypes=[("PDF Files", "*.pdf"), ("All files", "*.*")],
+            title="Guardar nómina como PDF"
+        )
+
+        if not file_path:
+            return
+
+        try:
+            export_nomina(secciones, file_path)
+            messagebox.showinfo("Nómina de votantes", f"Nómina exportada exitosamente a:\n{file_path}")
         except Exception as e:
             messagebox.showerror("Error de Exportación", f"No se pudo exportar el archivo PDF.\nError: {e}")
 
@@ -222,6 +267,8 @@ def crear_figura_resultados(resultados, cargos):
     """Crea la figura de barras horizontales (un subplot por cargo).
 
     Función pura sin dependencias de Tk: testeable sin display.
+    La altura crece con la cantidad de candidatas para que las barras
+    no colapsen (con muchas, el contenedor Tk usa scroll vertical).
 
     Args:
         resultados: filas (id, nombre, apellido, cargo, grado, votos, foto).
@@ -230,13 +277,22 @@ def crear_figura_resultados(resultados, cargos):
     Returns:
         matplotlib.figure.Figure lista para embeber.
     """
+    from matplotlib.ticker import MaxNLocator
+
     num_cargos = len(cargos)
-    fig = plt.figure(figsize=(4 * num_cargos, 6))
+    max_candidatas = 0
+    por_cargo = {}
+    for cargo in cargos:
+        filas = [row for row in resultados if row[3] == cargo]
+        por_cargo[cargo] = filas
+        max_candidatas = max(max_candidatas, len(filas))
+    altura = max(6.0, 0.55 * max_candidatas + 1.5)
+    fig = plt.figure(figsize=(4 * num_cargos, altura))
 
     for i, cargo in enumerate(cargos):
         ax = fig.add_subplot(1, num_cargos, i + 1)
 
-        cargo_results = [row for row in resultados if row[3] == cargo]
+        cargo_results = por_cargo[cargo]
 
         if not cargo_results:
             ax.text(0.5, 0.5, 'Sin datos', ha='center', va='center')
@@ -248,13 +304,18 @@ def crear_figura_resultados(resultados, cargos):
         nombres = [f"{r[1]} {r[2]}" for r in cargo_results]
         votos = [r[5] for r in cargo_results]
 
+        tope = max(1, max(votos))
         ax.barh(nombres, votos, color='#3498db')
         ax.set_title(cargo)
         ax.set_xlabel('Votos')
+        ax.set_xlim(0, tope * 1.2)
         ax.invert_yaxis()
+        ax.tick_params(axis='y', labelsize=8)
+        ax.tick_params(axis='x', labelsize=8)
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 
         for index, value in enumerate(votos):
-            ax.text(value, index, f' {value}')
+            ax.text(value + tope * 0.02, index, f'{value}', va='center', fontsize=8)
 
-    fig.tight_layout(pad=3.0)
+    fig.tight_layout(pad=2.0)
     return fig

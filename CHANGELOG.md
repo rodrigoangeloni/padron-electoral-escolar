@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/Version-v1.6.3-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![Version](https://img.shields.io/badge/Version-v1.7.0-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![Python](https://img.shields.io/badge/Python-3.7+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
 </div>
@@ -16,6 +16,12 @@
 </div>
 
 ---
+
+## 🚀 [v1.7.0] - 2026-10-14 - Nómina de votantes en PDF
+
+### ✨ Novedades
+- **📋 Nómina de votantes (votaron / no votaron)**: botón "Nómina PDF" en Resultados que exporta el padrón dividido en ausentes y presentes (CI, nombre, apellido, grado), con resumen de participación. Respeta el filtro Mañana/Tarde/Ambos. Pensada para convocar solo a los ausentes en caso de empate. Tests en `tests/test_nomina.py` (5 tests).
+- **📊 Gráficos legibles con muchas candidatas**: la altura de la figura crece con la cantidad de candidatas (ya no colapsan las barras), nombres completos, eje X en enteros y scroll vertical en la pestaña. Tests en `tests/test_resultados_perf.py` (2 nuevos).
 
 ## 🚀 [v1.6.3] - 2026-10-14 - Fotos portables al mover la app
 
@@ -392,6 +398,7 @@
 
 | Versión | Fecha de Lanzamiento | Características | Correcciones | Tamaño del Código |
 |:---:|:---:|:---:|
+| 1.7.0 | 2026-10-14 | 2 | 0 | 📋 Nómina PDF + 📊 gráficos |
 | 1.6.3 | 2026-10-14 | 0 | 1 | 🖼️ Fotos portables |
 | 1.6.2 | 2026-10-14 | 1 | 0 | 🖼️ Foto ganador en acta |
 | 1.6.1 | 2026-10-13 | 0 | 2 | 🪟 Admin redimensionable |

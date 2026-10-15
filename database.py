@@ -482,12 +482,33 @@ class DatabaseManager:
     def get_votantes(self):
         """
         Obtiene todos los votantes registrados
-        
+
         Returns:
             list: Lista de tuplas (id, ci, nombre, apellido, grado_curso, ya_voto, turno)
         """
         self.cursor.execute('SELECT id, ci, nombre, apellido, grado_curso, ya_voto, turno FROM votantes')
         return self.cursor.fetchall()
+
+    def get_nomina(self, turno=None):
+        """Divide el padrón en votaron / no votaron, opcionalmente por turno.
+
+        Args:
+            turno: 'MAÑANA'/'TARDE' o None (todos).
+
+        Returns:
+            tuple: (votaron, no_votaron) con filas
+                (ci, nombre, apellido, grado_curso, turno).
+        """
+        sql = 'SELECT ci, nombre, apellido, grado_curso, turno, ya_voto FROM votantes'
+        params = ()
+        if turno:
+            sql += ' WHERE turno = ?'
+            params = (turno,)
+        sql += ' ORDER BY grado_curso, apellido, nombre'
+        filas = self.cursor.execute(sql, params).fetchall()
+        votaron = [(ci, n, a, g, t) for ci, n, a, g, t, y in filas if y]
+        no_votaron = [(ci, n, a, g, t) for ci, n, a, g, t, y in filas if not y]
+        return votaron, no_votaron
     
     def delete_votante(self, ci):
         self.cursor.execute('DELETE FROM votantes WHERE ci = ?', (ci,))

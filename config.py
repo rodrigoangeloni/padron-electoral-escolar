@@ -40,7 +40,7 @@ VOTACION_ACTIVA = 'activa'
 VOTACION_CERRADA = 'cerrada'
 
 # --- Aplicación ---
-APP_VERSION = "1.6.3"
+APP_VERSION = "1.7.0"
 DESARROLLADOR = "Rodrigo Angeloni"
 
 # --- Interfaz Gráfica ---
