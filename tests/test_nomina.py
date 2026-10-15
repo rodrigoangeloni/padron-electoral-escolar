@@ -104,3 +104,21 @@ def test_export_nomina_padron_vacio_no_falla(tmp_path):
         assert os.path.getsize(ruta) > 0
     finally:
         db.close()
+
+
+def test_nomina_encabezado_y_pie_con_nombre_del_sistema(tmp_path):
+    """La nómina también lleva el membrete del sistema + versión y el pie completo."""
+    from pypdf import PdfReader
+    import config
+
+    db = _nuevo_manager(tmp_path, "nom6.db")
+    try:
+        ruta = str(tmp_path / "nomina_membrete.pdf")
+        export_nomina(_secciones(db, ["MAÑANA"]), ruta)
+
+        texto = "\n".join((p.extract_text() or "") for p in PdfReader(ruta).pages)
+        assert "SISTEMA DE VOTACIÓN ESCOLAR" in texto
+        assert f"v{config.APP_VERSION}" in texto
+        assert config.DESARROLLADOR in texto
+    finally:
+        db.close()

@@ -121,6 +121,22 @@ def test_acta_firma_unica_y_pie_con_desarrollador(db_manager, tmp_path):
     assert f"v{config.APP_VERSION}" in texto
 
 
+def test_acta_encabezado_y_pie_con_nombre_del_sistema(db_manager, tmp_path):
+    """Encabezado con SISTEMA DE VOTACIÓN ESCOLAR + versión; pie completo."""
+    from pypdf import PdfReader
+    import config
+
+    _eleccion(db_manager)
+    ruta = str(tmp_path / "acta_membrete.pdf")
+
+    export_acta([_seccion(db_manager, "MAÑANA")], ruta)
+
+    texto = "\n".join((pagina.extract_text() or "") for pagina in PdfReader(ruta).pages)
+    assert "SISTEMA DE VOTACIÓN ESCOLAR" in texto
+    assert (f"SISTEMA DE VOTACIÓN ESCOLAR - Desarrollado por {config.DESARROLLADOR} "
+            f"- v{config.APP_VERSION}") in texto
+
+
 def _tiene_imagenes(ruta):
     """Detecta objetos /Image dentro del PDF (fpdf incrusta la foto del ganador)."""
     from pypdf import PdfReader

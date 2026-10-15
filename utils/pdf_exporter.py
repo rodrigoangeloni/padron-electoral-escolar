@@ -4,7 +4,8 @@ Exportación del acta de resultados a PDF.
 Cada sección corresponde a un turno (o al general) e incluye:
 participación del padrón, ganadores con porcentaje y tabla detallada.
 Al final va la línea de firma del presidente de mesa o encargado.
-El pie de página acredita al desarrollador y la versión del programa.
+Encabezado con el nombre del sistema + versión; pie con el nombre del
+sistema, el desarrollador y la versión del programa.
 """
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
@@ -18,6 +19,12 @@ FOTO_GANADOR_MM = 22  # ancho del thumbnail del ganador
 class PDFExporter(FPDF):
     def header(self):
         self.set_font(FONT, 'B', 16)
+        self.cell(0, 10, 'SISTEMA DE VOTACIÓN ESCOLAR',
+                  new_x=XPos.LMARGIN, new_y=YPos.NEXT, align='C')
+        self.set_font(FONT, '', 10)
+        self.cell(0, 6, f'v{config.APP_VERSION}',
+                  new_x=XPos.LMARGIN, new_y=YPos.NEXT, align='C')
+        self.set_font(FONT, 'B', 14)
         titulo = getattr(self, 'titulo_reporte', 'Acta de Resultados Electorales')
         self.cell(0, 10, titulo, new_x=XPos.LMARGIN, new_y=YPos.NEXT, align='C')
         self.set_font(FONT, '', 8)
@@ -28,7 +35,8 @@ class PDFExporter(FPDF):
     def footer(self):
         self.set_y(-15)
         self.set_font(FONT, 'I', 8)
-        self.cell(0, 10, f'Desarrollado por {config.DESARROLLADOR} - v{config.APP_VERSION}',
+        self.cell(0, 10, f'SISTEMA DE VOTACIÓN ESCOLAR - Desarrollado por '
+                         f'{config.DESARROLLADOR} - v{config.APP_VERSION}',
                   new_x=XPos.RIGHT, new_y=YPos.TOP, align='L')
         self.set_x(-60)
         self.cell(0, 10, f'Página {self.page_no()}/{{nb}}',

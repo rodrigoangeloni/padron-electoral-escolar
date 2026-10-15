@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/Version-v1.7.0-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
+[![Version](https://img.shields.io/badge/Version-v1.7.1-blue.svg?style=for-the-badge)](https://github.com/rodrigoangeloni/padron-electoral-escolar)
 [![Python](https://img.shields.io/badge/Python-3.7+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
 </div>
@@ -16,6 +16,11 @@
 </div>
 
 ---
+
+## 🚀 [v1.7.1] - 2026-10-14 - Membrete del sistema en los PDF
+
+### ✨ Novedades
+- **📄 Encabezado y pie con el nombre del sistema**: todos los PDF llevan `SISTEMA DE VOTACIÓN ESCOLAR` + versión en el encabezado y `SISTEMA DE VOTACIÓN ESCOLAR - Desarrollado por Rodrigo Angeloni - vX.Y.Z` en el pie (aplica al acta y a la nómina).
 
 ## 🚀 [v1.7.0] - 2026-10-14 - Nómina de votantes en PDF
 
@@ -398,6 +403,7 @@
 
 | Versión | Fecha de Lanzamiento | Características | Correcciones | Tamaño del Código |
 |:---:|:---:|:---:|
+| 1.7.1 | 2026-10-14 | 1 | 0 | 📄 Membrete en PDF |
 | 1.7.0 | 2026-10-14 | 2 | 0 | 📋 Nómina PDF + 📊 gráficos |
 | 1.6.3 | 2026-10-14 | 0 | 1 | 🖼️ Fotos portables |
 | 1.6.2 | 2026-10-14 | 1 | 0 | 🖼️ Foto ganador en acta |
